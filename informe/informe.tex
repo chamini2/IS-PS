@@ -1,0 +1,88 @@
+\documentclass{ci5652}
+\usepackage{graphicx,amssymb,amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{subfigure}
+\usepackage{paralist}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+%----------------------- Macros and Definitions --------------------------
+
+% Add all additional macros here, do NOT include any additional files.
+
+% The environments theorem (Theorem), invar (Invariant), lemma (Lemma),
+% cor (Corollary), obs (Observation), conj (Conjecture), and prop
+% (Proposition) are already defined in the ci5652.cls file.
+
+%----------------------- Title -------------------------------------------
+
+\title{Titulo del paper}
+
+\author{Emely Arráiz
+        \and
+        Alejandro Flores}
+
+%------------------------------ Text -------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+\maketitle
+
+
+\begin{abstract}
+Una descripción breve del paper.
+\end{abstract}
+
+\section{Una sección cualquiera}
+Citan así~\cite{so2005}.
+
+\begin{algorithm}
+ \DontPrintSemicolon
+ \vspace*{0.1cm}
+ \KwIn{Descripcion}
+ \KwOut{Descripcion}
+ Primer paso\;
+ Segundo\;
+ \ForEach{$i = 1\dots n$}{
+  \If{Alguna condición}{
+   Algo aqui\;
+   }
+ }
+ \KwRet{Valor}
+ \vspace*{0.1cm}
+ \caption{Nombre}
+\end{algorithm}
+
+
+\section{Otra sección}
+
+Hola.
+
+\section*{Conclusiones}
+
+Aquí concluyen.
+
+%---------------------------- Bibliography -------------------------------
+
+% Please add the contents of the .bbl file that you generate,  or add bibitem entries manually if you like.
+% The entries should be in alphabetical order
+\small
+\bibliographystyle{abbrv}
+
+\begin{thebibliography}{99}
+
+\bibitem{so2005}
+C. So and H. So.
+\newblock A groundbreaking result.
+\newblock {\em Journal of Everything}, 59(2):23--37, 2005.
+
+\end{thebibliography}
+
+
+\newpage
+\section*{Apéndice}
+
+Bla.
+
+\end{document}
