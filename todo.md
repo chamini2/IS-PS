@@ -6,7 +6,7 @@
 - [ ] Describr las aplicaciones
 
 # Implementación
-- [ ] Definir representación de las soluciones del meta-problema
+- [x] on 2015-05-03 17:10:11 | Definir representación de las soluciones del meta-problema
 - [ ] Probar representación de las soluciones del meta-problema
 - [ ] Definir operador de vecindad
 - [ ] Probar operador de vecindad
