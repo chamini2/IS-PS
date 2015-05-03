@@ -10,7 +10,7 @@
 - [ ] Probar representación de las soluciones del meta-problema
 - [ ] Definir operador de vecindad
 - [ ] Probar operador de vecindad
-- [ ] Implementar 1-NN
+- [ ] Implementar 1-NN @chamini2
 - [ ] Probar 1-NN
 - [ ] Definir función de evaluacion
 - [ ] Probar función de evaluacion
