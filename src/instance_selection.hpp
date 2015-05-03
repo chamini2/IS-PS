@@ -3,8 +3,13 @@
 
 #define repeat(N) for(int i = 0; i < N; ++i)
 
+#include <cstdlib>
+
 #include <unordered_set>
 using std::unordered_set; 
+
+#include <unordered_map>
+using std::unordered_map; 
 
 // Template class to handle IS-PS solution representation
 // Template arguments: 
@@ -17,6 +22,11 @@ template <typename Point,
 class PopulationMap {
 public:
     PopulationMap() { }
+    PopulationMap(const PopulationMap& obj) {
+        points_to_toggle_ = obj->points_to_toggle_;
+        selected_points_ = obj->selected_points_;
+        unselected_points_ = obj->unselected_points_;
+    }
     // TODO: Generate (or not) initial solution
     PopulationMap(unordered_set<Point> data, int points_to_toggle) : 
                                                 points_to_toggle_ ( points_to_toggle ),
@@ -75,16 +85,45 @@ private:
     unordered_set<Point> unselected_points_;   
 };
 
-// One Nearest Neighbors classifier function
-// Arguments: p of class Point which is the point representation of the problem
-// Return value: it returns a type Class which is the classifies Point
-template <typename Class, typename Point>
-Class OneNN(Point) {
+// Performs a local search on the current map
+template <typename P, typename C, C (*F)(P, const unordered_set<P>&)>
+PopulationMap<P,C,F> LocalSearchFirstFound(const PopulationMap<P,C,F>& map, int iterations) {
+    unordered_map<PopulationMap<P,C,F>,bool> visited;
+    float map_quality = map.EvaluateQuality;
+
+    return LocalSearchFirstFound<P,C,F>(map, map_quality, iterations, iterations, visited);
+}
+template <typename P, typename C, C (*F)(P, const unordered_set<P>&)>
+PopulationMap<P,C,F> LocalSearchFirstFound(const PopulationMap<P,C,F>& map,
+                                          float map_quality,
+                                          int curr_iterations, int max_tierations, 
+                                          unordered_map<PopulationMap<P,C,F>,bool>& visited) {
+    PopulationMap<P,C,F> copy_map(map);
+    copy_map.NeighborhoodOperator();
+
+    if (curr_iterations == 0) {
+        return map;
+    }
+
+    if (visited[copy_map]) {
+        return LocalSearchFirstFound<P,C,F>(map, map_quality, curr_iterations, max_tierations, visited);
+
+    } else {
+        visited[copy_map] = true;
+
+        float copy_quality = copy_map.EvaluateQuality();
+
+        if (copy_quality > copy_map) {
+            return LocalSearchFirstFound<P,C,F>(copy_map, copy_quality, max_tierations, max_tierations, visited);
+        } else {
+            return LocalSearchFirstFound<P,C,F>(map, map_quality, curr_iterations - 1, max_tierations, visited);
+        }
+        
+    }
 }
 
-// Performs a local search on the current map
-void LocalSearchFirstFound(void);  
-void LocalSearchBestOfAll(void); 
-void LocalSearchBestOfPartial(int); // The argument is the percentage from 1 to 100
-void LocalSearchTopSolutions(int);  // The argument is the number of best solutions to keep
+// PopulationMap LocalSearchBestOfAll(const PopulationMap&);
+// PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
+// PopulationMap LocalSearchTopSolutions(const PopulationMap&, int);  // The argument is the number of best solutions to keep
+
 #endif
