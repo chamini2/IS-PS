@@ -6,9 +6,16 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
+#include <cstdio>
 
 #include <set>
 using std::multiset; 
+
+#include <iostream>
+using std::cout; 
+using std::endl; 
+using std::ostream; 
 
 // Template class to handle IS-PS solution representation
 // Template arguments: 
@@ -18,15 +25,15 @@ using std::multiset;
 template <typename Point, 
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float, float)>
+          float (*fitness)(float, float, float)>
 class PopulationMap {
 public:
     PopulationMap() { }
     PopulationMap(const PopulationMap& obj) {
-        points_to_toggle_ = obj->points_to_toggle_;
-        selected_points_ = obj->selected_points_;
-        unselected_points_ = obj->unselected_points_;
-        correctness_weight_ = obj->correctness_weight_;
+        points_to_toggle_   = obj.points_to_toggle_;
+        selected_points_    = obj.selected_points_;
+        unselected_points_  = obj.unselected_points_;
+        correctness_weight_ = obj.correctness_weight_;
     }
     // TODO: Generate (or not) initial solution
     PopulationMap(multiset<Point> data, 
@@ -45,6 +52,7 @@ public:
     // Function that modifies the map to generate a new neighbor solution map
     void NeighborhoodOperator(void) {
 
+        cout << selected_points_.size() << " -> ";  
         // This function may toggle the same point more than once
         repeat(points_to_toggle_) {
             auto random_point_iterator =
@@ -54,10 +62,10 @@ public:
             Point random_point = *random_point_iterator; 
             toggle(random_point); 
         }
+        cout << selected_points_.size() << "\n"; 
     }
     // Function that evaluates the current map's quality
-    // TODO: Check return type of evaluation
-    float EvaluateQuality(void) {
+    float EvaluateQuality(void) const {
 
         float classification_correctness = RunClassifier();
         float reduction_percentage = unselected_points_.size() / 
@@ -66,10 +74,16 @@ public:
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
     }
 
+    
+    multiset<Point> selected_points() const { return selected_points_; }   
+
+    int TotalSize() const { return selected_points_.size() + unselected_points_.size(); }
+    int size() const { return selected_points_.size(); }
+
 private:
     // Toggles points between selected and unselected points sets.
     void toggle(Point p) {
-        if (selected_points_.count(p) == 0) {
+        if (selected_points_.find(p) == selected_points_.end()) {
             unselected_points_.erase(p); 
             selected_points_.insert(p); 
         } else {
@@ -80,11 +94,10 @@ private:
 
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
-    float RunClassifier() {
+    float RunClassifier() const {
         int correct = 0; 
 
-        for (auto kv : selected_points_) {
-            Point p = kv->first; 
+        for (Point p: selected_points_) {
             if (p.ClassLabel() == classify(p, selected_points_)) {
                 ++correct; 
             }
@@ -99,13 +112,27 @@ private:
     float correctness_weight_;   
 };
 
+template <typename Point, 
+          typename Class, 
+          Class (*classify)(Point, const multiset<Point>&), 
+          float (*fitness)(float,float,float)>
+std::ostream& operator<<(std::ostream& os, const PopulationMap<Point, Class, classify, fitness>& obj) {
+    os << "Number of points " << obj.size() << endl; 
+    os << "Points: " << endl; 
+    for (Point p : obj.selected_points()) {
+        os << p << endl;
+    }
+
+    return os; 
+}
+
 // Performs a local search on the current map
 template <typename Point, 
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&), 
-          float (*fitness)(float, float)>
+          float (*fitness)(float,float,float)>
 PopulationMap<Point,Class,classify,fitness> LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
-    float map_quality = map.EvaluateQuality;
+    float map_quality = map.EvaluateQuality();
 
     assert(iterations > 0);
 
@@ -115,23 +142,24 @@ PopulationMap<Point,Class,classify,fitness> LocalSearchFirstFound(const Populati
 template <typename Point, 
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float,float)>
+          float (*fitness)(float,float,float)>
 PopulationMap<Point,Class,classify,fitness> LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map,
                                           float map_quality,
-                                          int curr_iterations, int max_tierations) {
+                                          int curr_iterations, int max_iterations) {
     PopulationMap<Point,Class,classify,fitness> copy_map(map);
-    copy_map.NeighborhoodOperator();
+    cout << copy_map.TotalSize() << " -- " << copy_map.size() << " -- " << copy_map.TotalSize() - copy_map.size() << endl; 
 
     if (curr_iterations == 0) {
         return map;
     }
 
+    copy_map.NeighborhoodOperator();
     float copy_quality = copy_map.EvaluateQuality();
 
-    if (copy_quality > copy_map) {
-        return LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, copy_quality, max_tierations, max_tierations);
+    if (copy_quality > map_quality) {
+        return LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, copy_quality, max_iterations, max_iterations);
     } else {
-        return LocalSearchFirstFound<Point,Class,classify,fitness>(map, map_quality, curr_iterations - 1, max_tierations);
+        return LocalSearchFirstFound<Point,Class,classify,fitness>(map, map_quality, curr_iterations - 1, max_iterations);
     }
 }
 

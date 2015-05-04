@@ -13,24 +13,32 @@ using std::unordered_map;
 #include <set>
 using std::multiset;
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 using std::pair;
 using std::make_pair;
 
+#include <gflags/gflags.h>
+
 #include "point_interface.hpp"
 #include "instance_selection.hpp"
+#include "classifiers.hpp"
+#include "fitness.hpp"
 
 class BalloonPoint : public PointInterface<bool> {
 public:
 
     BalloonPoint(bool class_label, vector<float> attributes) : 
-                        PointInterface<bool> ( class_label, attributes_ ) {
+                        PointInterface<bool> ( class_label, attributes ) {
     }
 
     // attributes_[0] == YELLOW/PURPLE (0/1)
     // attributes_[1] == SMALL/LARGE   (0/1)
     // attributes_[2] == DIP/STRETCH   (0/1)
     // attributes_[3] == ADULT/CHILD   (0/1)
-    float distance(PointInterface<bool> obj) {
+    float distance(const PointInterface<bool>& obj) {
         int size = attributes_.size();
         float distance = 0;
 
@@ -45,7 +53,15 @@ public:
 
 };
 
-inline bool operator < (const BalloonPoint& lhs, const BalloonPoint& rhs) {
+std::ostream& operator<<(std::ostream& os, const BalloonPoint& obj) {
+    for (float f : obj.attributes()) {
+        os << f << ", ";
+    }
+
+    return os; 
+}
+
+inline bool operator<(const BalloonPoint& lhs, const BalloonPoint& rhs) {
     int size = lhs.attributes().size();
 
     for (int i = 0; i < size; ++i) {
@@ -57,6 +73,12 @@ inline bool operator < (const BalloonPoint& lhs, const BalloonPoint& rhs) {
     return false;
 }
 
+// Flags to use
+DEFINE_int32(points_to_toggle, 2, "Puntos a incluir/excluir del conjunto solución");
+DEFINE_int32(local_iterations, 10, "Número de iteraciones antes de parar la búsqueda local");
+DEFINE_string(data_file, "./data.dat", "Archivo de datos para pruebas");
+
+
 pair<bool, vector<float> > ParseCSV(unordered_map<string, float>& rule,
                                     unordered_map<string, bool>& class_rule, 
                                     char* line);
@@ -64,10 +86,11 @@ multiset< BalloonPoint > ParseFile(unordered_map<string, float>& rule,
                                             unordered_map<string, bool>& class_rule, 
                                             const char* file);
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
+
+    google::ParseCommandLineFlags(&argc, &argv, true);
 
     multiset<BalloonPoint> points;
-
     unordered_map<string, float> rule = {
                                         {"YELLOW",0.0}, {"PURPLE",1.0}, 
                                         {"SMALL",0.0},  {"LARGE",1.0}, 
@@ -76,10 +99,27 @@ int main(int argc, char const *argv[]) {
                                     };
     unordered_map<string, bool> class_rule = {{"T",true}, {"F",false}};
 
-    printf("Reading file\n");
+    printf("Reading data from file %s ... ", FLAGS_data_file.c_str());
     fflush(stdout);
-    points = ParseFile(rule, class_rule, argv[1]);
-    printf("Reading file\n");
+    points = ParseFile(rule, class_rule, FLAGS_data_file.c_str());
+    printf("done\n");
+    fflush(stdout);
+
+    PopulationMap<BalloonPoint, bool, 
+                  OneNN, EulerQuality> pop_map(points, FLAGS_points_to_toggle); 
+
+
+    printf("Starting local search ... ");
+    fflush(stdout);
+    PopulationMap<BalloonPoint, bool, 
+                  OneNN, EulerQuality> best_map = LocalSearchFirstFound<BalloonPoint, bool, OneNN, EulerQuality>(pop_map, FLAGS_local_iterations);
+    printf("done\n");
+    fflush(stdout);
+
+    printf("Results:\n");
+    cout << pop_map << endl; 
+    cout << "----------------------" << endl; 
+    cout << best_map << endl; 
 
     return 0;
 }
@@ -97,23 +137,8 @@ multiset<BalloonPoint> ParseFile(unordered_map<string, float>& rule,
     assert(fp != NULL);
 
     while (getline(&line, &len, fp) != -1) {
-        printf("%s\n", line);
-        fflush(stdout);
-
         auto balloon_pair = ParseCSV(rule, class_rule, line);
-
-        printf("after\n");
-        fflush(stdout);
-        
-        BalloonPoint bp = BalloonPoint(balloon_pair.first, balloon_pair.second);
-
-        printf("after3\n");
-        fflush(stdout);
-
-        points.insert(bp);
-
-        printf("after2\n");
-        fflush(stdout);
+        points.insert(BalloonPoint(balloon_pair.first, balloon_pair.second));
     }
 
     return points;
@@ -128,23 +153,12 @@ pair<bool, vector<float> > ParseCSV(unordered_map<string, float>& rule,
     field = strtok(line, ",");
     next = strtok(NULL, ",");
     while (next != NULL) {
-        printf("%s", field);
-        printf(" | %s\n", next);
-        fflush(stdout);
 
         attributes.push_back(rule[field]);
         field = next;
         next = strtok(NULL, ",");
     }
 
-    for (float f : attributes) {
-        printf("%f, ", f);
-    }
-    printf("\n");
-
     field[strlen(field)-1] = '\0';
-    printf("'%d'\n", class_rule[field]);
-    fflush(stdout);
-
     return make_pair(class_rule[field], attributes);
 }

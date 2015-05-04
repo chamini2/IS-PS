@@ -18,7 +18,7 @@ public:
     ~PointInterface() {}
     // Returns the class label of type Class
     Class ClassLabel() { return class_label_; }
-    virtual float distance(PointInterface<Class>) = 0;
+    virtual float distance(const PointInterface<Class>&)=0;
     vector<float> attributes() const { return attributes_; }
 protected:
     Class class_label_;
