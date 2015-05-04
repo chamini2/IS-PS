@@ -54,12 +54,20 @@ public:
 
         cout << selected_points_.size() << " -> ";  
         // This function may toggle the same point more than once
-        // FIXME: Only taking from selected to unselected, make a randome 
-        // choice of that first
         repeat(points_to_toggle_) {
+
+            // We choose either selected_points_ or unselected_points_ (random)
+            // If any of them is empty, the we take the other one
+            int random_to_pick_set = rand() % 2; 
+            const multiset<Point>& set_to_use = ((random_to_pick_set && 
+                                                  !selected_points_.empty()) || 
+                                                  unselected_points_.empty() ? selected_points_ : 
+                                                                                 unselected_points_); 
+
+
             auto random_point_iterator =
-                std::next(std::begin(selected_points_), 
-                          std::rand() % selected_points_.size()); 
+                std::next(std::begin(set_to_use), 
+                          std::rand() % set_to_use.size()); 
 
             Point random_point = *random_point_iterator; 
             toggle(random_point); 
@@ -94,18 +102,42 @@ private:
         }
     }
 
+    // TODO: Use this as an initial solution
+    void GenerateRandomSolution() {
+
+        // TODO: Add unselected_points_ too
+        multiset<Point> data(selected_points_); 
+
+        // Clear both sets
+        selected_points_.clear(); 
+        unselected_points_.clear(); 
+        // First we randomize the selected_points
+        for (auto itr = data.begin(); itr != data.end(); ++itr) {
+            int use_in_solution = rand() % 2; 
+
+            if (use_in_solution == 1) {
+                selected_points_.insert(*itr); 
+            } else {
+                unselected_points_.insert(*itr); 
+            }
+        }
+    }
+
+    // TODO: Implement Greedy solution (CNN, RNN, etc)
+    void GenerateGreedySolution() {}
+
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
     float RunClassifier() const {
         int correct = 0; 
 
-        for (Point p: selected_points_) {
-            if (p.ClassLabel() == classify(p, selected_points_)) {
+        for (Point p: unselected_points_) {
+            if (p.ClassLabel() == classify(p, unselected_points_)) {
                 ++correct; 
             }
         }
 
-        return (float) correct / selected_points_.size(); 
+        return (float) correct / unselected_points_.size(); 
     }
 
     int points_to_toggle_; 
@@ -133,7 +165,9 @@ template <typename Point,
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&), 
           float (*fitness)(float,float,float)>
-PopulationMap<Point,Class,classify,fitness> LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+PopulationMap<Point,Class,classify,fitness> 
+    LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map, 
+                                                                int iterations) {
     float map_quality = map.EvaluateQuality();
 
     assert(iterations > 0);
@@ -145,11 +179,15 @@ template <typename Point,
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&),
           float (*fitness)(float,float,float)>
-PopulationMap<Point,Class,classify,fitness> LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map,
-                                          float map_quality,
-                                          int curr_iterations, int max_iterations) {
+PopulationMap<Point,Class,classify,fitness> 
+    LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map, 
+                                                            float map_quality, 
+                                                            int curr_iterations, 
+                                                            int max_iterations) {
     PopulationMap<Point,Class,classify,fitness> copy_map(map);
-    cout << copy_map.TotalSize() << " -- " << copy_map.size() << " -- " << copy_map.TotalSize() - copy_map.size() << endl; 
+    cout << copy_map.TotalSize() 
+         << " -- " << copy_map.size() 
+         << " -- " << copy_map.TotalSize() - copy_map.size() << endl; 
 
     if (curr_iterations == 0) {
         return map;
@@ -159,9 +197,15 @@ PopulationMap<Point,Class,classify,fitness> LocalSearchFirstFound(const Populati
     float copy_quality = copy_map.EvaluateQuality();
 
     if (copy_quality > map_quality) {
-        return LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, copy_quality, max_iterations, max_iterations);
+        return LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, 
+                                                                   copy_quality, 
+                                                                   max_iterations, 
+                                                                   max_iterations);
     } else {
-        return LocalSearchFirstFound<Point,Class,classify,fitness>(map, map_quality, curr_iterations - 1, max_iterations);
+        return LocalSearchFirstFound<Point,Class,classify,fitness>(map, 
+                                                                   map_quality, 
+                                                                   curr_iterations - 1, 
+                                                                   max_iterations);
     }
 }
 
