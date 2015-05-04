@@ -54,6 +54,8 @@ public:
 
         cout << selected_points_.size() << " -> ";  
         // This function may toggle the same point more than once
+        // FIXME: Only taking from selected to unselected, make a randome 
+        // choice of that first
         repeat(points_to_toggle_) {
             auto random_point_iterator =
                 std::next(std::begin(selected_points_), 
