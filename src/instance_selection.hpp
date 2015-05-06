@@ -3,6 +3,8 @@
 
 #define repeat(N) for(int i = 0; i < N; ++i)
 
+#define TEST_PRIVATE_ATTRIBUTES 1 // 1 => enable testing in private members of the classes
+
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -16,6 +18,10 @@ using std::multiset;
 using std::cout; 
 using std::endl; 
 using std::ostream; 
+
+#ifdef TEST_PRIVATE_ATTRIBUTES 
+#include "gtest-1.7.0/include/gtest/gtest.h"
+#endif
 
 // Template class to handle IS-PS solution representation
 // Template arguments: 
@@ -64,7 +70,6 @@ public:
                                                   unselected_points_.empty() ? selected_points_ : 
                                                                                  unselected_points_); 
 
-
             auto random_point_iterator =
                 std::next(std::begin(set_to_use), 
                           std::rand() % set_to_use.size()); 
@@ -77,14 +82,12 @@ public:
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
 
-        float classification_correctness = RunClassifier();
-        float reduction_percentage = unselected_points_.size() / 
-                                    (unselected_points_.size() +
-                                        selected_points_.size());
+        float classification_correctness = RunClassifier(unselected_points_);
+        float reduction_percentage       = GetReductionPercentage();
+
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
     }
 
-    
     multiset<Point> selected_points() const { return selected_points_; }   
     multiset<Point> unselected_points() const { return unselected_points_; }   
 
@@ -93,6 +96,13 @@ public:
     int UnselectedPointsSize() const { return unselected_points_.size(); }
 
 private:
+
+    friend class BallonPointTest;
+#ifdef TEST_PRIVATE_ATTRIBUTES 
+    FRIEND_TEST(BallonPointTest, TogglingPoints); 
+    FRIEND_TEST(BallonPointTest, FitnessFunction); 
+#endif
+
     // Toggles points between selected and unselected points sets.
     void toggle(Point p) {
         if (selected_points_.find(p) == selected_points_.end()) {
@@ -104,11 +114,16 @@ private:
         }
     }
 
+    float GetReductionPercentage() const {
+        return float(unselected_points_.size()) / (unselected_points_.size() +
+                                                        selected_points_.size()); 
+    }
+
     // TODO: Use this as an initial solution
     void GenerateRandomSolution() {
 
-        // TODO: Add unselected_points_ too
         multiset<Point> data(selected_points_); 
+        data.insert(unselected_points_.begin(), unselected_points_.end()); 
 
         // Clear both sets
         selected_points_.clear(); 
@@ -126,20 +141,22 @@ private:
     }
 
     // TODO: Implement Greedy solution (CNN, RNN, etc)
-    void GenerateGreedySolution() {}
+    void CNN() {}
+    void MCNN() {}
+    void RNN() {}
 
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
-    float RunClassifier() const {
+    float RunClassifier(const multiset<Point>& training_set) const {
         int correct = 0; 
 
-        for (Point p: unselected_points_) {
-            if (p.ClassLabel() == classify(p, unselected_points_)) {
+        for (Point p: training_set) {
+            if (p.ClassLabel() == classify(p, training_set)) {
                 ++correct; 
             }
         }
 
-        return (float) correct / unselected_points_.size(); 
+        return (float) (correct / training_set.size()); 
     }
 
     int points_to_toggle_; 
