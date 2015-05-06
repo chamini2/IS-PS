@@ -86,9 +86,11 @@ public:
 
     
     multiset<Point> selected_points() const { return selected_points_; }   
+    multiset<Point> unselected_points() const { return unselected_points_; }   
 
     int TotalSize() const { return selected_points_.size() + unselected_points_.size(); }
-    int size() const { return selected_points_.size(); }
+    int SelectedPointsSize() const { return selected_points_.size(); }
+    int UnselectedPointsSize() const { return unselected_points_.size(); }
 
 private:
     // Toggles points between selected and unselected points sets.
@@ -151,7 +153,7 @@ template <typename Point,
           Class (*classify)(Point, const multiset<Point>&), 
           float (*fitness)(float,float,float)>
 std::ostream& operator<<(std::ostream& os, const PopulationMap<Point, Class, classify, fitness>& obj) {
-    os << "Number of points " << obj.size() << endl; 
+    os << "Number of points " << obj.SelectedPointsSize() << endl; 
     os << "Points: " << endl; 
     for (Point p : obj.selected_points()) {
         os << p << endl;
@@ -186,8 +188,8 @@ PopulationMap<Point,Class,classify,fitness>
                                                             int max_iterations) {
     PopulationMap<Point,Class,classify,fitness> copy_map(map);
     cout << copy_map.TotalSize() 
-         << " -- " << copy_map.size() 
-         << " -- " << copy_map.TotalSize() - copy_map.size() << endl; 
+         << " -- " << copy_map.SelectedPointsSize() 
+         << " -- " << copy_map.TotalSize() - copy_map.SelectedPointsSize() << endl; 
 
     if (curr_iterations == 0) {
         return map;
