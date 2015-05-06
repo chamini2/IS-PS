@@ -1,7 +1,7 @@
 top: clean balloons
 
 balloons: fitness
-	g++ balloons.cpp -std=c++11 -g -o balloons -I./gflags/2.1.2/include/ \
+	g++ balloons.cpp -std=c++11 -g -O2 -o balloons -I./gflags/2.1.2/include/ \
 		./gflags-2.1.2/lib/libgflags.a ./gflags-2.1.2/lib/libgflags_nothreads.a -lpthread fitness.o
 
 fitness: fitness.cpp fitness.hpp

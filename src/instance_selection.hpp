@@ -19,7 +19,7 @@ using std::cout;
 using std::endl; 
 using std::ostream; 
 
-#ifdef TEST_PRIVATE_ATTRIBUTES 
+#if TEST_PRIVATE_ATTRIBUTES 
 #include "gtest-1.7.0/include/gtest/gtest.h"
 #endif
 
@@ -57,8 +57,6 @@ public:
 
     // Function that modifies the map to generate a new neighbor solution map
     void NeighborhoodOperator(void) {
-
-        cout << selected_points_.size() << " -> ";  
         // This function may toggle the same point more than once
         repeat(points_to_toggle_) {
 
@@ -77,12 +75,11 @@ public:
             Point random_point = *random_point_iterator; 
             toggle(random_point); 
         }
-        cout << selected_points_.size() << "\n"; 
     }
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
 
-        float classification_correctness = RunClassifier(unselected_points_);
+        float classification_correctness = RunClassifier(selected_points_,unselected_points_);
         float reduction_percentage       = GetReductionPercentage();
 
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
@@ -98,26 +95,26 @@ public:
 private:
 
     friend class BallonPointTest;
-#ifdef TEST_PRIVATE_ATTRIBUTES 
+#if TEST_PRIVATE_ATTRIBUTES 
     FRIEND_TEST(BallonPointTest, TogglingPoints); 
     FRIEND_TEST(BallonPointTest, FitnessFunction); 
 #endif
 
     // Toggles points between selected and unselected points sets.
     void toggle(Point p) {
-        if (selected_points_.find(p) == selected_points_.end()) {
-            unselected_points_.erase(p); 
-            selected_points_.insert(p); 
-        } else {
-            selected_points_.erase(p); 
+        auto point_itr(selected_points_.find(p)); 
+        if (point_itr != selected_points_.end()) {
+            selected_points_.erase(point_itr); 
             unselected_points_.insert(p); 
+        } else {
+            auto point_itr(unselected_points_.find(p)); 
+            if (point_itr != unselected_points_.end()) {
+                unselected_points_.erase(point_itr); 
+                selected_points_.insert(p); 
+            }
         }
     }
 
-    float GetReductionPercentage() const {
-        return float(unselected_points_.size()) / (unselected_points_.size() +
-                                                        selected_points_.size()); 
-    }
 
     // TODO: Use this as an initial solution
     void GenerateRandomSolution() {
@@ -147,16 +144,27 @@ private:
 
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
-    float RunClassifier(const multiset<Point>& training_set) const {
+    float RunClassifier(const multiset<Point>& training_set, 
+                                    const multiset<Point>& testing_set) const {
+
+        if (testing_set.empty()) {
+            return 0.0; 
+        }
+
         int correct = 0; 
 
-        for (Point p: training_set) {
+        for (Point p: testing_set) {
             if (p.ClassLabel() == classify(p, training_set)) {
                 ++correct; 
             }
         }
 
-        return (float) (correct / training_set.size()); 
+        return (float) (correct / testing_set.size()); 
+    }
+
+    float GetReductionPercentage() const {
+        return float(unselected_points_.size()) / (unselected_points_.size() +
+                                                        selected_points_.size()); 
     }
 
     int points_to_toggle_; 
@@ -204,9 +212,9 @@ PopulationMap<Point,Class,classify,fitness>
                                                             int curr_iterations, 
                                                             int max_iterations) {
     PopulationMap<Point,Class,classify,fitness> copy_map(map);
-    cout << copy_map.TotalSize() 
-         << " -- " << copy_map.SelectedPointsSize() 
-         << " -- " << copy_map.TotalSize() - copy_map.SelectedPointsSize() << endl; 
+        cout << copy_map.SelectedPointsSize() 
+             << " -- " << copy_map.UnselectedPointsSize()
+             << " -- " << copy_map.TotalSize() << endl; 
 
     if (curr_iterations == 0) {
         return map;
@@ -215,17 +223,15 @@ PopulationMap<Point,Class,classify,fitness>
     copy_map.NeighborhoodOperator();
     float copy_quality = copy_map.EvaluateQuality();
 
-    if (copy_quality > map_quality) {
-        return LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, 
-                                                                   copy_quality, 
-                                                                   max_iterations, 
-                                                                   max_iterations);
-    } else {
-        return LocalSearchFirstFound<Point,Class,classify,fitness>(map, 
-                                                                   map_quality, 
-                                                                   curr_iterations - 1, 
-                                                                   max_iterations);
-    }
+    return copy_quality > map_quality ? 
+                LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, 
+                                                                    copy_quality, 
+                                                                    max_iterations, 
+                                                                    max_iterations) :
+                LocalSearchFirstFound<Point,Class,classify,fitness>(map, 
+                                                                    map_quality, 
+                                                                    curr_iterations - 1, 
+                                                                    max_iterations);
 }
 
 // PopulationMap LocalSearchBestOfAll(const PopulationMap&);

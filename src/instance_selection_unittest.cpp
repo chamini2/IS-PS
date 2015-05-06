@@ -63,10 +63,10 @@ TEST_F(BallonPointTest, PopulationMapConsistency) {
                                                             pop_map.TotalSize()); 
 }
 
-#ifdef TEST_PRIVATE_ATTRIBUTES 
+#if TEST_PRIVATE_ATTRIBUTES 
 TEST_F(BallonPointTest, FitnessFunction) {
     PopulationMap<BalloonPoint, bool, OneNN, EulerQuality> copy_map(pop_map); 
-    float classification_correctness = copy_map.RunClassifier(copy_map.selected_points_); 
+    float classification_correctness = copy_map.RunClassifier(copy_map.selected_points_, copy_map.selected_points_); 
 
     EXPECT_EQ(classification_correctness, 1); 
 
