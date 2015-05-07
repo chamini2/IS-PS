@@ -1,4 +1,0 @@
-/home/juan/Uni/Diseño2/IS-PS/src/gflags-2.1.2/CMakeFiles/gflags.dir
-/home/juan/Uni/Diseño2/IS-PS/src/gflags-2.1.2/CMakeFiles/gflags-static.dir
-/home/juan/Uni/Diseño2/IS-PS/src/gflags-2.1.2/CMakeFiles/gflags_nothreads.dir
-/home/juan/Uni/Diseño2/IS-PS/src/gflags-2.1.2/CMakeFiles/gflags_nothreads-static.dir

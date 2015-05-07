@@ -1,2 +1,0 @@
-/usr/bin/ar cr lib/libgflags.a  CMakeFiles/gflags-static.dir/src/gflags.cc.o CMakeFiles/gflags-static.dir/src/gflags_reporting.cc.o CMakeFiles/gflags-static.dir/src/gflags_completions.cc.o
-/usr/bin/ranlib lib/libgflags.a
