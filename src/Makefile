@@ -8,7 +8,7 @@ fitness: fitness.cpp fitness.hpp
 	g++ fitness.cpp -std=c++11 -g -c 
 
 run: balloons
-	@./balloons --data_file=../data/balloons/adult-stretch.data --points_to_toggle=3 --local_iterations=100
+	@./balloons --data_file=../data/balloons/adult-stretch.data --points_to_toggle=1 --local_iterations=10
 
 tests: fitness 
 	g++ instance_selection_unittest.cpp -std=c++11 -I./gtest-1.7.0/include \

@@ -62,19 +62,21 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
 
     PopulationMap<BalloonPoint, bool, 
-                  OneNN, EulerQuality> pop_map(points, FLAGS_points_to_toggle); 
+                  OneNN, SquaredQuality> pop_map(points, FLAGS_points_to_toggle); 
 
+    pop_map.GenerateRandomSolution(); 
 
+    cout << "Original set of points:\n";
+    cout << pop_map << endl; 
+    cout << "----------------------" << endl; 
     printf("Starting local search ... ");
     fflush(stdout);
     PopulationMap<BalloonPoint, bool, 
-                  OneNN, EulerQuality> best_map = LocalSearchFirstFound<BalloonPoint, bool, OneNN, EulerQuality>(pop_map, FLAGS_local_iterations);
+                  OneNN, SquaredQuality> best_map = LocalSearchFirstFound<BalloonPoint, bool, OneNN, SquaredQuality>(pop_map, FLAGS_local_iterations);
     printf("done\n");
     fflush(stdout);
 
     printf("Results:\n");
-    cout << pop_map << endl; 
-    cout << "----------------------" << endl; 
     cout << best_map << endl; 
 
     return 0;

@@ -8,7 +8,7 @@ float WeightedQuality(float classification_correctness, float reduction_percenta
 }
 
 float EulerQuality(float classification_correctness, float reduction_percentage, float alpha) {
-    return exp(classification_correctness * reduction_percentage);
+    return exp(classification_correctness * reduction_percentage * 10000);
 }
 
 float SquaredQuality(float classification_correctness, float reduction_percentage, float alpha) {

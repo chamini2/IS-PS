@@ -55,6 +55,28 @@ public:
                                               correctness_weight_ ( correctness_weight ) {
     }
 
+    // TODO: Use this as an initial solution
+    void GenerateRandomSolution() {
+
+        srand (time(NULL));
+        multiset<Point> data(selected_points_); 
+        data.insert(unselected_points_.begin(), unselected_points_.end()); 
+
+        // Clear both sets
+        selected_points_.clear(); 
+        unselected_points_.clear(); 
+        // First we randomize the selected_points
+        for (auto itr = data.begin(); itr != data.end(); ++itr) {
+            int use_in_solution = rand() % 2; 
+
+            if (use_in_solution == 1) {
+                selected_points_.insert(*itr); 
+            } else {
+                unselected_points_.insert(*itr); 
+            }
+        }
+    }
+
     // Function that modifies the map to generate a new neighbor solution map
     void NeighborhoodOperator(void) {
         // This function may toggle the same point more than once
@@ -116,27 +138,7 @@ private:
     }
 
 
-    // TODO: Use this as an initial solution
-    void GenerateRandomSolution() {
-
-        multiset<Point> data(selected_points_); 
-        data.insert(unselected_points_.begin(), unselected_points_.end()); 
-
-        // Clear both sets
-        selected_points_.clear(); 
-        unselected_points_.clear(); 
-        // First we randomize the selected_points
-        for (auto itr = data.begin(); itr != data.end(); ++itr) {
-            int use_in_solution = rand() % 2; 
-
-            if (use_in_solution == 1) {
-                selected_points_.insert(*itr); 
-            } else {
-                unselected_points_.insert(*itr); 
-            }
-        }
-    }
-
+    
     // TODO: Implement Greedy solution (CNN, RNN, etc)
     void CNN() {}
     void MCNN() {}
@@ -193,42 +195,60 @@ template <typename Point,
           Class (*classify)(Point, const multiset<Point>&), 
           float (*fitness)(float,float,float)>
 PopulationMap<Point,Class,classify,fitness> 
-    LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map, 
-                                                                int iterations) {
-    float map_quality = map.EvaluateQuality();
+    LocalSearchFirstFound(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+        // At least 1 iteration
+        assert(iterations > 0);
+        int curr_iterations = 0;
+        float curr_quality  = map.EvaluateQuality();
+       
+        while (curr_iterations < iterations) {
+            PopulationMap<Point, Class, classify, fitness> copy_map(map); 
 
-    assert(iterations > 0);
+            // Get the quality of the modified map
+            copy_map.NeighborhoodOperator(); 
+            float copy_quality = copy_map.EvaluateQuality(); 
 
-    return LocalSearchFirstFound<Point,Class,classify,fitness>(map, map_quality, iterations, iterations);
-}
+            // If the quality is better than the previous map, we found a new map
+            if (curr_quality < copy_quality) {
+                map             = copy_map;
+                curr_iterations = 0;
+                curr_quality    = map.EvaluateQuality();
+            } else {
+                ++curr_iterations; 
+            }
+        }
 
-template <typename Point, 
-          typename Class, 
-          Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float,float,float)>
-PopulationMap<Point,Class,classify,fitness> 
-    LocalSearchFirstFound(const PopulationMap<Point,Class,classify,fitness>& map, 
-                                                            float map_quality, 
-                                                            int curr_iterations, 
-                                                            int max_iterations) {
-    PopulationMap<Point,Class,classify,fitness> copy_map(map);
-        cout << copy_map.SelectedPointsSize() 
-             << " -- " << copy_map.UnselectedPointsSize()
-             << " -- " << copy_map.TotalSize() << endl; 
+        return map; 
 
-    if (curr_iterations == 0) {
-        return map;
     }
 
-    copy_map.NeighborhoodOperator();
-    float copy_quality = copy_map.EvaluateQuality();
+template <typename Point, 
+         typename Class, 
+         Class (*classify)(Point, const multiset<Point>&),
+         float (*fitness)(float,float,float)>
+         PopulationMap<Point,Class,classify,fitness> 
+         LocalSearchFirstFoundRec(const PopulationMap<Point,Class,classify,fitness>& map, 
+                 float map_quality, 
+                 int curr_iterations, 
+                 int max_iterations) {
+             PopulationMap<Point,Class,classify,fitness> copy_map(map);
+             cout << copy_map.SelectedPointsSize() 
+                 << " -- " << copy_map.UnselectedPointsSize()
+                 << " -- " << copy_map.TotalSize() << endl; 
 
-    return copy_quality > map_quality ? 
-                LocalSearchFirstFound<Point,Class,classify,fitness>(copy_map, 
-                                                                    copy_quality, 
-                                                                    max_iterations, 
-                                                                    max_iterations) :
-                LocalSearchFirstFound<Point,Class,classify,fitness>(map, 
+             if (curr_iterations == 0) {
+                 return map;
+             }
+
+             copy_map.NeighborhoodOperator();
+             float copy_quality = copy_map.EvaluateQuality();
+
+             return copy_quality > map_quality ? 
+                 LocalSearchFirstFoundRec<Point,Class,classify,fitness>(copy_map, 
+                         copy_quality, 
+                         max_iterations, 
+                         max_iterations) :
+                 LocalSearchFirstFoundRec<Point,Class,classify,fitness>(map, 
                                                                     map_quality, 
                                                                     curr_iterations - 1, 
                                                                     max_iterations);
