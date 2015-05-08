@@ -19,7 +19,7 @@ using std::cout;
 using std::endl; 
 using std::ostream; 
 
-#if TEST_PRIVATE_ATTRIBUTES 
+#ifndef TEST_PRIVATE_ATTRIBUTES 
 #include "gtest-1.7.0/include/gtest/gtest.h"
 #endif
 
@@ -101,7 +101,9 @@ public:
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
 
-        float classification_correctness = RunClassifier(selected_points_,unselected_points_);
+        cout << "ajá " << flush;
+        float classification_correctness = RunClassifier(selected_points_, unselected_points_);
+        cout << "ajó" << endl << flush;
         float reduction_percentage       = GetReductionPercentage();
 
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
@@ -117,7 +119,7 @@ public:
 private:
 
     friend class BallonPointTest;
-#if TEST_PRIVATE_ATTRIBUTES 
+#ifndef TEST_PRIVATE_ATTRIBUTES 
     FRIEND_TEST(BallonPointTest, TogglingPoints); 
     FRIEND_TEST(BallonPointTest, FitnessFunction); 
 #endif
@@ -199,8 +201,13 @@ PopulationMap<Point,Class,classify,fitness>
         // At least 1 iteration
         assert(iterations > 0);
         int curr_iterations = 0;
+
+        cout << "start" << flush << endl;
+
         float curr_quality  = map.EvaluateQuality();
        
+        cout << "start" << flush << endl;
+
         while (curr_iterations < iterations) {
             PopulationMap<Point, Class, classify, fitness> copy_map(map); 
 
@@ -210,10 +217,12 @@ PopulationMap<Point,Class,classify,fitness>
 
             // If the quality is better than the previous map, we found a new map
             if (curr_quality < copy_quality) {
+                cout << "better " << flush;
                 map             = copy_map;
                 curr_iterations = 0;
                 curr_quality    = map.EvaluateQuality();
             } else {
+                cout << "not " << flush;
                 ++curr_iterations; 
             }
         }
