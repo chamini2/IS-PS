@@ -38,9 +38,10 @@ int main(int argc, char *argv[]) {
     points = ParseFile(rule, argv[1]);
     PopulationMap<AbalonePoint, int, OneNN, SquaredQuality> pop_map(points, 1);
 
-    cout << pop_map.TotalSize() << " = ";
     pop_map.GenerateRandomSolution(); 
-    cout << pop_map.SelectedPointsSize() << " + " << pop_map.UnselectedPointsSize() << endl;
+    cout << pop_map.TotalSize() << " = "
+         << pop_map.SelectedPointsSize() << " + " 
+         << pop_map.UnselectedPointsSize() << endl;
 
     cout << "Starting local search ... " << flush;
 

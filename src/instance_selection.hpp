@@ -18,10 +18,37 @@ using std::multiset;
 using std::cout; 
 using std::endl; 
 using std::ostream; 
+using std::flush; 
 
-#ifndef TEST_PRIVATE_ATTRIBUTES 
+#include <string>
+using std::string; 
+
+#if TEST_PRIVATE_ATTRIBUTES
 #include "gtest-1.7.0/include/gtest/gtest.h"
 #endif
+
+#include <ctime>
+using std::clock_t; 
+using std::clock; 
+
+// Class to measure time. The objects will serve as "function decorators"
+class MeasureTime {
+public:
+    MeasureTime(string fn) {
+        function_name_ = fn;
+        begin_         = clock();
+    }
+
+    ~MeasureTime() {
+        double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC; 
+        cout << function_name_ << " : " 
+             << elapsed_time << " seconds\n" << flush; 
+    }
+
+private:
+    clock_t begin_; 
+    string function_name_; 
+};
 
 // Template class to handle IS-PS solution representation
 // Template arguments: 
@@ -58,6 +85,9 @@ public:
     // TODO: Use this as an initial solution
     void GenerateRandomSolution() {
 
+        // Decorator to measure time
+        MeasureTime mt("GenerateRandomSolution"); 
+
         srand (time(NULL));
         multiset<Point> data(selected_points_); 
         data.insert(unselected_points_.begin(), unselected_points_.end()); 
@@ -79,6 +109,8 @@ public:
 
     // Function that modifies the map to generate a new neighbor solution map
     void NeighborhoodOperator(void) {
+
+        MeasureTime mt("NeighborhoodOperator"); 
         // This function may toggle the same point more than once
         repeat(points_to_toggle_) {
 
@@ -101,9 +133,9 @@ public:
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
 
-        cout << "ajá " << flush;
+        // Decorator to measure time
+        MeasureTime mt("EvaluateQuality"); 
         float classification_correctness = RunClassifier(selected_points_, unselected_points_);
-        cout << "ajó" << endl << flush;
         float reduction_percentage       = GetReductionPercentage();
 
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
@@ -202,11 +234,7 @@ PopulationMap<Point,Class,classify,fitness>
         assert(iterations > 0);
         int curr_iterations = 0;
 
-        cout << "start" << flush << endl;
-
         float curr_quality  = map.EvaluateQuality();
-       
-        cout << "start" << flush << endl;
 
         while (curr_iterations < iterations) {
             PopulationMap<Point, Class, classify, fitness> copy_map(map); 
@@ -217,18 +245,15 @@ PopulationMap<Point,Class,classify,fitness>
 
             // If the quality is better than the previous map, we found a new map
             if (curr_quality < copy_quality) {
-                cout << "better " << flush;
                 map             = copy_map;
                 curr_iterations = 0;
                 curr_quality    = map.EvaluateQuality();
             } else {
-                cout << "not " << flush;
                 ++curr_iterations; 
             }
         }
 
         return map; 
-
     }
 
 template <typename Point, 
@@ -241,9 +266,6 @@ template <typename Point,
                  int curr_iterations, 
                  int max_iterations) {
              PopulationMap<Point,Class,classify,fitness> copy_map(map);
-             cout << copy_map.SelectedPointsSize() 
-                 << " -- " << copy_map.UnselectedPointsSize()
-                 << " -- " << copy_map.TotalSize() << endl; 
 
              if (curr_iterations == 0) {
                  return map;
