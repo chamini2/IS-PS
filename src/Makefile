@@ -5,7 +5,7 @@ balloons: fitness
 		./gflags-2.1.2/lib/libgflags.a ./gflags-2.1.2/lib/libgflags_nothreads.a -lpthread fitness.o
 
 abalone: fitness
-	g++ abalone.cpp -std=c++11 -g -o abalone -lpthread fitness.o
+	g++ abalone.cpp -std=c++11 -g -o abalone -lpthread fitness.o -O2
 
 fitness: fitness.cpp fitness.hpp
 	g++ fitness.cpp -std=c++11 -g -c 

@@ -4,23 +4,26 @@
 #include <set>
 using std::multiset; 
 
+class MeasureTime; 
+
 // One Nearest Neighbors classifier function
 // Arguments: p of class Point which is the point representation of the problem
 // Return value: it returns a type Class which is the classifies Point
 template <typename Class, class Point>
 Class OneNN(Point point, const multiset<Point>& data) {
-    Point min = *data.begin();
-    float min_distance = point.distance(min);
+    //MeasureTime mt("OneNN"); 
+    const Point *min = &(*data.begin());
+    float min_distance = point.distance(*min);
 
-    for (Point elem : data) {
+    for (const Point& elem : data) {
         float elem_distance = point.distance(elem);
         if (elem_distance < min_distance) {
-            min = elem;
+            min = &elem;
             min_distance = elem_distance;
         }
     }
 
-    return min.ClassLabel();
+    return min->ClassLabel();
 }
 
 // TODO

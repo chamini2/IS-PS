@@ -37,18 +37,24 @@ public:
     MeasureTime(string fn) {
         function_name_ = fn;
         begin_         = clock();
+        ++deepness; 
     }
 
     ~MeasureTime() {
         double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC; 
+        repeat(deepness) { cout << "-"; }
         cout << function_name_ << " : " 
              << elapsed_time << " seconds\n" << flush; 
+        --deepness; 
     }
 
 private:
     clock_t begin_; 
     string function_name_; 
+    static int deepness; 
 };
+
+int MeasureTime::deepness = 0; 
 
 // Template class to handle IS-PS solution representation
 // Template arguments: 
@@ -183,13 +189,14 @@ private:
     float RunClassifier(const multiset<Point>& training_set, 
                                     const multiset<Point>& testing_set) const {
 
+        MeasureTime mt("RunClassifier"); 
         if (testing_set.empty()) {
             return 0.0; 
         }
 
         int correct = 0; 
 
-        for (Point p: testing_set) {
+        for (const Point& p: testing_set) {
             if (p.ClassLabel() == classify(p, training_set)) {
                 ++correct; 
             }
