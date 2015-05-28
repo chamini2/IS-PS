@@ -3,8 +3,18 @@
 #ifndef __POINT_INSTANCES_HPP__
 #define __POINT_INSTANCES_HPP__
 
+#include <cstring>
+
+#include <iostream>
+using std::pair; 
+
 #include <sstream>
 using std::ostream; 
+
+#include <set>
+using std::multiset; 
+
+#include <cassert>
 #include "point_interface.hpp"
 #include "classifiers.hpp"
 
@@ -19,6 +29,44 @@ public:
 
     float distance(const PointInterface<int>& obj) {
         return distance_fun(attributes_, obj.attributes()); 
+    }
+
+    static multiset<GenericPoint<distance_fun> > load(const char* filename) {
+        FILE *fp;
+        char *line = NULL;
+        size_t len = 0;
+
+        multiset<GenericPoint<distance_fun> > points; 
+
+        fp = fopen(filename, "r");
+        assert(fp != NULL);
+
+        while (getline(&line, &len, fp) != -1) {
+
+            auto inst_pair = ParseCSV(line);
+            points.insert(GenericPoint<distance_fun>(inst_pair.first, inst_pair.second));
+        }
+
+    }
+private:
+
+    static pair<bool, vector<float> > ParseCSV(char* line) {
+        char *next, *field;
+        vector<float> attributes;
+
+        field = strtok(line, ",");
+        next = strtok(NULL, ",");
+        while (next != NULL) {
+
+            attributes.push_back(atof(field));
+
+            field = next;
+            next = strtok(NULL, ",");
+        }
+
+        field[strlen(field)-1] = '\0';
+        return make_pair(atoi(field), attributes);
+
     }
 };
 
