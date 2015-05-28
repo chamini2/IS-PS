@@ -4,6 +4,9 @@
 #include <set>
 using std::multiset; 
 
+#include <vector>
+using std::vector; 
+
 class MeasureTime; 
 
 // One Nearest Neighbors classifier function
@@ -25,6 +28,11 @@ Class OneNN(Point point, const multiset<Point>& data) {
 
     return min->ClassLabel();
 }
+
+
+// Distances
+float EuclideanDistance(const vector<float>&, const vector<float>&);
+float HammingDistance(const vector<float>&, const vector<float>&); 
 
 // TODO
 template <typename Class, class Point>

@@ -6,6 +6,67 @@
 #include <sstream>
 using std::ostream; 
 #include "point_interface.hpp"
+#include "classifiers.hpp"
+
+// Generic point class.
+// Template argument: Distance function to use
+template <float (*distance_fun)(const vector<float>&, const vector<float>&)>
+class GenericPoint : public PointInterface<int> {
+public:
+    GenericPoint(int class_label, vector<float> attributes) : 
+                    PointInterface<int> (class_label, attributes) {
+    }
+
+    float distance(const PointInterface<int>& obj) {
+        return distance_fun(attributes_, obj.attributes()); 
+    }
+};
+
+// Operator << for HammingDistance and EuclideanDistance
+std::ostream& operator<<(std::ostream& os, const GenericPoint<HammingDistance>& obj) {
+    for (float f : obj.attributes()) {
+        os << f << ", ";
+    }
+    return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const GenericPoint<EuclideanDistance>& obj) {
+    for (float f : obj.attributes()) {
+        os << f << ", ";
+    }
+    return os; 
+}
+
+// Operator << for HammingDistance and EuclideanDistance
+inline bool operator<(const GenericPoint<HammingDistance>& lhs, 
+                      const GenericPoint<HammingDistance>& rhs) {
+    int size = lhs.attributes().size();
+
+    for (int i = 0; i < size; ++i) {
+        if (lhs.attributes()[i] != rhs.attributes()[i]) {
+            return lhs.attributes()[i] < rhs.attributes()[i];
+        }
+    }
+
+    return false;
+}
+
+inline bool operator<(const GenericPoint<EuclideanDistance>& lhs, 
+                      const GenericPoint<EuclideanDistance>& rhs) {
+    int size = lhs.attributes().size();
+
+    for (int i = 0; i < size; ++i) {
+        if (lhs.attributes()[i] != rhs.attributes()[i]) {
+            return lhs.attributes()[i] < rhs.attributes()[i];
+        }
+    }
+
+    return false;
+}
+
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// ------------------------------------------------------------
 
 // Point instance class for Ballons problem
 // inside data directory of the repository
@@ -21,16 +82,7 @@ public:
     // attributes_[2] == DIP/STRETCH   (0/1)
     // attributes_[3] == ADULT/CHILD   (0/1)
     float distance(const PointInterface<bool>& obj) {
-        int size = attributes_.size();
-        float distance = 0;
-
-        for (int i = 0; i < size; ++i) {
-            if (attributes_[i] != obj.attributes()[i]) {
-                ++distance;
-            }
-        }
-
-        return distance;
+        return HammingDistance(attributes_, obj.attributes()); 
     }
 
 };
@@ -74,16 +126,7 @@ public:
 
     // class          Rings     == int
     float distance(const PointInterface<int>& obj) {
-        int size = attributes_.size();
-        float distance = attributes_[0] == obj.attributes()[0] ? 0 : 1;
-
-        for (int i = 1; i < size; ++i) {
-            float attr_dist = attributes_[0] - obj.attributes()[0];
-            attr_dist = attr_dist < 0 ? - attr_dist : attr_dist;
-            distance += attr_dist;
-        }
-
-        return distance;
+        return EuclideanDistance(attributes_, obj.attributes()); 
     }
 
 };
@@ -96,6 +139,96 @@ std::ostream& operator<<(std::ostream& os, const AbalonePoint& obj) {
 }
 
 inline bool operator<(const AbalonePoint& lhs, const AbalonePoint& rhs) {
+    int size = lhs.attributes().size();
+
+    for (int i = 0; i < size; ++i) {
+        if (lhs.attributes()[i] != rhs.attributes()[i]) {
+            return lhs.attributes()[i] < rhs.attributes()[i];
+        }
+    }
+
+    return false;
+}
+
+class GlassPoint : public PointInterface<int> {
+public:
+    GlassPoint(int class_label, vector<float> attributes) : 
+                    PointInterface<int> (class_label, attributes) {
+    }
+
+    float distance(const PointInterface<int>& obj) {
+        return EuclideanDistance(attributes_, obj.attributes()); 
+    }
+};
+
+std::ostream& operator<<(std::ostream& os, const GlassPoint& obj) {
+    for (float f : obj.attributes()) {
+        os << f << ", ";
+    }
+    return os; 
+}
+
+inline bool operator<(const AbalonePoint& lhs, const GlassPoint& rhs) {
+    int size = lhs.attributes().size();
+
+    for (int i = 0; i < size; ++i) {
+        if (lhs.attributes()[i] != rhs.attributes()[i]) {
+            return lhs.attributes()[i] < rhs.attributes()[i];
+        }
+    }
+
+    return false;
+}
+
+class IrisPoint : public PointInterface<int> {
+public:
+    IrisPoint(int class_label, vector<float> attributes) : 
+                    PointInterface<int> (class_label, attributes) {
+    }
+
+    float distance(const PointInterface<int>& obj) {
+        return EuclideanDistance(attributes_, obj.attributes()); 
+    }
+};
+
+std::ostream& operator<<(std::ostream& os, const IrisPoint& obj) {
+    for (float f : obj.attributes()) {
+        os << f << ", ";
+    }
+    return os; 
+}
+
+inline bool operator<(const AbalonePoint& lhs, const IrisPoint& rhs) {
+    int size = lhs.attributes().size();
+
+    for (int i = 0; i < size; ++i) {
+        if (lhs.attributes()[i] != rhs.attributes()[i]) {
+            return lhs.attributes()[i] < rhs.attributes()[i];
+        }
+    }
+
+    return false;
+}
+
+
+class BloggerPoint : public PointInterface<int> {
+public:
+    BloggerPoint(int class_label, vector<float> attributes) : 
+                    PointInterface<int> (class_label, attributes) {
+    }
+
+    float distance(const PointInterface<int>& obj) {
+        return HammingDistance(attributes_, obj.attributes()); 
+    }
+};
+
+std::ostream& operator<<(std::ostream& os, const BloggerPoint& obj) {
+    for (float f : obj.attributes()) {
+        os << f << ", ";
+    }
+    return os; 
+}
+inline bool operator<(const AbalonePoint& lhs, const BloggerPoint& rhs) {
     int size = lhs.attributes().size();
 
     for (int i = 0; i < size; ++i) {
