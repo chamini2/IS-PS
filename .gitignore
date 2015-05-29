@@ -26,9 +26,3 @@
 *.exe
 *.out
 *.app
-
-# added by GitSavvy
-/src/balloons
-
-# added by GitSavvy
-/src/abalone

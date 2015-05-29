@@ -1,10 +1,7 @@
-top: clean principal
+top: clean program
 
-principal: fitness classifiers
-	g++ principal.cpp -std=c++11 -g -o principal -lpthread fitness.o classifiers.o
-
-abalone: fitness
-	g++ abalone.cpp -std=c++11 -g -o abalone -lpthread fitness.o -O2
+program: fitness classifiers
+	g++ program.cpp -std=c++11 -g -o program -lpthread fitness.o classifiers.o
 
 fitness: fitness.cpp fitness.hpp
 	g++ fitness.cpp -std=c++11 -g -c 
@@ -12,11 +9,8 @@ fitness: fitness.cpp fitness.hpp
 classifiers: classifiers.cpp classifiers.hpp
 	g++ classifiers.cpp -std=c++11 -g -c
 
-run: top
-	@./abalone ../data/abalone/abalone.data
-
-run_principal: clean principal
-	@./principal ../data/small/blogger/blogger.data
+run_program: clean program
+	@./program ../data/small/blogger/blogger.data
 
 
 tests: fitness 
@@ -27,4 +21,6 @@ run_tests: tests
 	@./instance_selection_unittest
 
 clean:
-	@rm *.o || rm principal || rm abalone || :
+	@rm *.o || :
+	@rm program || :
+	@rm -r program.dSYM/ || :

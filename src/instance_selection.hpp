@@ -3,7 +3,7 @@
 
 #define repeat(N) for(int i = 0; i < N; ++i)
 
-#define TEST_PRIVATE_ATTRIBUTES 1 // 1 => enable testing in private members of the classes
+#define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
 
 #include <cassert>
 #include <cmath>
@@ -89,10 +89,46 @@ public:
     }
 
     // TODO: Use this as an initial solution
-    void GenerateRandomSolution() {
+    void CNN() {
 
         // Decorator to measure time
-        //MeasureTime mt("GenerateRandomSolution"); 
+        MeasureTime mt("CNN"); 
+
+        // Start with the empty set C `selected_points_`
+        unselected_points_ = selected_points_;
+        selected_points_.clear();
+
+        auto random_point_iterator =
+            std::next(std::begin(unselected_points_), 
+                      std::rand() % unselected_points_.size());
+
+        Point point = *random_point_iterator; 
+
+        unselected_points_.erase(point);
+        selected_points_.insert(point);
+
+        bool changed = true;
+        while (changed) {
+            changed = false;
+            for (Point p : unselected_points_) {
+                if (p.ClassLabel != classify(p, selected_points_)) {
+                    unselected_points_.erase(p);
+                    selected_points_.insert(p);
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    // TODO: Implement Greedy solution (CNN, RNN, etc)
+    void MCNN() {}
+    void RNN() {}
+
+    // TODO: Use this as an initial solution
+    void RandomSolution() {
+
+        // Decorator to measure time
+        //MeasureTime mt("RandomSolution"); 
 
         srand (time(NULL));
         multiset<Point> data(selected_points_); 
@@ -136,7 +172,7 @@ public:
 
             auto random_point_iterator =
                 std::next(std::begin(set_to_use), 
-                          std::rand() % set_to_use.size()); 
+                          std::rand() % set_to_use.size());
 
             Point random_point = *random_point_iterator; 
             toggle(random_point, random_to_pick_set); 
@@ -181,13 +217,6 @@ private:
             selected_points_.insert(p); 
         }
     }
-
-
-    
-    // TODO: Implement Greedy solution (CNN, RNN, etc)
-    void CNN() {}
-    void MCNN() {}
-    void RNN() {}
 
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
