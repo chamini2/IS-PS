@@ -1,6 +1,10 @@
 #ifndef __CLASSIFIERS_HPP__
 #define __CLASSIFIERS_HPP__
 
+#include <iostream>
+using std::cout;
+using std::endl; 
+#include <cstdio>
 #include <set>
 using std::multiset; 
 
@@ -14,6 +18,7 @@ class MeasureTime;
 // Return value: it returns a type Class which is the classifies Point
 template <typename Class, class Point>
 Class OneNN(Point point, const multiset<Point>& data) {
+    assert(data.size() > 0); 
     //MeasureTime mt("OneNN"); 
     const Point *min = &(*data.begin());
     float min_distance = point.distance(*min);
@@ -25,7 +30,7 @@ Class OneNN(Point point, const multiset<Point>& data) {
             min_distance = elem_distance;
         }
     }
-
+    
     return min->ClassLabel();
 }
 

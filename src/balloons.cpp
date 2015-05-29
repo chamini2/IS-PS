@@ -20,49 +20,31 @@ using std::endl;
 using std::pair;
 using std::make_pair;
 
-#include <gflags/gflags.h>
 
 #include "point_instances.hpp"
 #include "instance_selection.hpp"
 #include "classifiers.hpp"
 #include "fitness.hpp"
 
-// TODO: Remove gflags and use getopt
-
-// Flags to use
-DEFINE_int32(points_to_toggle, 2, "Puntos a incluir/excluir del conjunto solución");
-DEFINE_int32(local_iterations, 10, "Número de iteraciones antes de parar la búsqueda local");
-DEFINE_string(data_file, "./data.dat", "Archivo de datos para pruebas");
-
-
-pair<bool, vector<float> > ParseCSV(unordered_map<string, float>& rule,
-                                    unordered_map<string, bool>& class_rule, 
-                                    char* line);
-multiset< BalloonPoint > ParseFile(unordered_map<string, float>& rule, 
-                                            unordered_map<string, bool>& class_rule, 
-                                            const char* file);
-
 int main(int argc, char *argv[]) {
 
-    google::ParseCommandLineFlags(&argc, &argv, true);
+    if (argc < 2) {
+        printf("Must specify data"); 
+        exit(1); 
+    }
 
-    multiset<BalloonPoint> points;
-    unordered_map<string, float> rule = {
-                                        {"YELLOW",0.0}, {"PURPLE",1.0}, 
-                                        {"SMALL",0.0},  {"LARGE",1.0}, 
-                                        {"DIP",0.0},    {"STRETCH",1.0}, 
-                                        {"ADULT",0.0},  {"CHILD",1.0}
-                                    };
-    unordered_map<string, bool> class_rule = {{"T",true}, {"F",false}};
-
-    printf("Reading data from file %s ... ", FLAGS_data_file.c_str());
+    printf("Reading data from file %s ... ", argv[1]);
     fflush(stdout);
-    points = ParseFile(rule, class_rule, FLAGS_data_file.c_str());
     printf("done\n");
     fflush(stdout);
 
-    PopulationMap<BalloonPoint, bool, 
-                  OneNN, SquaredQuality> pop_map(points, FLAGS_points_to_toggle); 
+    //multiset<GenericPoint<HammingDistance> > points = GenericPoint<HammingDistance>::load(argv[1]); 
+    multiset<GenericPoint<EuclideanDistance> > points = GenericPoint<EuclideanDistance>::load(argv[1]); 
+
+    //PopulationMap<GenericPoint<HammingDistance>, int, 
+                  //OneNN, SquaredQuality> pop_map(points, 1); 
+    PopulationMap<GenericPoint<EuclideanDistance>, int, 
+                  OneNN, WeightedQuality> pop_map(points, 1); 
 
     pop_map.GenerateRandomSolution(); 
 
@@ -71,8 +53,15 @@ int main(int argc, char *argv[]) {
     cout << "----------------------" << endl; 
     printf("Starting local search ... ");
     fflush(stdout);
-    PopulationMap<BalloonPoint, bool, 
-                  OneNN, SquaredQuality> best_map = LocalSearchFirstFound<BalloonPoint, bool, OneNN, SquaredQuality>(pop_map, FLAGS_local_iterations);
+    //PopulationMap<GenericPoint<HammingDistance>, 
+                  //int, OneNN, SquaredQuality> best_map = 
+                      //LocalSearchFirstFound<GenericPoint<HammingDistance>, 
+                                            //int, OneNN, SquaredQuality>(pop_map, 20);
+                                            
+    PopulationMap<GenericPoint<EuclideanDistance>, 
+                  int, OneNN, WeightedQuality> best_map = 
+                      LocalSearchFirstFound<GenericPoint<EuclideanDistance>, 
+                                            int, OneNN, WeightedQuality>(pop_map, 20);
     printf("done\n");
     fflush(stdout);
 
@@ -80,43 +69,4 @@ int main(int argc, char *argv[]) {
     cout << best_map << endl; 
 
     return 0;
-}
-
-multiset<BalloonPoint> ParseFile(unordered_map<string, float>& rule, 
-                                            unordered_map<string, bool>& class_rule, 
-                                            const char* file) {
-    FILE *fp;
-    char *line = NULL;
-    size_t len = 0;
-
-    multiset< BalloonPoint > points;
-
-    fp = fopen(file, "r");
-    assert(fp != NULL);
-
-    while (getline(&line, &len, fp) != -1) {
-        auto balloon_pair = ParseCSV(rule, class_rule, line);
-        points.insert(BalloonPoint(balloon_pair.first, balloon_pair.second));
-    }
-
-    return points;
-}
-
-pair<bool, vector<float> > ParseCSV(unordered_map<string, float>& rule,
-                                    unordered_map<string, bool>& class_rule, 
-                                    char* line) {
-    char *next, *field;
-    vector<float> attributes;
-
-    field = strtok(line, ",");
-    next = strtok(NULL, ",");
-    while (next != NULL) {
-
-        attributes.push_back(rule[field]);
-        field = next;
-        next = strtok(NULL, ",");
-    }
-
-    field[strlen(field)-1] = '\0';
-    return make_pair(class_rule[field], attributes);
 }

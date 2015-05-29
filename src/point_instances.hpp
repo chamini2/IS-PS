@@ -27,6 +27,8 @@ public:
                     PointInterface<int> (class_label, attributes) {
     }
 
+    ~GenericPoint() {}
+
     float distance(const PointInterface<int>& obj) {
         return distance_fun(attributes_, obj.attributes()); 
     }
@@ -47,10 +49,11 @@ public:
             points.insert(GenericPoint<distance_fun>(inst_pair.first, inst_pair.second));
         }
 
+        return points; 
     }
 private:
 
-    static pair<bool, vector<float> > ParseCSV(char* line) {
+    static pair<int, vector<float> > ParseCSV(char* line) {
         char *next, *field;
         vector<float> attributes;
 
@@ -65,16 +68,21 @@ private:
         }
 
         field[strlen(field)-1] = '\0';
-        return make_pair(atoi(field), attributes);
+        int classLabel = atoi(field); 
+        printf("class: \"%d\"\n", classLabel); 
+        return make_pair(classLabel, attributes);
 
     }
 };
 
 // Operator << for HammingDistance and EuclideanDistance
 std::ostream& operator<<(std::ostream& os, const GenericPoint<HammingDistance>& obj) {
+    
     for (float f : obj.attributes()) {
         os << f << ", ";
     }
+
+    os << obj.ClassLabel(); 
     return os; 
 }
 
@@ -82,6 +90,8 @@ std::ostream& operator<<(std::ostream& os, const GenericPoint<EuclideanDistance>
     for (float f : obj.attributes()) {
         os << f << ", ";
     }
+
+    os << obj.ClassLabel(); 
     return os; 
 }
 

@@ -41,10 +41,10 @@ public:
     }
 
     ~MeasureTime() {
-        double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC; 
-        repeat(deepness) { cout << "-"; }
-        cout << function_name_ << " : " 
-             << elapsed_time << " seconds\n" << flush; 
+        //double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC; 
+        //repeat(deepness) { cout << "-"; }
+        //cout << function_name_ << " : " 
+             //<< elapsed_time << " seconds\n" << flush; 
         --deepness; 
     }
 
@@ -123,17 +123,23 @@ public:
             // We choose either selected_points_ or unselected_points_ (random)
             // If any of them is empty, the we take the other one
             int random_to_pick_set = rand() % 2; 
-            const multiset<Point>& set_to_use = ((random_to_pick_set && 
-                                                  !selected_points_.empty()) || 
-                                                  unselected_points_.empty() ? selected_points_ : 
-                                                                                 unselected_points_); 
+
+            if (selected_points_.empty()) {
+                random_to_pick_set = 0; 
+            } else if (unselected_points_.empty()) {
+                random_to_pick_set = 1; 
+            }
+
+
+            const multiset<Point>& set_to_use = (random_to_pick_set == 1 ? selected_points_ 
+                                                                         : unselected_points_); 
 
             auto random_point_iterator =
                 std::next(std::begin(set_to_use), 
                           std::rand() % set_to_use.size()); 
 
             Point random_point = *random_point_iterator; 
-            toggle(random_point); 
+            toggle(random_point, random_to_pick_set); 
         }
     }
     // Function that evaluates the current map's quality
@@ -141,8 +147,11 @@ public:
 
         // Decorator to measure time
         MeasureTime mt("EvaluateQuality"); 
+
         float classification_correctness = RunClassifier(selected_points_, unselected_points_);
         float reduction_percentage       = GetReductionPercentage();
+
+
 
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
     }
@@ -163,17 +172,13 @@ private:
 #endif
 
     // Toggles points between selected and unselected points sets.
-    void toggle(Point p) {
-        auto point_itr(selected_points_.find(p)); 
-        if (point_itr != selected_points_.end()) {
-            selected_points_.erase(point_itr); 
+    void toggle(Point p, int set_to_use) {
+        if (set_to_use == 1) {
+            selected_points_.erase(p); 
             unselected_points_.insert(p); 
         } else {
-            auto point_itr(unselected_points_.find(p)); 
-            if (point_itr != unselected_points_.end()) {
-                unselected_points_.erase(point_itr); 
-                selected_points_.insert(p); 
-            }
+            unselected_points_.erase(p); 
+            selected_points_.insert(p); 
         }
     }
 
@@ -196,13 +201,14 @@ private:
 
         int correct = 0; 
 
+        // TODO: Parallelize this for
         for (const Point& p: testing_set) {
             if (p.ClassLabel() == classify(p, training_set)) {
                 ++correct; 
             }
         }
 
-        return (float) (correct / testing_set.size()); 
+        return float(correct) / testing_set.size(); 
     }
 
     float GetReductionPercentage() const {
@@ -221,7 +227,7 @@ template <typename Point,
           Class (*classify)(Point, const multiset<Point>&), 
           float (*fitness)(float,float,float)>
 std::ostream& operator<<(std::ostream& os, const PopulationMap<Point, Class, classify, fitness>& obj) {
-    os << "Number of points " << obj.SelectedPointsSize() << endl; 
+    os << "Number of points selected " << obj.SelectedPointsSize() << endl; 
     os << "Points: " << endl; 
     for (Point p : obj.selected_points()) {
         os << p << endl;

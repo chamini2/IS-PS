@@ -1,8 +1,7 @@
-top: clean abalone
+top: clean balloons
 
-balloons: fitness
-	g++ balloons.cpp -std=c++11 -g -o balloons -I./gflags/2.1.2/include/ \
-		./gflags-2.1.2/lib/libgflags.a ./gflags-2.1.2/lib/libgflags_nothreads.a -lpthread fitness.o
+balloons: fitness classifiers
+	g++ balloons.cpp -std=c++11 -g -o balloons -lpthread fitness.o classifiers.o
 
 abalone: fitness
 	g++ abalone.cpp -std=c++11 -g -o abalone -lpthread fitness.o -O2
@@ -10,8 +9,15 @@ abalone: fitness
 fitness: fitness.cpp fitness.hpp
 	g++ fitness.cpp -std=c++11 -g -c 
 
+classifiers: classifiers.cpp classifiers.hpp
+	g++ classifiers.cpp -std=c++11 -g -c
+
 run: top
 	@./abalone ../data/abalone/abalone.data
+
+run_balloons: clean balloons
+	@./balloons ../data/small/blogger/blogger.data
+
 
 tests: fitness 
 	g++ instance_selection_unittest.cpp -std=c++11 -I./gtest-1.7.0/include \
