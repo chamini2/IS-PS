@@ -5,6 +5,8 @@
 
 #define TEST_PRIVATE_ATTRIBUTES 1 // 1 => enable testing in private members of the classes
 
+#define N_THREADS 100
+
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -22,6 +24,15 @@ using std::flush;
 
 #include <string>
 using std::string; 
+
+#include <thread>
+using std::thread;
+
+#include <mutex>
+using std::mutex;
+
+#include <array>
+using std::array; 
 
 #if TEST_PRIVATE_ATTRIBUTES
 #include "gtest-1.7.0/include/gtest/gtest.h"
@@ -189,8 +200,15 @@ private:
     void MCNN() {}
     void RNN() {}
 
+    // Thread function to be used in parallel
+    void ClassifyPoint(int thread, const Point& p, const multiset<Point>& training_set) const {
+
+        if (p.ClassLabel() == classify(p, training_set)) {
+            ++good_classifications_[thread]; 
+        }
+    }
+
     // Returns the percentage of correct classified points (from 0 to 1)
-    // TODO: Consider to multiply by 100 the percentage
     float RunClassifier(const multiset<Point>& training_set, 
                                     const multiset<Point>& testing_set) const {
 
@@ -199,13 +217,41 @@ private:
             return 0.0; 
         }
 
+        //memset(good_classifications_, 0, sizeof(good_classifications_)); 
+        //thread classifiers[N_THREADS]; 
+
+        //auto fun_ptr = &PopulationMap<Point, Class, classify, fitness>::ClassifyPoint;
+
+        //// TODO: Parallelize this for
+        //auto p = testing_set.begin(); 
+        //for (int t = 0; p != testing_set.end(); ++p, t = (t + 1) % N_THREADS) {
+
+            //classifiers[t] = thread(fun_ptr, this, t, *p, training_set); 
+
+            //// Wait all threads N_THREAD threads are used
+            //if (t == N_THREADS - 1) {
+                //for (int w = 0; w < N_THREADS; ++w) {
+                    //classifiers[w].join(); 
+                //}
+            //}
+        //}
+
+        //// Collect the well classified points
+        //int correct = 0; 
+        //for (int w = 0; w < N_THREADS; ++w) {
+            //if (classifiers[w].joinable()) {
+                //classifiers[w].join(); 
+            //}
+            //correct += good_classifications_[w]; 
+        /*}*/
+
         int correct = 0; 
 
-        // TODO: Parallelize this for
-        for (const Point& p: testing_set) {
+        for (auto& p : testing_set) {
             if (p.ClassLabel() == classify(p, training_set)) {
                 ++correct; 
             }
+            
         }
 
         return float(correct) / testing_set.size(); 
@@ -220,6 +266,7 @@ private:
     multiset<Point> selected_points_;   
     multiset<Point> unselected_points_;   
     float correctness_weight_;   
+    mutable int good_classifications_[N_THREADS]; 
 };
 
 template <typename Point, 
