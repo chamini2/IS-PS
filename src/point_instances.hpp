@@ -69,7 +69,6 @@ private:
 
         field[strlen(field)-1] = '\0';
         int classLabel = atoi(field); 
-        printf("class: \"%d\"\n", classLabel); 
         return make_pair(classLabel, attributes);
 
     }

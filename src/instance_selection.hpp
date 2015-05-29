@@ -41,10 +41,10 @@ public:
     }
 
     ~MeasureTime() {
-        //double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC; 
-        //repeat(deepness) { cout << "-"; }
-        //cout << function_name_ << " : " 
-             //<< elapsed_time << " seconds\n" << flush; 
+        double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC; 
+        repeat(deepness) { cout << "-"; }
+        cout << function_name_ << " : " 
+             << elapsed_time << " seconds\n" << flush; 
         --deepness; 
     }
 
@@ -92,7 +92,7 @@ public:
     void GenerateRandomSolution() {
 
         // Decorator to measure time
-        MeasureTime mt("GenerateRandomSolution"); 
+        //MeasureTime mt("GenerateRandomSolution"); 
 
         srand (time(NULL));
         multiset<Point> data(selected_points_); 
@@ -116,7 +116,7 @@ public:
     // Function that modifies the map to generate a new neighbor solution map
     void NeighborhoodOperator(void) {
 
-        MeasureTime mt("NeighborhoodOperator"); 
+        //MeasureTime mt("NeighborhoodOperator"); 
         // This function may toggle the same point more than once
         repeat(points_to_toggle_) {
 
@@ -146,7 +146,7 @@ public:
     float EvaluateQuality(void) const {
 
         // Decorator to measure time
-        MeasureTime mt("EvaluateQuality"); 
+        //MeasureTime mt("EvaluateQuality"); 
 
         float classification_correctness = RunClassifier(selected_points_, unselected_points_);
         float reduction_percentage       = GetReductionPercentage();
@@ -194,7 +194,7 @@ private:
     float RunClassifier(const multiset<Point>& training_set, 
                                     const multiset<Point>& testing_set) const {
 
-        MeasureTime mt("RunClassifier"); 
+        //MeasureTime mt("RunClassifier"); 
         if (testing_set.empty()) {
             return 0.0; 
         }
