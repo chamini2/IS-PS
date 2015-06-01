@@ -1,10 +1,7 @@
-top: clean principal
+top: clean program
 
-principal: fitness classifiers
-	g++ principal.cpp fitness.o classifiers.o -std=c++11 -pthread -g -o principal 
-
-abalone: fitness
-	g++ abalone.cpp -std=c++11 -g -o abalone -pthread fitness.o -O2
+program: fitness classifiers
+	g++ program.cpp -std=c++11 -g -o program -pthread fitness.o classifiers.o
 
 fitness: fitness.cpp fitness.hpp
 	g++ fitness.cpp -std=c++11 -pthread -g -c 
@@ -12,19 +9,18 @@ fitness: fitness.cpp fitness.hpp
 classifiers: classifiers.cpp classifiers.hpp
 	g++ classifiers.cpp -std=c++11 -pthread -g -c
 
-run: top
-	@./abalone ../data/abalone/abalone.data
-
-run_principal: clean principal
-	@./principal ../data/small/blogger/blogger.data
+run_program: clean program
+	@./program ../data/small/glass/glass.data euclidean
 
 
 tests: fitness 
 	g++ instance_selection_unittest.cpp -std=c++11 -I./gtest-1.7.0/include \
-			gtest-1.7.0/src/gtest-all.o -o instance_selection_unittest -pthread fitness.o
+			gtest-1.7.0/src/gtest-all.o -o instance_selection_unittest -lpthread fitness.o
 
 run_tests: tests
 	@./instance_selection_unittest
 
 clean:
-	@rm *.o || rm principal || rm abalone || :
+	@rm *.o || :
+	@rm program || :
+	@rm -r program.dSYM/ || :

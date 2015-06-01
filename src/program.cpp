@@ -20,7 +20,6 @@ using std::endl;
 using std::pair;
 using std::make_pair;
 
-
 #include "point_instances.hpp"
 #include "instance_selection.hpp"
 #include "classifiers.hpp"
@@ -37,17 +36,12 @@ int main(int argc, char *argv[]) {
 
     MeasureTime mt("principal"); 
 
-    printf("Reading data from file %s ... ", argv[1]);
-    fflush(stdout);
-    printf("done\n");
-    fflush(stdout);
-
     if (strcmp(argv[2], "hamming") == 0) {
         multiset<GenericPoint<HammingDistance> > points = GenericPoint<HammingDistance>::load(argv[1]); 
         PopulationMap<GenericPoint<HammingDistance>, int, 
                       OneNN, SquaredQuality> pop_map(points, 1); 
 
-        pop_map.GenerateRandomSolution(); 
+        pop_map.RandomSolution(); 
         cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush; 
         PopulationMap<GenericPoint<HammingDistance>, 
                       int, OneNN, SquaredQuality> best_map = 
@@ -55,27 +49,30 @@ int main(int argc, char *argv[]) {
                                                 int, OneNN, SquaredQuality>(pop_map, 20);
 
         cout << "Result number of points: " << best_map.SelectedPointsSize() << endl << flush; 
-        
     } else if (strcmp(argv[2], "euclidean") == 0){
 
         multiset<GenericPoint<EuclideanDistance> > points = GenericPoint<EuclideanDistance>::load(argv[1]); 
-
+        cout << "N points: " << points.size() << endl << flush; 
         PopulationMap<GenericPoint<EuclideanDistance>, int, 
                       OneNN, WeightedQuality> pop_map(points, 1); 
 
-        pop_map.GenerateRandomSolution(); 
-        cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush; 
-
         PopulationMap<GenericPoint<EuclideanDistance>, 
-                      int, OneNN, WeightedQuality> best_map = 
-                          LocalSearchFirstFound<GenericPoint<EuclideanDistance>, 
-                                                int, OneNN, WeightedQuality>(pop_map, 20);
+                      int, OneNN, WeightedQuality> best_map = IteratedLocalSearch<GenericPoint<EuclideanDistance>,
+                                                                                  int, OneNN, WeightedQuality>(pop_map, 20);
+
+        //pop_map.RandomSolution(); 
+        //cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush; 
+        //PopulationMap<GenericPoint<EuclideanDistance>, 
+                      //int, OneNN, WeightedQuality> best_map = 
+                          //LocalSearchFirstFound<GenericPoint<EuclideanDistance>, 
+                                                //int, OneNN, WeightedQuality>(pop_map, 20);
+
         cout << "Result number of points: " << best_map.SelectedPointsSize() << endl << flush; 
     } else {
         printf("Invalid distance function\n");
         printf("Available distances: \n");
         for (auto dist : distance_functions) {
-            printf(" - %s", dist);
+            printf(" - %s\n", dist);
         }
     }
 
