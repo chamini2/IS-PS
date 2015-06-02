@@ -419,62 +419,62 @@ template <typename Point,
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&), 
           float (*fitness)(float,float,float)>
-          PopulationMap<Point,Class,classify,fitness> 
-          LocalSearchFirstFound(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
-        // At least 1 iteration
-        assert(iterations > 0);
-        int curr_iterations = 0;
+    PopulationMap<Point,Class,classify,fitness> 
+        LocalSearchFirstFound(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+    // At least 1 iteration
+    assert(iterations > 0);
+    int curr_iterations = 0;
 
-        float curr_quality  = map.EvaluateQuality();
+    float curr_quality  = map.EvaluateQuality();
 
-        while (curr_iterations < iterations) {
-            PopulationMap<Point, Class, classify, fitness> copy_map(map); 
+    while (curr_iterations < iterations) {
+        PopulationMap<Point, Class, classify, fitness> copy_map(map); 
 
-            // Get the quality of the modified map
-            copy_map.NeighborhoodOperator(); 
-            float copy_quality = copy_map.EvaluateQuality(); 
+        // Get the quality of the modified map
+        copy_map.NeighborhoodOperator(); 
+        float copy_quality = copy_map.EvaluateQuality(); 
 
-            // If the quality is better than the previous map, we found a new map
-            if (curr_quality < copy_quality) {
-                map             = copy_map;
-                curr_iterations = 0;
-                curr_quality    = map.EvaluateQuality();
-            } else {
-                ++curr_iterations; 
-            }
+        // If the quality is better than the previous map, we found a new map
+        if (curr_quality < copy_quality) {
+            map             = copy_map;
+            curr_iterations = 0;
+            curr_quality    = map.EvaluateQuality();
+        } else {
+            ++curr_iterations; 
         }
-
-        return map; 
     }
+
+    return map; 
+}
 
 template <typename Point, 
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&),
           float (*fitness)(float,float,float)>
-          PopulationMap<Point,Class,classify,fitness> 
-          LocalSearchFirstFoundRec(const PopulationMap<Point,Class,classify,fitness>& map, 
-                  float map_quality, 
-                  int curr_iterations, 
-                  int max_iterations) {
-              PopulationMap<Point,Class,classify,fitness> copy_map(map);
+    PopulationMap<Point,Class,classify,fitness> 
+        LocalSearchFirstFoundRec(const PopulationMap<Point,Class,classify,fitness>& map, 
+                                 float map_quality, 
+                                 int curr_iterations, 
+                                 int max_iterations) {
+    PopulationMap<Point,Class,classify,fitness> copy_map(map);
 
-              if (curr_iterations == 0) {
-                  return map;
-              }
+    if (curr_iterations == 0) {
+        return map;
+    }
 
-              copy_map.NeighborhoodOperator();
-              float copy_quality = copy_map.EvaluateQuality();
+    copy_map.NeighborhoodOperator();
+    float copy_quality = copy_map.EvaluateQuality();
 
-              return copy_quality > map_quality ? 
-                  LocalSearchFirstFoundRec<Point,Class,classify,fitness>(copy_map, 
-                          copy_quality, 
-                          max_iterations, 
-                          max_iterations) :
-                  LocalSearchFirstFoundRec<Point,Class,classify,fitness>(map, 
-                          map_quality, 
-                          curr_iterations - 1, 
-                          max_iterations);
-          }
+    return copy_quality > map_quality ? 
+    LocalSearchFirstFoundRec<Point,Class,classify,fitness>(copy_map, 
+                                                           copy_quality, 
+                                                           max_iterations, 
+                                                           max_iterations) :
+    LocalSearchFirstFoundRec<Point,Class,classify,fitness>(map, 
+                                                           map_quality, 
+                                                           curr_iterations - 1, 
+                                                           max_iterations);
+}
 
 // PopulationMap LocalSearchBestOfAll(const PopulationMap&);
 // PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
@@ -484,31 +484,33 @@ template <typename Point,
          typename Class, 
          Class (*classify)(Point, const multiset<Point>&), 
          float (*fitness)(float,float,float)>
-         PopulationMap<Point,Class,classify,fitness> 
-         IteratedLocalSearch(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+    PopulationMap<Point,Class,classify,fitness> 
+        IteratedLocalSearch(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
 
-              const int local_search_its = 20; 
+    const int local_search_its = 20; 
 
-              PopulationMap<Point,Class,classify,fitness> initial_solution(map); 
-              initial_solution.RandomSolution();
+    PopulationMap<Point,Class,classify,fitness> initial_solution(map); 
+    initial_solution.RandomSolution();
 
-              PopulationMap<Point,Class,classify,fitness> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
+    PopulationMap<Point,Class,classify,fitness> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
 
-              float curr_quality = best_solution.EvaluateQuality(); 
+    float curr_quality = best_solution.EvaluateQuality(); 
 
-              for (int it = 0; it < iterations; ++it) { 
+    for (int it = 0; it < iterations; ++it) { 
 
-                  PopulationMap<Point,Class,classify,fitness>& perturbated_solution(best_solution);
-                  perturbated_solution.RandomSolution(); 
+        PopulationMap<Point,Class,classify,fitness>& perturbated_solution(best_solution);
+        perturbated_solution.RandomSolution(); 
 
-                  const PopulationMap<Point,Class,classify,fitness>& candidate_solution = LocalSearchFirstFound<Point, Class, classify, fitness>(perturbated_solution, local_search_its);
-                  float candidate_quality = candidate_solution.EvaluateQuality(); 
+        const PopulationMap<Point,Class,classify,fitness>& candidate_solution = LocalSearchFirstFound<Point, Class, classify, fitness>(perturbated_solution, local_search_its);
+        float candidate_quality = candidate_solution.EvaluateQuality(); 
 
-                  // If the quality is better than the previous map, we found a new map
-                  if (curr_quality < candidate_quality) {
-                      best_solution = candidate_solution; 
-                      curr_quality  = candidate_quality; 
-                  }
-              }
-         }
+        // If the quality is better than the previous map, we found a new map
+        if (curr_quality < candidate_quality) {
+            best_solution = candidate_solution; 
+            curr_quality  = candidate_quality; 
+        }
+    }
+
+    return best_solution;
+}
 #endif
