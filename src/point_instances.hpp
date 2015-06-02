@@ -3,6 +3,7 @@
 #ifndef __POINT_INSTANCES_HPP__
 #define __POINT_INSTANCES_HPP__
 
+// #include <algorithm>
 #include <cstring>
 
 #include <iostream>
@@ -18,6 +19,8 @@ using std::multiset;
 #include "point_interface.hpp"
 #include "classifiers.hpp"
 
+int g_max_label = 0;
+
 // Generic point class.
 // Template argument: Distance function to use
 template <float (*distance_fun)(const vector<float>&, const vector<float>&)>
@@ -25,6 +28,7 @@ class GenericPoint : public PointInterface<int> {
 public:
     GenericPoint(int class_label, vector<float> attributes) : 
                     PointInterface<int> (class_label, attributes) {
+        g_max_label = std::max(g_max_label, class_label);
     }
 
     ~GenericPoint() {}
@@ -56,6 +60,7 @@ public:
         fflush(stdout);        
         return points; 
     }
+
 private:
 
     static pair<int, vector<float> > ParseCSV(char* line) {

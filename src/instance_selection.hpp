@@ -5,6 +5,8 @@
 
 #define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
 
+// #include "classifiers.hpp"
+
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -88,7 +90,7 @@ public:
                                               correctness_weight_ ( correctness_weight ) {
     }
 
-    // TODO: Use this as an initial solution
+    // TODO: Use one of these as an initial solution
     void CNN() {
 
         // Decorator to measure time
@@ -98,39 +100,134 @@ public:
         unselected_points_ = selected_points_;
         selected_points_.clear();
 
+        srand(time(NULL));
         auto random_point_iterator =
             std::next(std::begin(unselected_points_), 
                       std::rand() % unselected_points_.size());
 
         Point point = *random_point_iterator; 
 
-        unselected_points_.erase(point);
+        std::cout << "unselected points: " << unselected_points_.size() << std::endl;
+        std::cout << "point: " << point << std::endl;
+
         selected_points_.insert(point);
+        unselected_points_.erase(point);
 
         bool changed = true;
         while (changed) {
+            std::cout << "vuelta, ";
             changed = false;
-            for (Point p : unselected_points_) {
-                if (p.ClassLabel != classify(p, selected_points_)) {
-                    unselected_points_.erase(p);
+
+            for (auto curr = unselected_points_.begin(); curr != unselected_points_.end(); ) {
+                Point p = *curr;
+                curr++;
+                if (p.ClassLabel() != classify(p, selected_points_)) {
                     selected_points_.insert(p);
+                    unselected_points_.erase(p);
                     changed = true;
                 }
+            }
+
+            // Code for batch proccessing
+            // for (Point p : unselected_points_) {
+            //     if (p.ClassLabel() != classify(p, selected_points_)) {
+            //         points_to_remove.insert(p);
+            //         changed = true;
+            //     }
+            // }
+            // for (Point p : points_to_remove) {
+            //     selected_points_.insert(p);
+            //     unselected_points_.erase(p);
+            // }
+        }
+    }
+
+    void MCNN() {
+
+        MeasureTime mt("MCNN");
+
+        srand(time(NULL));
+
+        // Start with the empty set C `selected_points_`
+        unselected_points_ = selected_points_;
+        selected_points_.clear();
+
+        vector< vector<Point&> > classes_values(g_max_label);
+        vector< bool > already(g_max_label);
+
+        for (auto p : selected_points_) {
+            classes_values[p.ClassLabel()].push_back(p);
+        }
+
+        for (auto cv : classes_values) {
+            if (cv.size() > 0) {
+                Point p = cv[rand() % cv.size()];
+                selected_points_.insert(p);
+                unselected_points_.erase(p);
+                std::cout << "point: " << p << std::endl;
+            }
+        }
+
+        bool changed = true;
+        while (changed) {
+            std::cout << "vuelta, ";
+            multiset<Point> points_to_move;
+            changed = false;
+
+            for (Point p : unselected_points_) {
+                if (p.ClassLabel() != classify(p, selected_points_)) {
+                    points_to_move.insert(p);
+                    changed = true;
+                }
+            }
+            for (Point p : points_to_move) {
+                if (!already[p.ClassLabel()]) {
+                    already[p.ClassLabel] = true;
+                    selected_points_.insert(p);
+                    unselected_points_.erase(p);
+                }
+            }
+
+            for (int i; i < g_max_label; ++i) {
+                already[i] = false;
             }
         }
     }
 
-    // TODO: Implement Greedy solution (CNN, RNN, etc)
-    void MCNN() {}
-    void RNN() {}
+    void RNN() {
 
-    // TODO: Use this as an initial solution
+        MeasureTime mt("RNN"); 
+
+        CNN();
+
+        multiset<Point> all(selected_points_);
+        all.insert(unselected_points_.begin(), unselected_points_.end());
+
+        multiset<Point> selected_points_copy = selected_points_;
+
+        for (Point p : selected_points_copy) {
+            bool out = true;
+            selected_points_.erase(p);
+            for (Point i : all) {
+                if (p.ClassLabel() != classify(p, selected_points_)) {
+                    selected_points_.insert(p);
+                    out = false;
+                    break;
+                }
+            }
+
+            if (out) {
+                std::cout << "fuera\n";
+            }
+        }
+    }
+
     void RandomSolution() {
 
         // Decorator to measure time
         //MeasureTime mt("RandomSolution"); 
 
-        srand (time(NULL));
+        srand(time(NULL));
         multiset<Point> data(selected_points_); 
         data.insert(unselected_points_.begin(), unselected_points_.end()); 
 
