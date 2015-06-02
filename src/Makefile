@@ -23,5 +23,6 @@ run_tests: tests
 
 clean:
 	@rm *.o || :
+	@rm *.gch || :
 	@rm program || :
 	@rm -r program.dSYM/ || :
