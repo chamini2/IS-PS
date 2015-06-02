@@ -7,13 +7,13 @@
 #include <cstring>
 
 #include <iostream>
-using std::pair; 
+using std::pair;
 
 #include <sstream>
-using std::ostream; 
+using std::ostream;
 
 #include <set>
-using std::multiset; 
+using std::multiset;
 
 #include <cassert>
 #include "point_interface.hpp"
@@ -26,7 +26,7 @@ int g_max_label = 0;
 template <float (*distance_fun)(const vector<float>&, const vector<float>&)>
 class GenericPoint : public PointInterface<int> {
 public:
-    GenericPoint(int class_label, vector<float> attributes) : 
+    GenericPoint(int class_label, vector<float> attributes) :
                     PointInterface<int> (class_label, attributes) {
         g_max_label = std::max(g_max_label, class_label);
     }
@@ -34,7 +34,7 @@ public:
     ~GenericPoint() {}
 
     float distance(const PointInterface<int>& obj) {
-        return distance_fun(attributes_, obj.attributes()); 
+        return distance_fun(attributes_, obj.attributes());
     }
 
     static multiset<GenericPoint<distance_fun> > load(const char* filename) {
@@ -45,7 +45,7 @@ public:
         char *line = NULL;
         size_t len = 0;
 
-        multiset<GenericPoint<distance_fun> > points; 
+        multiset<GenericPoint<distance_fun> > points;
 
         fp = fopen(filename, "r");
         assert(fp != NULL);
@@ -57,8 +57,8 @@ public:
         }
 
         printf("done\n");
-        fflush(stdout);        
-        return points; 
+        fflush(stdout);
+        return points;
     }
 
 private:
@@ -78,7 +78,7 @@ private:
         }
 
         field[strlen(field)-1] = '\0';
-        int classLabel = atoi(field); 
+        int classLabel = atoi(field);
         return make_pair(classLabel, attributes);
 
     }
@@ -86,13 +86,13 @@ private:
 
 // Operator << for HammingDistance and EuclideanDistance
 std::ostream& operator<<(std::ostream& os, const GenericPoint<HammingDistance>& obj) {
-    
+
     for (float f : obj.attributes()) {
         os << f << ", ";
     }
 
-    os << obj.ClassLabel(); 
-    return os; 
+    os << obj.ClassLabel();
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const GenericPoint<EuclideanDistance>& obj) {
@@ -100,12 +100,12 @@ std::ostream& operator<<(std::ostream& os, const GenericPoint<EuclideanDistance>
         os << f << ", ";
     }
 
-    os << obj.ClassLabel(); 
-    return os; 
+    os << obj.ClassLabel();
+    return os;
 }
 
 // Operator << for HammingDistance and EuclideanDistance
-inline bool operator<(const GenericPoint<HammingDistance>& lhs, 
+inline bool operator<(const GenericPoint<HammingDistance>& lhs,
                       const GenericPoint<HammingDistance>& rhs) {
     int size = lhs.attributes().size();
 
@@ -118,7 +118,7 @@ inline bool operator<(const GenericPoint<HammingDistance>& lhs,
     return false;
 }
 
-inline bool operator<(const GenericPoint<EuclideanDistance>& lhs, 
+inline bool operator<(const GenericPoint<EuclideanDistance>& lhs,
                       const GenericPoint<EuclideanDistance>& rhs) {
     int size = lhs.attributes().size();
 

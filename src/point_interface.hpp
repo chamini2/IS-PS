@@ -11,8 +11,8 @@ template <typename Class>
 class PointInterface {
 public:
     PointInterface() {}
-    PointInterface(Class class_label, vector<float> attributes) : 
-                            class_label_ ( class_label ), 
+    PointInterface(Class class_label, vector<float> attributes) :
+                            class_label_ ( class_label ),
                             attributes_ ( attributes ) {
     }
     ~PointInterface() {}
