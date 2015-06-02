@@ -1,4 +1,13 @@
 # Informe
+- [ ] Descripción de GRASP
+- [ ] Descripción de diferentes perturbaciones de LS
+    - [ ] Pros
+    - [ ] Cons
+    - [ ] Comparación
+- [ ] Descripción de diferentes perturbaciones de ILS
+    - [ ] Comparación
+    - [ ] Pros
+    - [ ] Cons
 - [x] on 2015-05-10 21:53:50 | Descripción del problema
 - [x] on 2015-05-10 21:53:51 | Leer sobre trabajos previos
 - [x] on 2015-05-10 21:53:52 | Citar y explicar trabajos previos
@@ -8,6 +17,13 @@
 # Implementación
 - [ ] Probar diferentes funciones de fitness
 - [ ] Probar de búsqueda local
+- [ ] Implementar perturbación de solución inteligente para ILS
+- [ ] Implementar perturbación inteligente para LS
+    - [ ] Función de costo por punto añadido a la solución
+    - [ ] Función de costo por punto quitado de la solución
+- [ ] Implementar GRASP
+    - [ ] Implementar algoritmo como tal
+    - [ ] Implementar GreedySolution: Función de costo por punto añadido a la solución
 - [ ] Ejecutar el algoritmo con instancias considerables
     - [ ] Ejecutar el algoritmo con instancias grandes
     - [ ] Ejecutar el algoritmo con instancias medianas
