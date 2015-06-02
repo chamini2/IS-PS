@@ -8,6 +8,7 @@
     - [ ] Comparación
     - [ ] Pros
     - [ ] Cons
+- [ ] Hacer presentación
 - [x] on 2015-05-10 21:53:50 | Descripción del problema
 - [x] on 2015-05-10 21:53:51 | Leer sobre trabajos previos
 - [x] on 2015-05-10 21:53:52 | Citar y explicar trabajos previos
