@@ -27,6 +27,21 @@
 - [ ] Ejecutar el algoritmo con instancias considerables
     - [ ] Ejecutar el algoritmo con instancias grandes
     - [ ] Ejecutar el algoritmo con instancias medianas
+- [ ] Realizar pruebas en LS
+    - [ ] Correr pruebas small
+    - [ ] Correr pruebas medium
+    - [ ] Correr pruebas large
+    - [ ] Analizar resultados
+- [ ] Realizar pruebas en ILS
+    - [ ] Correr pruebas small
+    - [ ] Correr pruebas medium
+    - [ ] Correr pruebas large
+    - [ ] Analizar resultados
+- [ ] Realizar pruebas en GRASP
+    - [ ] Correr pruebas small
+    - [ ] Correr pruebas medium
+    - [ ] Correr pruebas large
+    - [ ] Analizar resultados
 - [x] on 2015-05-11 13:12:08 | Probar representación de las soluciones del meta-problema
 - [x] on 2015-05-11 13:12:10 | Probar operador de vecindad
 - [x] on 2015-05-11 13:12:11 | Probar 1-NN
