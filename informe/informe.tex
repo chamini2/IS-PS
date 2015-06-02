@@ -87,8 +87,27 @@ Como fue descrito en la sección~\ref{sect:meta}, se tomó la representación de
 
 Para ~\ref{eq:exp}, $\beta$ tomó el valor de \textit{Euler} por la forma en que la función exponencial crece. Como se puede ver en la figura~\ref{fig:euler3}, la misma penaliza a los valores más bajos, pues su crecimiento en ese punto es lento y a medida que los valores suben, el valor de la función crece de forma más violenta. En las figuras~\ref{fig:squared3} y~\ref{fig:weighted3} se puede notar que~\ref{eq:sqr} y~\ref{eq:weight} tienen un comportamiento parecido a~\ref{eq:exp} pero menos pronunciado. 
 
-El operador de vencidad que se definió, consiste en una función que intercambia $K$ instancias entre \textbf{SP} y \textbf{UP} para generar nuevas soluciones, donde $K$ es un parámetro a calibrar dependiendo del problema de clasificación.
+Por otra parte, el operador de vencidad que se definió consiste en una función que intercambia $K$ instancias entre \textbf{SP} y \textbf{UP} para generar nuevas soluciones, donde $K$ es un parámetro a calibrar dependiendo del problema de clasificación.
 
+Para la selección de las instancias a intercambiar, se tomaron en cuenta dos estrategias:
+
+\begin{itemize}
+\item \textbf{Selección aleatoria:} Se seleccionan puntos de forma aleatoria de alguno de los dos conjuntos \textbf{SP} o \textbf{UP}.
+\item \textbf{Selección en base a costos:} Las instancias a intercambiar entre \textbf{SP} y \textbf{UP} son seleccionadas dependiendo de cuánto mejoren o empeoren la solución actual. Para determinar dicha medida, se define el \textit{costo incremental} $C(e)$ como una estimación del porcentaje de mejora a la solución al insertar la instancia $e$ a la misma y el \textit{costo decremental} $D(e)$ como una estimación de mejora a la solución al extraer la instancia $e$ de la misma. 
+
+Para el caso específico de IS/PS, se tomaron dos definiciones de las función de costo incremental y decremental. 
+
+\begin{itemize}
+\item \textbf{Prueba por fuerza bruta:} En el caso de la función incremental $C(e)$, el valor se obtiene con la diferencia entre la evaluación de la solución que contiene al punto $e$ y la evaluación de la solución que no contiene al punto $e$. Y en el caso de la función decremental $D(e) = -C(e)$.
+
+\item \textbf{Variación de posición del centroide:} En este caso se define la función incremental $C(e)$ como la variación de la posición del centroide de la clase de $e$, cuyo valor se considera mejor si es mayor. Y definimos la función decremental $D(e)$ igual que $C(e)$ pero en este caso su valor se considera mejor mientras sea menor.
+
+\end{itemize}
+
+La estrategia por fuerza bruta es la más convencional de las dos, puesto que obtiene el costo a partir de la función de evaluación definida para la búsqueda local y por ende asegura que la perturbación mejore la solución anterior. Pero por otro lado, se trata de un algoritmo con un orden de ejecución alto para la cantidad de veces que se podría repetir.
+
+La estrategia de la distancia al centroide se trata de insertar puntos a la solución que modifiquen de una manera significativa la posición del centroide actual. Esto es porque una instancia que no modifique la posición del centroide de forma significativa, es una instancia cuyo valor no influye tanto a la hora de clasificar.
+\end{itemize}
 \begin{algorithm}
  \DontPrintSemicolon
  \vspace*{0.1cm}

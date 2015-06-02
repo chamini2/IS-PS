@@ -1,14 +1,14 @@
 # Informe
 - [ ] Descripción de GRASP
-- [ ] Descripción de diferentes perturbaciones de LS
-    - [ ] Pros
-    - [ ] Cons
-    - [ ] Comparación
 - [ ] Descripción de diferentes perturbaciones de ILS
     - [ ] Comparación
     - [ ] Pros
     - [ ] Cons
 - [ ] Hacer presentación
+- [x] on 2015-06-02 19:28:04 | Descripción de diferentes perturbaciones de LS 
+    - [x] on 2015-06-02 19:28:04 | Pros
+    - [x] on 2015-06-02 19:28:04 | Cons
+    - [x] on 2015-06-02 19:28:04 | Comparación
 - [x] on 2015-05-10 21:53:50 | Descripción del problema
 - [x] on 2015-05-10 21:53:51 | Leer sobre trabajos previos
 - [x] on 2015-05-10 21:53:52 | Citar y explicar trabajos previos
