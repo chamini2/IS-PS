@@ -52,10 +52,11 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[2], "euclidean") == 0){
 
         multiset<GenericPoint<EuclideanDistance> > points = GenericPoint<EuclideanDistance>::load(argv[1]); 
-        cout << "N points: " << points.size() << endl << flush; 
         PopulationMap<GenericPoint<EuclideanDistance>, int, 
                       OneNN, WeightedQuality> pop_map(points, 1); 
 
+        pop_map.CNN(); 
+        cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush; 
         PopulationMap<GenericPoint<EuclideanDistance>, 
                       int, OneNN, WeightedQuality> best_map = IteratedLocalSearch<GenericPoint<EuclideanDistance>,
                                                                                   int, OneNN, WeightedQuality>(pop_map, 20);

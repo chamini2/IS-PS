@@ -133,23 +133,23 @@ El operador de vencidad que se definió, consiste en una función que intercambi
 
 
 \section{Búsqueda local iterada}
-La búsqueda local iterada se trata de realizar una búsqueda local sobre una solución inicial, para obtener una mejor solución, la cual se perturba para generar una nueva solución inicial que se utiliza de forma recursiva realizando el mismo proceso. La solución perturbada puede ser mejor o peor que la solución generada por la búsqueda local, dado que lo que se quiere obtener al realizar dicha perturbación es expandir el espacio de búsqueda (lo que puede generar una solución peor pero que al realizar la búsqueda local sobre ella, lleve a un mínimo/máxmimo mejor que el encontrado) o minimizar/maximizar aún más la solución actual.
+La búsqueda local iterada se trata de realizar una búsqueda local sobre una solución inicial para obtener una mejor solución, la cual se perturba para generar una nueva solución inicial que se utiliza para realizar el mismo proceso. La solución perturbada puede ser mejor o peor que la solución generada por la búsqueda local, dado que lo que se quiere obtener al realizar dicha perturbación es expandir el espacio de búsqueda (lo que puede generar una solución peor pero que al realizar la búsqueda local sobre ella, lleve a un valor mejor que el encontrado) o mejorar aún más la solución actual.
 
 En los experimentos a realizar en esta metaheurística se tomaron en cuenta 2 formas de perturbación de soluciones:
 
 \begin{itemize}
-\item [\textbf{Perturbación aleatoria}:] Se perturba de forma aleatoria pero reservada, es decir, se cambia una pequeña cantidad de atributos al azar para que de esta forma la solución generada se mantenga en el mismo mínimo/máximo local que generó la última búsqueda local.
-\item [\textbf{Perturbación \textit{Greedy}}:] Se perturba la solución con un algoritmo \textit{Greedy} como \textit{CNN }y \textit{MCNN}, los cuales generan soluciones aleatorias que pueden tener una cantidad de cambios considerables. Esta perturbación puede generar soluciones incluso peores que la inicial, pero que diversifica el espacio de búsqueda para acceder a otros mínimos/máximos. 
+\item [\textbf{Perturbación aleatoria}:] Se perturba de forma aleatoria pero reservada, es decir, se cambia una pequeña cantidad de atributos al azar para que la solución generada se mantenga en la misma localidad que consiguió la última búsqueda local.
+\item [\textbf{Perturbación \textit{Greedy}}:] Se perturba la solución con un algoritmo \textit{Greedy} como \textit{CNN }o \textit{MCNN}, los cuales generan soluciones aleatorias que pueden tener una cantidad de cambios considerables. Esta perturbación puede generar soluciones incluso peores que la inicial, pero que diversifica el espacio de búsqueda para acceder a otras localidades. 
 \end{itemize}
 
-La idea detrás de estos tipos de perturbación es mejorar las soluciones que se puedan encontrar con el algoritmo. Una vez ejecutada una búsqueda local, existen dos escenarios posibles: El primero es que la búsqueda no llegó a generar el mínimo/máximo local, para lo cual se ejecuta el primer tipo de perturbación intentando así alcanzarlo. Y el segundo es que la búsqueda local sí consiguipo un mínimo/máximo local, por lo que es necesario salir del mismo para ampliar el espacio de búsqueda cayendo en el radio de búsqueda de otro mínimo o máximo local y para ello se ejecuta el segundo tipo de perturbación.
+La idea detrás de estos tipos de perturbación es mejorar las soluciones que se puedan encontrar con el algoritmo. Una vez ejecutada una búsqueda local, existen dos escenarios posibles: El primero es que la búsqueda no llegó a generar el mejor valor local, para lo cual se ejecuta el primer tipo de perturbación intentando así alcanzarlo. Y el segundo es que la búsqueda local sí consiguipo el mejor valor local, por lo que es necesario salir del mismo para ampliar el espacio de búsqueda cayendo en otra localidad de búsqueda y para ello se ejecuta el segundo tipo de perturbación. Para una referencia visual, ver la figura~\ref{fig:perturbaciones}
 
 % FIGURA DE TIPOS DE PERTURBACIÓN
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\linewidth]{perturbaciones}
 	\caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
-	\label{fig:euler3}
+	\label{fig:perturbaciones}
 \end{figure}
 \section{GRASP}
 %\subsection{Resultados}
