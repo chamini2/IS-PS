@@ -77,10 +77,11 @@ Donde $cl$ corresponde al porcentaje de classificación correcta, $rd$ al porcen
 
 Por otra parte, también es necesario definir un operador de vecindad, el cual consiste en una función capaz de generar nuevas soluciones a partir de cualquier solución. El mismo depende de la metaheurística aplicada a problema.
 
-En los experimentos realizados en este estudio, se consideró el uso de búsqueda local, la cual consiste en partir de una solución inicial, que va a ser modificada por un operador de vecindad que genera otra solución factible. Luego, la solución actual se compara con la solución generada a través de una función de evaluación de calidad, y se desecha la peor de ambas para recurrir en el mismo proceso con la restante.
+En los experimentos realizados en este estudio, se consideró el uso de búsqueda local como metaheurística lineal y búsqueda local iterada y GRASP como metaheurísticas de trayectoria.
 
+\section{Búsqueda local}
 
-\section{Experimentos con búsqueda local}
+La búsqueda local consiste en partir de una solución inicial, que va a ser modificada por un operador de vecindad que genera otra solución factible. Luego, la solución actual se compara con la solución generada a través de una función de evaluación de calidad, y se desecha la peor de ambas para recurrir en el mismo proceso con la restante.
 
 Como fue descrito en la sección~\ref{sect:meta}, se tomó la representación de \textbf{SP}y \textbf{UP} para las soluciones y las funciones de evaluación se tomaron las funciones~\ref{eq:sqr}, ~\ref{eq:weight} y~\ref{eq:exp}, .
 
@@ -110,18 +111,19 @@ El operador de vencidad que se definió, consiste en una función que intercambi
  \caption{Operador de vecindad}
 \end{algorithm}
 
+% FIGURA DE FUNCIÓN POR PESO
 \begin{figure}[p]
 	\includegraphics[width=\linewidth]{weighted-3b}
 	\caption{Pesada, ecuación~\ref{eq:weight}}
 	\label{fig:weighted3}
 \end{figure}
-
+% FIGURA DE FUNCIÓN CUADRÁTICA
 \begin{figure}[p]
 	\includegraphics[width=\linewidth]{squared-3b}
 	\caption{Cuadrática, ecuación~\ref{eq:sqr}}
 	\label{fig:squared3}
 \end{figure}
-
+% FIGURA DE FUNCIÓN EULER
 \begin{figure}[p]
 	\centering
 	\includegraphics[width=\linewidth]{euler-3b}
@@ -129,6 +131,27 @@ El operador de vencidad que se definió, consiste en una función que intercambi
 	\label{fig:euler3}
 \end{figure}
 
+
+\section{Búsqueda local iterada}
+La búsqueda local iterada se trata de realizar una búsqueda local sobre una solución inicial, para obtener una mejor solución, la cual se perturba para generar una nueva solución inicial que se utiliza de forma recursiva realizando el mismo proceso. La solución perturbada puede ser mejor o peor que la solución generada por la búsqueda local, dado que lo que se quiere obtener al realizar dicha perturbación es expandir el espacio de búsqueda (lo que puede generar una solución peor pero que al realizar la búsqueda local sobre ella, lleve a un mínimo/máxmimo mejor que el encontrado) o minimizar/maximizar aún más la solución actual.
+
+En los experimentos a realizar en esta metaheurística se tomaron en cuenta 2 formas de perturbación de soluciones:
+
+\begin{itemize}
+\item [\textbf{Perturbación aleatoria}:] Se perturba de forma aleatoria pero reservada, es decir, se cambia una pequeña cantidad de atributos al azar para que de esta forma la solución generada se mantenga en el mismo mínimo/máximo local que generó la última búsqueda local.
+\item [\textbf{Perturbación \textit{Greedy}}:] Se perturba la solución con un algoritmo \textit{Greedy} como \textit{CNN }y \textit{MCNN}, los cuales generan soluciones aleatorias que pueden tener una cantidad de cambios considerables. Esta perturbación puede generar soluciones incluso peores que la inicial, pero que diversifica el espacio de búsqueda para acceder a otros mínimos/máximos. 
+\end{itemize}
+
+La idea detrás de estos tipos de perturbación es mejorar las soluciones que se puedan encontrar con el algoritmo. Una vez ejecutada una búsqueda local, existen dos escenarios posibles: El primero es que la búsqueda no llegó a generar el mínimo/máximo local, para lo cual se ejecuta el primer tipo de perturbación intentando así alcanzarlo. Y el segundo es que la búsqueda local sí consiguipo un mínimo/máximo local, por lo que es necesario salir del mismo para ampliar el espacio de búsqueda cayendo en el radio de búsqueda de otro mínimo o máximo local y para ello se ejecuta el segundo tipo de perturbación.
+
+% FIGURA DE TIPOS DE PERTURBACIÓN
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\linewidth]{perturbaciones}
+	\caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
+	\label{fig:euler3}
+\end{figure}
+\section{GRASP}
 %\subsection{Resultados}
 %\section*{Conclusiones}
 %---------------------------- Bibliography -------------------------------

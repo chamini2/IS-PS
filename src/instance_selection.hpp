@@ -5,6 +5,8 @@
 
 #define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
 
+#define N_THREADS 100
+
 // #include "classifiers.hpp"
 
 #include <cassert>
@@ -24,6 +26,15 @@ using std::flush;
 
 #include <string>
 using std::string; 
+
+#include <thread>
+using std::thread;
+
+#include <mutex>
+using std::mutex;
+
+#include <array>
+using std::array; 
 
 #if TEST_PRIVATE_ATTRIBUTES
 #include "gtest-1.7.0/include/gtest/gtest.h"
@@ -269,7 +280,7 @@ public:
 
             auto random_point_iterator =
                 std::next(std::begin(set_to_use), 
-                          std::rand() % set_to_use.size());
+                          std::rand() % set_to_use.size()); 
 
             Point random_point = *random_point_iterator; 
             toggle(random_point, random_to_pick_set); 
@@ -315,6 +326,16 @@ private:
         }
     }
 
+
+    
+    // Thread function to be used in parallel
+    void ClassifyPoint(int thread, const Point& p, const multiset<Point>& training_set) const {
+
+        if (p.ClassLabel() == classify(p, training_set)) {
+            ++good_classifications_[thread]; 
+        }
+    }
+
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
     float RunClassifier(const multiset<Point>& training_set, 
@@ -325,6 +346,35 @@ private:
             return 0.0; 
         }
 
+        // XXX: PARALLELISM IS SLOWER
+        //memset(good_classifications_, 0, sizeof(good_classifications_)); 
+        //thread classifiers[N_THREADS]; 
+
+        //auto fun_ptr = &PopulationMap<Point, Class, classify, fitness>::ClassifyPoint;
+
+        //// TODO: Parallelize this for
+        //auto p = testing_set.begin(); 
+        //for (int t = 0; p != testing_set.end(); ++p, t = (t + 1) % N_THREADS) {
+
+            //classifiers[t] = thread(fun_ptr, this, t, *p, training_set); 
+
+            //// Wait all threads N_THREAD threads are used
+            //if (t == N_THREADS - 1) {
+                //for (int w = 0; w < N_THREADS; ++w) {
+                    //classifiers[w].join(); 
+                //}
+            //}
+        //}
+
+        //// Collect the well classified points
+        //int correct = 0; 
+        //for (int w = 0; w < N_THREADS; ++w) {
+            //if (classifiers[w].joinable()) {
+                //classifiers[w].join(); 
+            //}
+            //correct += good_classifications_[w]; 
+        /*}*/
+
         int correct = 0; 
 
         // TODO: Parallelize this for
@@ -332,6 +382,7 @@ private:
             if (p.ClassLabel() == classify(p, training_set)) {
                 ++correct; 
             }
+            
         }
 
         return float(correct) / testing_set.size(); 
@@ -346,6 +397,7 @@ private:
     multiset<Point> selected_points_;   
     multiset<Point> unselected_points_;   
     float correctness_weight_;   
+    mutable int good_classifications_[N_THREADS]; 
 };
 
 template <typename Point, 
@@ -367,8 +419,8 @@ template <typename Point,
           typename Class, 
           Class (*classify)(Point, const multiset<Point>&), 
           float (*fitness)(float,float,float)>
-PopulationMap<Point,Class,classify,fitness> 
-    LocalSearchFirstFound(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+          PopulationMap<Point,Class,classify,fitness> 
+          LocalSearchFirstFound(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
         // At least 1 iteration
         assert(iterations > 0);
         int curr_iterations = 0;
@@ -396,36 +448,67 @@ PopulationMap<Point,Class,classify,fitness>
     }
 
 template <typename Point, 
-         typename Class, 
-         Class (*classify)(Point, const multiset<Point>&),
-         float (*fitness)(float,float,float)>
-         PopulationMap<Point,Class,classify,fitness> 
-         LocalSearchFirstFoundRec(const PopulationMap<Point,Class,classify,fitness>& map, 
-                 float map_quality, 
-                 int curr_iterations, 
-                 int max_iterations) {
-             PopulationMap<Point,Class,classify,fitness> copy_map(map);
+          typename Class, 
+          Class (*classify)(Point, const multiset<Point>&),
+          float (*fitness)(float,float,float)>
+          PopulationMap<Point,Class,classify,fitness> 
+          LocalSearchFirstFoundRec(const PopulationMap<Point,Class,classify,fitness>& map, 
+                  float map_quality, 
+                  int curr_iterations, 
+                  int max_iterations) {
+              PopulationMap<Point,Class,classify,fitness> copy_map(map);
 
-             if (curr_iterations == 0) {
-                 return map;
-             }
+              if (curr_iterations == 0) {
+                  return map;
+              }
 
-             copy_map.NeighborhoodOperator();
-             float copy_quality = copy_map.EvaluateQuality();
+              copy_map.NeighborhoodOperator();
+              float copy_quality = copy_map.EvaluateQuality();
 
-             return copy_quality > map_quality ? 
-                 LocalSearchFirstFoundRec<Point,Class,classify,fitness>(copy_map, 
-                         copy_quality, 
-                         max_iterations, 
-                         max_iterations) :
-                 LocalSearchFirstFoundRec<Point,Class,classify,fitness>(map, 
-                                                                    map_quality, 
-                                                                    curr_iterations - 1, 
-                                                                    max_iterations);
-}
+              return copy_quality > map_quality ? 
+                  LocalSearchFirstFoundRec<Point,Class,classify,fitness>(copy_map, 
+                          copy_quality, 
+                          max_iterations, 
+                          max_iterations) :
+                  LocalSearchFirstFoundRec<Point,Class,classify,fitness>(map, 
+                          map_quality, 
+                          curr_iterations - 1, 
+                          max_iterations);
+          }
 
 // PopulationMap LocalSearchBestOfAll(const PopulationMap&);
 // PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
 // PopulationMap LocalSearchTopSolutions(const PopulationMap&, int);  // The argument is the number of best solutions to keep
 
+template <typename Point, 
+         typename Class, 
+         Class (*classify)(Point, const multiset<Point>&), 
+         float (*fitness)(float,float,float)>
+         PopulationMap<Point,Class,classify,fitness> 
+         IteratedLocalSearch(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+
+              const int local_search_its = 20; 
+
+              PopulationMap<Point,Class,classify,fitness> initial_solution(map); 
+              initial_solution.RandomSolution();
+
+              PopulationMap<Point,Class,classify,fitness> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
+
+              float curr_quality = best_solution.EvaluateQuality(); 
+
+              for (int it = 0; it < iterations; ++it) { 
+
+                  PopulationMap<Point,Class,classify,fitness>& perturbated_solution(best_solution);
+                  perturbated_solution.RandomSolution(); 
+
+                  const PopulationMap<Point,Class,classify,fitness>& candidate_solution = LocalSearchFirstFound<Point, Class, classify, fitness>(perturbated_solution, local_search_its);
+                  float candidate_quality = candidate_solution.EvaluateQuality(); 
+
+                  // If the quality is better than the previous map, we found a new map
+                  if (curr_quality < candidate_quality) {
+                      best_solution = candidate_solution; 
+                      curr_quality  = candidate_quality; 
+                  }
+              }
+         }
 #endif
