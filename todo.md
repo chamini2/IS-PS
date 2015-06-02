@@ -16,6 +16,7 @@
 - [x] on 2015-05-10 21:53:58 | Describr las aplicaciones
 
 # Implementación
+- [ ] Calcular porcentaje de error de la solución final
 - [ ] Probar diferentes funciones de fitness
 - [ ] Probar de búsqueda local
 - [ ] Implementar perturbación de solución inteligente para ILS
