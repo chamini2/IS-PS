@@ -1,13 +1,16 @@
 top: clean program
 
-program: fitness classifiers
-	g++ program.cpp -std=c++11 -g -o program -pthread fitness.o classifiers.o
+program: testing
+	g++ program.cpp -std=c++11 -O2 -o program -pthread testing.o fitness.o classifiers.o
 
 fitness: fitness.cpp fitness.hpp
-	g++ fitness.cpp -std=c++11 -pthread -g -c
+	g++ fitness.cpp -std=c++11 -pthread -O2 -c
 
 classifiers: classifiers.cpp classifiers.hpp
-	g++ classifiers.cpp -std=c++11 -pthread -g -c
+	g++ classifiers.cpp -std=c++11 -pthread -O2 -c
+
+testing: testing.cpp testing.hpp fitness classifiers
+	g++ testing.cpp fitness.o classifiers.o -std=c++11 -pthread -O2 -c 
 
 run_program: clean program
 	@./program ../data/small/glass/glass.data euclidean

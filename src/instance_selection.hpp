@@ -15,11 +15,20 @@
 #include <cstring>
 #include <cstdio>
 
+#include <iostream>
+using std::make_pair; 
+
 #include <vector>
 using std::vector;
 
 #include <set>
 using std::multiset;
+
+#include <unordered_map>
+using std::unordered_map; 
+
+#include <map>
+using std::map; 
 
 #include <iostream>
 using std::cout;
@@ -79,9 +88,9 @@ private:
 
 // Functions to compare two GenericPoints by their incremental cost
 template <typename Point>
-bool CompareCosts(const Point& lhs,
-                  const Point& rhs) {
-    return lhs.IncrementalCost() < rhs.IncrementalCost(); 
+bool CompareCosts(const pair<Point, float>& lhs,
+                  const pair<Point, float>& rhs) {
+    return lhs.second < rhs.second; 
 }
 
 int MeasureTime::deepness = 0;
@@ -103,7 +112,9 @@ public:
         selected_points_    = obj.selected_points_;
         unselected_points_  = obj.unselected_points_;
         correctness_weight_ = obj.correctness_weight_;
-        point_sum_          = obj.point_sum_; 
+        point_sum_          = obj.point_sum_;
+        class_frequency_    = obj.class_frequency_;
+        centroids_          = obj.centroids_;
     }
     // TODO: Generate (or not) initial solution
     PopulationMap(multiset<Point> data,
@@ -120,27 +131,44 @@ public:
     }
 
     void InitialSolution() {
+        // Greedy
         CNN(); 
 
         // Expecting at least 1 point in selected points
         assert(!selected_points_.empty()); 
 
         int n_attributes = selected_points_.begin()->attributes().size();
-        point_sum_       = vector<float>(n_attributes, 0);
 
-        // Point SUM initialization 
         for (auto p : selected_points_) {
+            ++class_frequency_[p.ClassLabel()]; 
+            vector<float>& class_sum = point_sum_[p.ClassLabel()]; 
+            if (class_sum.empty()) {
+                class_sum = vector<float>(n_attributes, 0.0); 
+            }
+
             for (int i = 0; i < n_attributes; ++i) {
-                point_sum_[i] += p.attributes()[i]; 
+                class_sum[i] += p.attributes()[i]; 
             }
         }
+
+        for (auto sum : point_sum_) {
+            Class c = sum.first; 
+            vector<float> avg = point_sum_[c]; 
+            int n_points = class_frequency_[c]; 
+            for (int i = 0; i < n_attributes; ++i) {
+                avg[i] /= n_points; 
+            }
+
+            centroids_[c] = avg; 
+        }
+
     }
 
     // TODO: Use one of these as an initial solution
     void CNN() {
 
         // Decorator to measure time
-        MeasureTime mt("CNN");
+        //MeasureTime mt("CNN");
 
         // Start with the empty set C `selected_points_`
         unselected_points_ = selected_points_;
@@ -153,15 +181,12 @@ public:
 
         Point point = *random_point_iterator;
 
-        std::cout << "unselected points: " << unselected_points_.size() << std::endl;
-        std::cout << "point: " << point << std::endl;
 
         selected_points_.insert(point);
         unselected_points_.erase(point);
 
         bool changed = true;
         while (changed) {
-            std::cout << "vuelta, ";
             changed = false;
 
             for (auto curr = unselected_points_.begin(); curr != unselected_points_.end(); ) {
@@ -210,13 +235,11 @@ public:
                 Point p = cv[rand() % cv.size()];
                 selected_points_.insert(p);
                 unselected_points_.erase(p);
-                std::cout << "point: " << p << std::endl;
             }
         }
 
         bool changed = true;
         while (changed) {
-            std::cout << "vuelta, ";
             multiset<Point> points_to_move;
             changed = false;
 
@@ -242,7 +265,7 @@ public:
 
     void RNN() {
 
-        MeasureTime mt("RNN");
+        //MeasureTime mt("RNN");
 
         CNN();
 
@@ -263,7 +286,6 @@ public:
             }
 
             if (out) {
-                std::cout << "fuera\n";
             }
         }
     }
@@ -311,8 +333,8 @@ public:
             }
 
 
-            //Point random_point = GetRandomPoint(random_to_pick_set); 
-            Point random_point = GetBestPoint(random_to_pick_set); 
+            Point random_point = GetRandomPoint(random_to_pick_set); 
+            //Point random_point = GetBestPoint(random_to_pick_set); 
             toggle(random_point, random_to_pick_set);
         }
     }
@@ -333,38 +355,42 @@ public:
                                                                      : unselected_points_);
 
         int N = set_to_use.begin()->attributes().size(); 
-        vector<float> centroid(point_sum_); 
-        for (int i = 0; i < N; ++i) {
-            centroid[i] /= set_to_use.size(); 
-        }
+        map<Point, float> cost_map; 
 
-        int n_points = set_to_use.size() + (random_to_pick_set == 1 ? -1 : 1); 
-        for (auto p : set_to_use ) {
-            vector<float> tmp_centroid(point_sum_); 
+        for (const Point& p : set_to_use) {
+
+            int n_points = class_frequency_[p.ClassLabel()]; 
+            vector<float> centroid = centroids_[p.ClassLabel()]; 
+            if (centroid.empty()) {
+                return p; 
+            }
+            vector<float> tmp_centroid(point_sum_[p.ClassLabel()]); 
             
             if (random_to_pick_set == 1) {
                 // Substract each attribute of the point to be removed
                 for (int i = 0; i < N; ++i) {
                     tmp_centroid[i] -= p.attributes()[i];
                 }
+                --n_points; 
             } else  {
                 // Add each attribute of the point to be inserted
                 for (int i = 0; i < N; ++i) {
                     tmp_centroid[i] += p.attributes()[i];
                 }
+                ++n_points; 
             }
 
             for (int i = 0; i < N; ++i) {
                 tmp_centroid[i] /= n_points; 
             }
 
-            p.IncrementalCost(EuclideanDistance(centroid, tmp_centroid)); 
+            cost_map[p] = EuclideanDistance(centroid, tmp_centroid); 
         }
 
         if (random_to_pick_set == 1) {
-            return *min_element(set_to_use.begin(), set_to_use.end(), CompareCosts<Point>); 
+            return min_element(cost_map.begin(), cost_map.end(), CompareCosts<Point>)->first; 
         } else {
-            return *max_element(set_to_use.begin(), set_to_use.end(), CompareCosts<Point>); 
+            return max_element(cost_map.begin(), cost_map.end(), CompareCosts<Point>)->first;  
         }
     }
 
@@ -382,6 +408,11 @@ public:
         return fitness(classification_correctness, reduction_percentage, correctness_weight_);
     }
 
+
+    pair<float,float> SolutionStatistics() {
+        return make_pair(RunClassifier(selected_points_, unselected_points_), GetReductionPercentage()); 
+    }
+
     multiset<Point> selected_points() const { return selected_points_; }
     multiset<Point> unselected_points() const { return unselected_points_; }
 
@@ -397,28 +428,16 @@ private:
     FRIEND_TEST(BallonPointTest, FitnessFunction);
 #endif
 
-    
     // Toggles points between selected and unselected points sets.
     void toggle(Point p, int set_to_use) {
-        int N = p.attributes().size(); 
         if (set_to_use == 1) {
-            // Substract each attribute of the point to be removed
-            for (int i = 0; i < N; ++i) {
-                point_sum_[i] -= p.attributes()[i];
-            }
             selected_points_.erase(p);
             unselected_points_.insert(p);
         } else {
-            // Add each attribute of the point to be inserted
-            for (int i = 0; i < N; ++i) {
-                point_sum_[i] += p.attributes()[i];
-            }
             unselected_points_.erase(p);
             selected_points_.insert(p);
         }
     }
-
-
 
     // Thread function to be used in parallel
     void ClassifyPoint(int thread, const Point& p, const multiset<Point>& training_set) const {
@@ -489,8 +508,12 @@ private:
     multiset<Point> selected_points_;
     multiset<Point> unselected_points_;
     float correctness_weight_;
-    vector<float> point_sum_;
+    float error_rate_; 
+    unordered_map<Class, vector<float> > point_sum_;
+    unordered_map<Class, int> class_frequency_;
+    unordered_map<Class, vector<float> > centroids_; 
     mutable int good_classifications_[N_THREADS];
+
 };
 
 template <typename Point,

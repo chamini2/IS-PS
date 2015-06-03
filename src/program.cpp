@@ -20,61 +20,62 @@ using std::endl;
 using std::pair;
 using std::make_pair;
 
-#include "point_instances.hpp"
-#include "instance_selection.hpp"
-#include "classifiers.hpp"
-#include "fitness.hpp"
+#include <cstring>
+#include "testing.hpp"
 
 const char *distance_functions[] = { "hamming", "euclidean" };
 
+vector<string> ParseCSV(char* line) {
+    char *field;
+    vector<string> attributes;
+
+    field = strtok(line, ",");
+    while (field != NULL) {
+        if (field[strlen(field) - 1] == '\n') {
+            field[strlen(field) - 1] = '\0'; 
+        }
+        attributes.push_back(field);
+        field = strtok(NULL, ",");
+    }
+
+    return attributes; 
+}
+
+vector<Test> load(const char* filename) {
+        FILE *fp;
+        char *line = NULL;
+        size_t len = 0;
+
+        vector<Test> result;
+
+        fp = fopen(filename, "r");
+        assert(fp != NULL);
+
+        while (getline(&line, &len, fp) != -1) {
+
+            Test t(ParseCSV(line)); 
+            result.push_back(t); 
+        }
+
+        printf("done\n");
+        fflush(stdout);
+
+        return result; 
+}
+
+
+
 int main(int argc, char *argv[]) {
 
-    if (argc < 3) {
-        printf("Usage: %s <data_file> <distance_function>", argv[0]);
+    if (argc < 2) {
+        printf("Usage: %s <test_file>", argv[0]);
         exit(1);
     }
 
-    MeasureTime mt("principal");
+    vector<Test> tests = load(argv[1]); 
 
-    if (strcmp(argv[2], "hamming") == 0) {
-        multiset<GenericPoint<HammingDistance> > points = GenericPoint<HammingDistance>::load(argv[1]);
-        PopulationMap<GenericPoint<HammingDistance>, int,
-                      OneNN, SquaredQuality> pop_map(points, 1);
-
-        pop_map.InitialSolution();
-        cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush;
-        PopulationMap<GenericPoint<HammingDistance>,
-                      int, OneNN, SquaredQuality> best_map =
-                          LocalSearchFirstFound<GenericPoint<HammingDistance>,
-                                                int, OneNN, SquaredQuality>(pop_map, 20);
-
-        cout << "Result number of points: " << best_map.SelectedPointsSize() << endl << flush;
-    } else if (strcmp(argv[2], "euclidean") == 0){
-
-        multiset<GenericPoint<EuclideanDistance> > points = GenericPoint<EuclideanDistance>::load(argv[1]);
-        PopulationMap<GenericPoint<EuclideanDistance>, int,
-                      OneNN, WeightedQuality> pop_map(points, 1);
-
-        pop_map.InitialSolution();
-        cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush;
-        PopulationMap<GenericPoint<EuclideanDistance>,
-                      int, OneNN, WeightedQuality> best_map = IteratedLocalSearch<GenericPoint<EuclideanDistance>,
-                                                                                  int, OneNN, WeightedQuality>(pop_map, 20);
-
-        //pop_map.RandomSolution();
-        //cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush;
-        //PopulationMap<GenericPoint<EuclideanDistance>,
-                      //int, OneNN, WeightedQuality> best_map =
-                          //LocalSearchFirstFound<GenericPoint<EuclideanDistance>,
-                                                //int, OneNN, WeightedQuality>(pop_map, 20);
-
-        cout << "Result number of points: " << best_map.SelectedPointsSize() << endl << flush;
-    } else {
-        printf("Invalid distance function\n");
-        printf("Available distances: \n");
-        for (auto dist : distance_functions) {
-            printf(" - %s\n", dist);
-        }
+    for (Test t : tests) {
+        cout << t << t.run() << endl; 
     }
 
     return 0;

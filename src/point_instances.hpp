@@ -26,8 +26,14 @@ int g_max_label = 0;
 template <float (*distance_fun)(const vector<float>&, const vector<float>&)>
 class GenericPoint : public PointInterface<int> {
 public:
+    GenericPoint(const GenericPoint<distance_fun>& obj) {
+        class_label_      = obj.class_label_;
+        attributes_       = obj.attributes_;
+    }
+
     GenericPoint() : PointInterface<int>(0, vector<float>()) {
     }
+
     GenericPoint(int class_label, vector<float> attributes) :
                     PointInterface<int> (class_label, attributes) {
         g_max_label = std::max(g_max_label, class_label);
@@ -40,8 +46,6 @@ public:
     }
 
     static multiset<GenericPoint<distance_fun> > load(const char* filename) {
-        printf("Reading data from file %s ... ", filename);
-        fflush(stdout);
 
         FILE *fp;
         char *line = NULL;
@@ -58,13 +62,8 @@ public:
             points.insert(GenericPoint<distance_fun>(inst_pair.first, inst_pair.second));
         }
 
-        printf("done\n");
-        fflush(stdout);
         return points;
     }
-
-    void IncrementalCost(float cost) { incremental_cost_ = cost; }
-    float IncrementalCost() const { return incremental_cost_; }
 
 private:
 
@@ -87,8 +86,6 @@ private:
         return make_pair(classLabel, attributes);
 
     }
-
-    float incremental_cost_; 
 };
 
 // Operator << for HammingDistance and EuclideanDistance
