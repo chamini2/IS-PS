@@ -171,6 +171,7 @@ public:
         }
 
         for (auto cv : classes_values) {
+            // Maybe the class didn't exist
             if (cv.size() > 0) {
                 Point p = cv[rand() % cv.size()];
                 selected_points_.insert(p);

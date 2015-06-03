@@ -19,7 +19,7 @@
 
 %----------------------- Title -------------------------------------------
 
-\title{Problema de selección de prototipo (IS/PS):\\ 
+\title{Problema de selección de prototipo (IS/PS):\\
        Un enfoque con metaheurísticas}
 
 \author{Juan Carlos Arocha Ovalles
@@ -50,7 +50,7 @@ Este problema es bastante común en diversas áreas de ciencias de la computaci�
 \section{Trabajos anteriores}
 \label{sect:works}
 
-Entre las soluciones que se estudiaron en el estado del arte, en~\cite{toussaint2002proximity} Toussaint describe soluciones de tipo \textit{Greedy} como CNN, RNN y MCNN, las cuales demuestran una baja complejidad de tiempo y cuyos resultados son aceptables pero no optimales.Cano y Herrera en ~\cite{1255391}, proponen utiliazr algoritmos evolutivos solucionar el problema de selección de instancias para extracción de conocimientos en bases de datos (KDD), presentan una función de evaluación de calidad que se utilizaron para las pruebas; finalmente, concluyen que para KDD, los algoritmos evolutivos mejoran tanto la reducción del subconjunto, como la presición. Luego García y Derrac, con apoyo de Cano y Herrera, en ~\cite{garcia2012prototype} hacen un análisis extenso de los diversos algritmos basados en el algoritmo \textit{K-NN}. 
+Entre las soluciones que se estudiaron en el estado del arte, en~\cite{toussaint2002proximity} Toussaint describe soluciones de tipo \textit{Greedy} como CNN, RNN y MCNN, las cuales demuestran una baja complejidad de tiempo y cuyos resultados son aceptables pero no optimales.Cano y Herrera en ~\cite{1255391}, proponen utiliazr algoritmos evolutivos solucionar el problema de selección de instancias para extracción de conocimientos en bases de datos (KDD), presentan una función de evaluación de calidad que se utilizaron para las pruebas; finalmente, concluyen que para KDD, los algoritmos evolutivos mejoran tanto la reducción del subconjunto, como la presición. Luego García y Derrac, con apoyo de Cano y Herrera, en ~\cite{garcia2012prototype} hacen un análisis extenso de los diversos algritmos basados en el algoritmo \textit{K-NN}.
 
 \section{Metaheurísticas}
 \label{sect:meta}
@@ -81,22 +81,26 @@ En los experimentos realizados en este estudio, se consideró el uso de búsqued
 
 % FIGURA DE FUNCIÓN POR PESO
 \begin{figure}[p]
-	\includegraphics[width=\linewidth]{weighted-3b}
-	\caption{Pesada, ecuación~\ref{eq:weight}}
-	\label{fig:weighted3}
+    \centering
+    \includegraphics[width=0.8\linewidth]{weighted-3b}
+    \caption{Pesada, ecuación~\ref{eq:weight}}
+    \label{fig:weighted3}
 \end{figure}
+
 % FIGURA DE FUNCIÓN CUADRÁTICA
 \begin{figure}[p]
-	\includegraphics[width=\linewidth]{squared-3b}
-	\caption{Cuadrática, ecuación~\ref{eq:sqr}}
-	\label{fig:squared3}
+    \centering
+    \includegraphics[width=0.8\linewidth]{squared-3b}
+    \caption{Cuadrática, ecuación~\ref{eq:sqr}}
+    \label{fig:squared3}
 \end{figure}
+
 % FIGURA DE FUNCIÓN EULER
 \begin{figure}[p]
-	\centering
-	\includegraphics[width=\linewidth]{euler-3b}
-	\caption{Euler, ecuación~\ref{eq:exp}}
-	\label{fig:euler3}
+    \centering
+    \includegraphics[width=0.8\linewidth]{euler-3b}
+    \caption{Euler, ecuación~\ref{eq:exp}}
+    \label{fig:euler3}
 \end{figure}
 
 \section{Búsqueda local}\label{sect:ls}
@@ -105,72 +109,71 @@ La búsqueda local consiste en partir de una solución inicial, que va a ser mod
 
 Como fue descrito en la sección~\ref{sect:meta}, se tomó la representación de \textbf{SP}y \textbf{UP} para las soluciones y las funciones de evaluación se tomaron las funciones~\ref{eq:sqr}, ~\ref{eq:weight} y~\ref{eq:exp}, .
 
-Para ~\ref{eq:exp}, $\beta$ tomó el valor de \textit{Euler} por la forma en que la función exponencial crece. Como se puede ver en la figura~\ref{fig:euler3}, la misma penaliza a los valores más bajos, pues su crecimiento en ese punto es lento y a medida que los valores suben, el valor de la función crece de forma más violenta. En las figuras~\ref{fig:squared3} y~\ref{fig:weighted3} se puede notar que~\ref{eq:sqr} y~\ref{eq:weight} tienen un comportamiento parecido a~\ref{eq:exp} pero menos pronunciado. 
+Para ~\ref{eq:exp}, $\beta$ tomó el valor de \textit{Euler} por la forma en que la función exponencial crece. Como se puede ver en la figura~\ref{fig:euler3}, la misma penaliza a los valores más bajos, pues su crecimiento en ese punto es lento y a medida que los valores suben, el valor de la función crece de forma más violenta. En las figuras~\ref{fig:squared3} y~\ref{fig:weighted3} se puede notar que~\ref{eq:sqr} y~\ref{eq:weight} tienen un comportamiento parecido a~\ref{eq:exp} pero menos pronunciado.
 
 Por otra parte, el operador de vencidad que se definió consiste en una función que intercambia $K$ instancias entre \textbf{SP} y \textbf{UP} para generar nuevas soluciones, donde $K$ es un parámetro a calibrar dependiendo del problema de clasificación.
 
 Para la selección de las instancias a intercambiar, se tomaron en cuenta dos estrategias:
 
 \begin{itemize}
-\item \textbf{Selección aleatoria:} Se seleccionan puntos de forma aleatoria de alguno de los dos conjuntos \textbf{SP} o \textbf{UP}.
-\item \textbf{Selección en base a costos:} Las instancias a intercambiar entre \textbf{SP} y \textbf{UP} son seleccionadas dependiendo de cuánto mejoren o empeoren la solución actual. Para determinar dicha medida, se define el \textit{costo incremental} $C(e)$ como una estimación del porcentaje de mejora a la solución al insertar la instancia $e$ a la misma y el \textit{costo decremental} $D(e)$ como una estimación de mejora a la solución al extraer la instancia $e$ de la misma. 
+    \item \textbf{Selección aleatoria:} Se seleccionan puntos de forma aleatoria de alguno de los dos conjuntos \textbf{SP} o \textbf{UP}.
+    \item \textbf{Selección en base a costos:} Las instancias a intercambiar entre \textbf{SP} y \textbf{UP} son seleccionadas dependiendo de cuánto mejoren o empeoren la solución actual. Para determinar dicha medida, se define el \textit{costo incremental} $C(e)$ como una estimación del porcentaje de mejora a la solución al insertar la instancia $e$ a la misma y el \textit{costo decremental} $D(e)$ como una estimación de mejora a la solución al extraer la instancia $e$ de la misma.
 
-Para el caso específico de IS/PS, se tomaron dos definiciones de las función de costo incremental y decremental. 
+    Para el caso específico de IS/PS, se tomaron dos definiciones de las función de costo incremental y decremental.
 
-\begin{itemize}
-\item \textbf{Prueba por fuerza bruta:} En el caso de la función incremental $C(e)$, el valor se obtiene con la diferencia entre la evaluación de la solución que contiene al punto $e$ y la evaluación de la solución que no contiene al punto $e$. Y en el caso de la función decremental $D(e) = -C(e)$.
+    \begin{itemize}
+        \item \textbf{Prueba por fuerza bruta:} En el caso de la función incremental $C(e)$, el valor se obtiene con la diferencia entre la evaluación de la calidad de la solución que contiene al punto $e$ y la evaluación de la calidad de la solución que no contiene al punto $e$. Y en el caso de la función decremental $D(e) = -C(e)$.
 
-\item \textbf{Variación de posición del centroide:} En este caso se define la función incremental $C(e)$ como la variación de la posición del centroide de la clase de $e$, cuyo valor se considera mejor si es mayor. Y definimos la función decremental $D(e)$ igual que $C(e)$ pero en este caso su valor se considera mejor mientras sea menor.
+        \item \textbf{Variación de posición del centroide:} En este caso se define la función incremental $C(e)$ como la variación de la posición del centroide de la clase de $e$, cuyo valor se considera mejor si es mayor. Y definimos la función decremental $D(e)$ igual que $C(e)$ pero en este caso su valor se considera mejor mientras sea menor.
+    \end{itemize}
 
-\end{itemize}
+    La estrategia por fuerza bruta es la más convencional de las dos, puesto que obtiene el costo a partir de la función de evaluación definida para la búsqueda local y por ende asegura que la perturbación mejore la solución anterior. Pero por otro lado, se trata de un algoritmo con un orden de ejecución alto para la cantidad de veces que se podría repetir.
 
-La estrategia por fuerza bruta es la más convencional de las dos, puesto que obtiene el costo a partir de la función de evaluación definida para la búsqueda local y por ende asegura que la perturbación mejore la solución anterior. Pero por otro lado, se trata de un algoritmo con un orden de ejecución alto para la cantidad de veces que se podría repetir.
-
-La estrategia de la distancia al centroide se trata de insertar puntos a la solución que modifiquen de una manera significativa la posición del centroide actual. Esto es porque una instancia que no modifique la posición del centroide de forma significativa, es una instancia cuyo valor no influye tanto a la hora de clasificar.
+    La estrategia de la distancia al centroide se trata de insertar puntos a la solución que modifiquen de una manera significativa la posición del centroide actual. Esto es porque una instancia que no modifique la posición del centroide de forma significativa, es una instancia cuyo valor no influye tanto a la hora de clasificar.
 \end{itemize}
 
 \begin{algorithm}
-	\DontPrintSemicolon
-	\vspace*{0.1cm}
-	\KwIn{SP, UP : Conjunto de puntos, K : Entero}
-	\KwOut{SP', UP'}
-	\ForEach{$1 \dots K$}{
-		$sacar \leftarrow booleano\_al\_azar()$\;
-		\If{$sacar$}{
-			$punto \leftarrow punto\_al\_azar(SP)$\;
-			$SP' \leftarrow SP\ \backslash{}\ \{punto\}$\;
-			$UP' \leftarrow UP\ \cup\ \{punto\}$\;
- 		}
- 		\Else{
-			$punto \leftarrow punto\_al\_azar(UP)$\;
-			$UP' \leftarrow UP\ \backslash{}\ \{punto\}$\;
-			$SP' \leftarrow SP\ \cup\ \{punto\}$\;
-		}
-	}
-	\vspace*{0.1cm}
-	\caption{Operador de vecindad con selección aleatoria}
+    \DontPrintSemicolon
+    \vspace*{0.1cm}
+    \KwIn{SP, UP : Conjunto de puntos, K : Entero}
+    \KwOut{SP', UP'}
+    \ForEach{$1 \dots K$}{
+        $sacar \leftarrow booleano\_al\_azar()$\;
+        \If{$sacar$}{
+            $punto \leftarrow punto\_al\_azar(SP)$\;
+            $SP' \leftarrow SP\ \backslash{}\ \{punto\}$\;
+            $UP' \leftarrow UP\ \cup\ \{punto\}$\;
+        }
+        \Else{
+            $punto \leftarrow punto\_al\_azar(UP)$\;
+            $UP' \leftarrow UP\ \backslash{}\ \{punto\}$\;
+            $SP' \leftarrow SP\ \cup\ \{punto\}$\;
+        }
+    }
+    \vspace*{0.1cm}
+    \caption{Operador de vecindad con selección aleatoria}
 \end{algorithm}
 
 \begin{algorithm}
-	\DontPrintSemicolon
-	\vspace*{0.1cm}
-	\KwIn{SP, UP : Conjunto de puntos}
-	\KwOut{SP', UP'}
-	\ForEach{$1 \dots K$}{
-		$sacar \leftarrow booleano\_al\_azar()$\;
-		\If{$sacar$}{
-			$punto = argmin\{C(e) | e \in SP\}$\;
-			$SP' \leftarrow SP\ \backslash{}\ \{punto\}$\;
-			$UP' \leftarrow UP\ \cup\ \{punto\}$\;
- 		}
- 		\Else{
-			$punto = argmax\{C(e) | e \in UP\}$\;
-			$UP' \leftarrow UP\ \backslash{}\ \{punto\}$\;
-			$SP' \leftarrow SP\ \cup\ \{punto\}$\;
-		}
-	}
-	\vspace*{0.1cm}
-	\caption{Operador de vecindad con selección en base a costos}
+    \DontPrintSemicolon
+    \vspace*{0.1cm}
+    \KwIn{SP, UP : Conjunto de puntos}
+    \KwOut{SP', UP'}
+    \ForEach{$1 \dots K$}{
+        $sacar \leftarrow booleano\_al\_azar()$\;
+        \If{$sacar$}{
+            $punto = argmin\{C(e) | e \in SP\}$\;
+            $SP' \leftarrow SP\ \backslash{}\ \{punto\}$\;
+            $UP' \leftarrow UP\ \cup\ \{punto\}$\;
+        }
+        \Else{
+            $punto = argmax\{C(e) | e \in UP\}$\;
+            $UP' \leftarrow UP\ \backslash{}\ \{punto\}$\;
+            $SP' \leftarrow SP\ \cup\ \{punto\}$\;
+        }
+    }
+    \vspace*{0.1cm}
+    \caption{Operador de vecindad con selección en base a costos}
 \end{algorithm}
 
 \section{Búsqueda local iterada}
@@ -179,65 +182,66 @@ La búsqueda local iterada se trata de realizar una búsqueda local sobre una so
 En los experimentos a realizar en esta metaheurística se tomaron en cuenta 2 formas de perturbación de soluciones:
 
 \begin{itemize}
-\item [\textbf{Perturbación aleatoria}:] Se perturba de forma aleatoria pero reservada, es decir, se cambia una pequeña cantidad de atributos al azar para que la solución generada se mantenga en la misma localidad que consiguió la última búsqueda local.
-\item [\textbf{Perturbación \textit{Greedy}}:] Se perturba la solución con un algoritmo \textit{Greedy} como \textit{CNN }o \textit{MCNN}, los cuales generan soluciones aleatorias que pueden tener una cantidad de cambios considerables. Esta perturbación puede generar soluciones incluso peores que la inicial, pero que diversifica el espacio de búsqueda para acceder a otras localidades. 
+    \item [\textbf{Perturbación aleatoria}:] Se perturba de forma aleatoria pero reservada, es decir, se cambia una pequeña cantidad de atributos al azar para que la solución generada se mantenga en la misma localidad que consiguió la última búsqueda local.
+    \item [\textbf{Perturbación \textit{Greedy}}:] Se perturba la solución con un algoritmo \textit{Greedy} como \textit{CNN }o \textit{MCNN}, los cuales generan soluciones aleatorias que pueden tener una cantidad de cambios considerables. Esta perturbación puede generar soluciones incluso peores que la inicial, pero que diversifica el espacio de búsqueda para acceder a otras localidades.
 \end{itemize}
 
-La idea detrás de estos tipos de perturbación es mejorar las soluciones que se puedan encontrar con el algoritmo. Una vez ejecutada una búsqueda local, existen dos escenarios posibles: El primero es que la búsqueda no llegó a generar el mejor valor local, para lo cual se ejecuta el primer tipo de perturbación intentando así alcanzarlo. Y el segundo es que la búsqueda local sí consiguipo el mejor valor local, por lo que es necesario salir del mismo para ampliar el espacio de búsqueda cayendo en otra localidad de búsqueda y para ello se ejecuta el segundo tipo de perturbación. Para una referencia visual, ver la figura~\ref{fig:perturbaciones}
+La idea detrás de estos tipos de perturbación es mejorar las soluciones que se puedan encontrar con el algoritmo. Una vez ejecutada una búsqueda local, existen dos escenarios posibles: El primero es que la búsqueda no llegó a generar el mejor valor local, para lo cual se ejecuta el primer tipo de perturbación intentando así alcanzarlo. Y el segundo es que la búsqueda local sí consiguipo el mejor valor local, por lo que es necesario salir del mismo para ampliar el espacio de búsqueda cayendo en otra localidad de búsqueda y para ello se ejecuta el segundo tipo de perturbación. Para una referencia visual, ver la figura~\ref{fig:perturbaciones}.
 
 % FIGURA DE TIPOS DE PERTURBACIÓN
 \begin{figure}[h!]
-	\centering
-	\includegraphics[width=\linewidth]{perturbaciones}
-	\caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
-	\label{fig:perturbaciones}
+    \centering
+    \includegraphics[width=\linewidth]{perturbaciones}
+    \caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
+    \label{fig:perturbaciones}
 \end{figure}
 
 \section{\textit{\textbf{Greedy Randomized Adaptive Search Procedures}} (GRASP)}
 
-GRASP (por sus siglas en inglés \textit{Greedy Randomized Adaptive Search Procedures}) es una metaheurística de trayectoria que trata de una forma aleatoria, recorrer la mayor cantidad de vecindades del espacio de búsqueda y de esa manera obtener la mejor solución. El algoritmo consiste generar una solución aleatoria a partir de un algoritmo \textit{greedy} y luego esta se le aplica una búsqueda local para intentar llegar a la mejor solución de esa vecindad, repitiendo este proceso $N$ veces guardando siempre la mejor solución (Véase el algoritmo~\ref{alg:grasp}). 
+GRASP (por sus siglas en inglés \textit{Greedy Randomized Adaptive Search Procedures}) es una metaheurística de trayectoria que trata de forma aleatoria, recorrer la mayor cantidad de vecindades del espacio de búsqueda y de esa manera obtener la mejor solución. El algoritmo consiste generar una solución aleatoria a partir de un algoritmo \textit{greedy} y luego esta se le aplica una búsqueda local para intentar llegar a la mejor solución de esa vecindad, repitiendo este proceso $N$ veces guardando siempre la mejor solución (Véase el algoritmo~\ref{alg:grasp}).
 
 \begin{algorithm}
- \DontPrintSemicolon
- \vspace*{0.1cm}
- \KwIn{N, Semilla : Entero}
- \KwOut{$S_{best}$}
- 
- $f_{best} = \infty$\;
- \ForEach{$1 \dots N$}{
-  $S = AlgoritmoGreedyAleatorio(Semilla)$\;
-  $S = BusquedaLocal(S)$
-  \If{$f(S) < f_{best}$}{
-	$S_{best} = S$\;
-	$f_{best} = f(S)$\;
-   }
-  }
- \vspace*{0.1cm}
- \caption{Algoritmo GRASP}
- \label{alg:grasp}
+    \DontPrintSemicolon
+    \vspace*{0.1cm}
+    \KwIn{N, Semilla : Entero}
+    \KwOut{$S_{best}$}
+
+    $f_{best} \leftarrow \infty$\;
+    \ForEach{$1 \dots N$}{
+        $S \leftarrow AlgoritmoGreedyAleatorio(Semilla)$\;
+        $S \leftarrow BusquedaLocal(S)$\;
+        \If{$f(S) < f_{best}$}{
+            $S_{best} \leftarrow S$\;
+            $f_{best} \leftarrow f(S)$\;
+        }
+    }
+    \vspace*{0.1cm}
+    \caption{Algoritmo GRASP}
+    \label{alg:grasp}
 \end{algorithm}
 La implementación en general es simple, pero lo que hace que sea efectivo o no es la generación de las soluciones aleatorias. La función que realiza esta tarea necesita definir una función de costo incremental para decidir cuál de los puntos que no está en la solución es el mejor candidato para ser añadido. En el caso de IS/PS, se tomó la función \textit{Variación de posición del centroide} definida en la sección~\ref{sect:ls}. Véase el algoritmo~\ref{alg:greedy-random-grasp} para más información.
 
 
 \begin{algorithm}
- \DontPrintSemicolon
- \vspace*{0.1cm}
- \KwIn{Semilla : Entero}
- \KwOut{$S_{best}$}
- $Candidatos = ConjuntoAleatorio()$\;
- $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
- \While{$Candidatos\neq \emptyset$}{
- 	$C_{min} = min\{C(e) | e \in C\}$\;	
- 	$C_{max} = max\{C(e) | e \in C\}$\;	
- 	$RCL = \{e\in C|C(e)\leq C_{min} +\alpha (C_{max} - C_{min})\}$\; 
- 	$s = Aleatorio(RCL)$\;
- 	$S_{best} = S_{best}\cup \{s\}$\;
- 	$Candidatos = Candidatos\setminus \{s\}$\;
+    \DontPrintSemicolon
+    \vspace*{0.1cm}
+    \KwIn{Semilla : Entero}
+    \KwOut{$S_{best}$}
+
+    $Candidatos \leftarrow ConjuntoAleatorio()$\;
     $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
- }
- \vspace*{0.1cm}
- \caption{Algoritmo GRASP}
- \label{alg:greedy-random-grasp}
+    \While{$Candidatos\neq \emptyset$}{
+        $C_{min} \leftarrow min\{C(e) | e \in C\}$\;
+        $C_{max} \leftarrow max\{C(e) | e \in C\}$\;
+        $RCL \leftarrow \{e\in C|C(e)\leq C_{min} +\alpha (C_{max} - C_{min})\}$\;
+        $s \leftarrow Aleatorio(RCL)$\;
+        $S_{best} \leftarrow S_{best}\cup \{s\}$\;
+        $Candidatos \leftarrow Candidatos\setminus \{s\}$\;
+        $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
+    }
+    \vspace*{0.1cm}
+    \caption{Algoritmo Greedy Aleatorio}
+    \label{alg:greedy-random-grasp}
 \end{algorithm}
 %\subsection{Resultados}
 %\section*{Conclusiones}
@@ -248,7 +252,6 @@ La implementación en general es simple, pero lo que hace que sea efectivo o no 
 \small
 \bibliographystyle{abbrv}
 \bibliography{informe}
-
 
 % \newpage
 % \section*{Apéndice}
