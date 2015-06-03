@@ -78,13 +78,9 @@ private:
 };
 
 // Functions to compare two GenericPoints by their incremental cost
-bool CompareCosts(GenericPoint<EuclideanDistance> lhs,
-                  GenericPoint<EuclideanDistance> rhs) {
-    return lhs.IncrementalCost() < rhs.IncrementalCost(); 
-}
-
-bool CompareCosts(const GenericPoint<HammingDistance>& lhs,
-                  const GenericPoint<HammingDistance>& rhs) {
+template <typename Point>
+bool CompareCosts(const Point& lhs,
+                  const Point& rhs) {
     return lhs.IncrementalCost() < rhs.IncrementalCost(); 
 }
 
@@ -366,9 +362,9 @@ public:
         }
 
         if (random_to_pick_set == 1) {
-            return *min_element(set_to_use.begin(), set_to_use.end(), CompareCosts); 
+            return *min_element(set_to_use.begin(), set_to_use.end(), CompareCosts<Point>); 
         } else {
-            return *max_element(set_to_use.begin(), set_to_use.end(), CompareCosts); 
+            return *max_element(set_to_use.begin(), set_to_use.end(), CompareCosts<Point>); 
         }
     }
 
