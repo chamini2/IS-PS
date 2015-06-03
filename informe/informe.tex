@@ -79,7 +79,27 @@ Por otra parte, también es necesario definir un operador de vecindad, el cual c
 
 En los experimentos realizados en este estudio, se consideró el uso de búsqueda local como metaheurística lineal y búsqueda local iterada y GRASP como metaheurísticas de trayectoria.
 
-\section{Búsqueda local}
+% FIGURA DE FUNCIÓN POR PESO
+\begin{figure}[p]
+	\includegraphics[width=\linewidth]{weighted-3b}
+	\caption{Pesada, ecuación~\ref{eq:weight}}
+	\label{fig:weighted3}
+\end{figure}
+% FIGURA DE FUNCIÓN CUADRÁTICA
+\begin{figure}[p]
+	\includegraphics[width=\linewidth]{squared-3b}
+	\caption{Cuadrática, ecuación~\ref{eq:sqr}}
+	\label{fig:squared3}
+\end{figure}
+% FIGURA DE FUNCIÓN EULER
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=\linewidth]{euler-3b}
+	\caption{Euler, ecuación~\ref{eq:exp}}
+	\label{fig:euler3}
+\end{figure}
+
+\section{Búsqueda local}\label{sect:ls}
 
 La búsqueda local consiste en partir de una solución inicial, que va a ser modificada por un operador de vecindad que genera otra solución factible. Luego, la solución actual se compara con la solución generada a través de una función de evaluación de calidad, y se desecha la peor de ambas para recurrir en el mismo proceso con la restante.
 
@@ -108,48 +128,50 @@ La estrategia por fuerza bruta es la más convencional de las dos, puesto que ob
 
 La estrategia de la distancia al centroide se trata de insertar puntos a la solución que modifiquen de una manera significativa la posición del centroide actual. Esto es porque una instancia que no modifique la posición del centroide de forma significativa, es una instancia cuyo valor no influye tanto a la hora de clasificar.
 \end{itemize}
+
 \begin{algorithm}
- \DontPrintSemicolon
- \vspace*{0.1cm}
- \KwIn{SP, UP : Conjunto de puntos, K : Entero}
- \KwOut{SP', UP'}
- \ForEach{$1 \dots K$}{
-  $sacar = booleano\_al\_azar()$\;
-  \If{$sacar$}{
-	$punto = punto\_al\_azar(SP)$\;
-	$SP' = SP\ \backslash{}\ \{punto\}$\;
-	$UP' = UP\ \cup\ \{punto\}$\;
-  }
-  \Else{
-	$punto = punto\_al\_azar(UP)$\;
-	$UP' = UP\ \backslash{}\ \{punto\}$\;
-	$SP' = SP\ \cup\ \{punto\}$\;
-  }
- }
- \vspace*{0.1cm}
- \caption{Operador de vecindad}
+	\DontPrintSemicolon
+	\vspace*{0.1cm}
+	\KwIn{SP, UP : Conjunto de puntos, K : Entero}
+	\KwOut{SP', UP'}
+	\ForEach{$1 \dots K$}{
+		$sacar \leftarrow booleano\_al\_azar()$\;
+		\If{$sacar$}{
+			$punto \leftarrow punto\_al\_azar(SP)$\;
+			$SP' \leftarrow SP\ \backslash{}\ \{punto\}$\;
+			$UP' \leftarrow UP\ \cup\ \{punto\}$\;
+ 		}
+ 		\Else{
+			$punto \leftarrow punto\_al\_azar(UP)$\;
+			$UP' \leftarrow UP\ \backslash{}\ \{punto\}$\;
+			$SP' \leftarrow SP\ \cup\ \{punto\}$\;
+		}
+	}
+	\vspace*{0.1cm}
+	\caption{Operador de vecindad con selección aleatoria}
 \end{algorithm}
 
-% FIGURA DE FUNCIÓN POR PESO
-\begin{figure}[p]
-	\includegraphics[width=\linewidth]{weighted-3b}
-	\caption{Pesada, ecuación~\ref{eq:weight}}
-	\label{fig:weighted3}
-\end{figure}
-% FIGURA DE FUNCIÓN CUADRÁTICA
-\begin{figure}[p]
-	\includegraphics[width=\linewidth]{squared-3b}
-	\caption{Cuadrática, ecuación~\ref{eq:sqr}}
-	\label{fig:squared3}
-\end{figure}
-% FIGURA DE FUNCIÓN EULER
-\begin{figure}[p]
-	\centering
-	\includegraphics[width=\linewidth]{euler-3b}
-	\caption{Euler, ecuación~\ref{eq:exp}}
-	\label{fig:euler3}
-\end{figure}
-
+\begin{algorithm}
+	\DontPrintSemicolon
+	\vspace*{0.1cm}
+	\KwIn{SP, UP : Conjunto de puntos}
+	\KwOut{SP', UP'}
+	\ForEach{$1 \dots K$}{
+		$sacar \leftarrow booleano\_al\_azar()$\;
+		\If{$sacar$}{
+			$punto = argmin\{C(e) | e \in SP\}$\;
+			$SP' \leftarrow SP\ \backslash{}\ \{punto\}$\;
+			$UP' \leftarrow UP\ \cup\ \{punto\}$\;
+ 		}
+ 		\Else{
+			$punto = argmax\{C(e) | e \in UP\}$\;
+			$UP' \leftarrow UP\ \backslash{}\ \{punto\}$\;
+			$SP' \leftarrow SP\ \cup\ \{punto\}$\;
+		}
+	}
+	\vspace*{0.1cm}
+	\caption{Operador de vecindad con selección en base a costos}
+\end{algorithm}
 
 \section{Búsqueda local iterada}
 La búsqueda local iterada se trata de realizar una búsqueda local sobre una solución inicial para obtener una mejor solución, la cual se perturba para generar una nueva solución inicial que se utiliza para realizar el mismo proceso. La solución perturbada puede ser mejor o peor que la solución generada por la búsqueda local, dado que lo que se quiere obtener al realizar dicha perturbación es expandir el espacio de búsqueda (lo que puede generar una solución peor pero que al realizar la búsqueda local sobre ella, lleve a un valor mejor que el encontrado) o mejorar aún más la solución actual.
@@ -170,7 +192,53 @@ La idea detrás de estos tipos de perturbación es mejorar las soluciones que se
 	\caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
 	\label{fig:perturbaciones}
 \end{figure}
-\section{GRASP}
+
+\section{\textit{\textbf{Greedy Randomized Adaptive Search Procedures}} (GRASP)}
+
+GRASP (por sus siglas en inglés \textit{Greedy Randomized Adaptive Search Procedures}) es una metaheurística de trayectoria que trata de una forma aleatoria, recorrer la mayor cantidad de vecindades del espacio de búsqueda y de esa manera obtener la mejor solución. El algoritmo consiste generar una solución aleatoria a partir de un algoritmo \textit{greedy} y luego esta se le aplica una búsqueda local para intentar llegar a la mejor solución de esa vecindad, repitiendo este proceso $N$ veces guardando siempre la mejor solución (Véase el algoritmo~\ref{alg:grasp}). 
+
+\begin{algorithm}
+ \DontPrintSemicolon
+ \vspace*{0.1cm}
+ \KwIn{N, Semilla : Entero}
+ \KwOut{$S_{best}$}
+ 
+ $f_{best} = \infty$\;
+ \ForEach{$1 \dots N$}{
+  $S = AlgoritmoGreedyAleatorio(Semilla)$\;
+  $S = BusquedaLocal(S)$
+  \If{$f(S) < f_{best}$}{
+	$S_{best} = S$\;
+	$f_{best} = f(S)$\;
+   }
+  }
+ \vspace*{0.1cm}
+ \caption{Algoritmo GRASP}
+ \label{alg:grasp}
+\end{algorithm}
+La implementación en general es simple, pero lo que hace que sea efectivo o no es la generación de las soluciones aleatorias. La función que realiza esta tarea necesita definir una función de costo incremental para decidir cuál de los puntos que no está en la solución es el mejor candidato para ser añadido. En el caso de IS/PS, se tomó la función \textit{Variación de posición del centroide} definida en la sección~\ref{sect:ls}. Véase el algoritmo~\ref{alg:greedy-random-grasp} para más información.
+
+
+\begin{algorithm}
+ \DontPrintSemicolon
+ \vspace*{0.1cm}
+ \KwIn{Semilla : Entero}
+ \KwOut{$S_{best}$}
+ $Candidatos = ConjuntoAleatorio()$\;
+ $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
+ \While{$Candidatos\neq \emptyset$}{
+ 	$C_{min} = min\{C(e) | e \in C\}$\;	
+ 	$C_{max} = max\{C(e) | e \in C\}$\;	
+ 	$RCL = \{e\in C|C(e)\leq C_{min} +\alpha (C_{max} - C_{min})\}$\; 
+ 	$s = Aleatorio(RCL)$\;
+ 	$S_{best} = S_{best}\cup \{s\}$\;
+ 	$Candidatos = Candidatos\setminus \{s\}$\;
+    $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
+ }
+ \vspace*{0.1cm}
+ \caption{Algoritmo GRASP}
+ \label{alg:greedy-random-grasp}
+\end{algorithm}
 %\subsection{Resultados}
 %\section*{Conclusiones}
 %---------------------------- Bibliography -------------------------------
