@@ -79,7 +79,7 @@ Por otra parte, también es necesario definir un operador de vecindad, el cual c
 
 En los experimentos realizados en este estudio, se consideró el uso de búsqueda local como metaheurística lineal y búsqueda local iterada y GRASP como metaheurísticas de trayectoria.
 
-\section{Búsqueda local}
+\section{Búsqueda local}\label{sect:ls}
 
 La búsqueda local consiste en partir de una solución inicial, que va a ser modificada por un operador de vecindad que genera otra solución factible. Luego, la solución actual se compara con la solución generada a través de una función de evaluación de calidad, y se desecha la peor de ambas para recurrir en el mismo proceso con la restante.
 
@@ -108,6 +108,7 @@ La estrategia por fuerza bruta es la más convencional de las dos, puesto que ob
 
 La estrategia de la distancia al centroide se trata de insertar puntos a la solución que modifiquen de una manera significativa la posición del centroide actual. Esto es porque una instancia que no modifique la posición del centroide de forma significativa, es una instancia cuyo valor no influye tanto a la hora de clasificar.
 \end{itemize}
+
 \begin{algorithm}
  \DontPrintSemicolon
  \vspace*{0.1cm}
@@ -170,7 +171,53 @@ La idea detrás de estos tipos de perturbación es mejorar las soluciones que se
 	\caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
 	\label{fig:perturbaciones}
 \end{figure}
-\section{GRASP}
+
+\section{\textit{\textbf{Greedy Randomized Adaptive Search Procedures}} (GRASP)}
+
+GRASP (por sus siglas en inglés \textit{Greedy Randomized Adaptive Search Procedures}) es una metaheurística de trayectoria que trata de una forma aleatoria, recorrer la mayor cantidad de vecindades del espacio de búsqueda y de esa manera obtener la mejor solución. El algoritmo consiste generar una solución aleatoria a partir de un algoritmo \textit{greedy} y luego esta se le aplica una búsqueda local para intentar llegar a la mejor solución de esa vecindad, repitiendo este proceso $N$ veces guardando siempre la mejor solución (Véase el algoritmo~\ref{alg:grasp}). 
+
+\begin{algorithm}
+ \DontPrintSemicolon
+ \vspace*{0.1cm}
+ \KwIn{N, Semilla : Entero}
+ \KwOut{$S_{best}$}
+ 
+ $f_{best} = \infty$\;
+ \ForEach{$1 \dots N$}{
+  $S = AlgoritmoGreedyAleatorio(Semilla)$\;
+  $S = BusquedaLocal(S)$
+  \If{$f(S) < f_{best}$}{
+	$S_{best} = S$\;
+	$f_{best} = f(S)$\;
+   }
+  }
+ \vspace*{0.1cm}
+ \caption{Algoritmo GRASP}
+ \label{alg:grasp}
+\end{algorithm}
+La implementación en general es simple, pero lo que hace que sea efectivo o no es la generación de las soluciones aleatorias. La función que realiza esta tarea necesita definir una función de costo incremental para decidir cuál de los puntos que no está en la solución es el mejor candidato para ser añadido. En el caso de IS/PS, se tomó la función \textit{Variación de posición del centroide} definida en la sección~\ref{sect:ls}. Véase el algoritmo~\ref{alg:greedy-random-grasp} para más información.
+
+
+\begin{algorithm}
+ \DontPrintSemicolon
+ \vspace*{0.1cm}
+ \KwIn{Semilla : Entero}
+ \KwOut{$S_{best}$}
+ $Candidatos = ConjuntoAleatorio()$\;
+ $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
+ \While{$Candidatos\neq \emptyset$}{
+ 	$C_{min} = min\{C(e) | e \in C\}$\;	
+ 	$C_{max} = max\{C(e) | e \in C\}$\;	
+ 	$RCL = \{e\in C|C(e)\leq C_{min} +\alpha (C_{max} - C_{min})\}$\; 
+ 	$s = Aleatorio(RCL)$\;
+ 	$S_{best} = S_{best}\cup \{s\}$\;
+ 	$Candidatos = Candidatos\setminus \{s\}$\;
+    $EvaluarCostoIncremental(e)|\forall e\in Candidatos$\;
+ }
+ \vspace*{0.1cm}
+ \caption{Algoritmo GRASP}
+ \label{alg:greedy-random-grasp}
+\end{algorithm}
 %\subsection{Resultados}
 %\section*{Conclusiones}
 %---------------------------- Bibliography -------------------------------
