@@ -5,6 +5,12 @@
     - [ ] Pros
     - [ ] Cons
 - [ ] Hacer presentación
+- [ ] Agregar información de selección inicial al informe
+    - [ ] Todas las instancias
+    - [ ] Aleatorio
+    - [ ] CNN
+    - [ ] MCNN
+    - [ ] RNN
 - [x] on 2015-06-02 19:28:04 | Descripción de diferentes perturbaciones de LS 
     - [x] on 2015-06-02 19:28:04 | Pros
     - [x] on 2015-06-02 19:28:04 | Cons
