@@ -15,6 +15,9 @@
 #include <cstring>
 #include <cstdio>
 
+#include <vector>
+using std::vector;
+
 #include <set>
 using std::multiset;
 
@@ -23,6 +26,11 @@ using std::cout;
 using std::endl;
 using std::ostream;
 using std::flush;
+
+#include <algorithm>
+using std::min_element;
+using std::max_element;
+
 
 #include <string>
 using std::string;
@@ -43,6 +51,8 @@ using std::array;
 #include <ctime>
 using std::clock_t;
 using std::clock;
+
+#include "point_instances.hpp"
 
 // Class to measure time. The objects will serve as "function decorators"
 class MeasureTime {
@@ -67,6 +77,17 @@ private:
     static int deepness;
 };
 
+// Functions to compare two GenericPoints by their incremental cost
+bool CompareCosts(GenericPoint<EuclideanDistance> lhs,
+                  GenericPoint<EuclideanDistance> rhs) {
+    return lhs.IncrementalCost() < rhs.IncrementalCost(); 
+}
+
+bool CompareCosts(const GenericPoint<HammingDistance>& lhs,
+                  const GenericPoint<HammingDistance>& rhs) {
+    return lhs.IncrementalCost() < rhs.IncrementalCost(); 
+}
+
 int MeasureTime::deepness = 0;
 
 // Template class to handle IS-PS solution representation
@@ -86,6 +107,7 @@ public:
         selected_points_    = obj.selected_points_;
         unselected_points_  = obj.unselected_points_;
         correctness_weight_ = obj.correctness_weight_;
+        point_sum_          = obj.point_sum_; 
     }
     // TODO: Generate (or not) initial solution
     PopulationMap(multiset<Point> data,
@@ -99,6 +121,23 @@ public:
                   float correctness_weight) : points_to_toggle_ ( points_to_toggle ),
                                               selected_points_ ( data ),
                                               correctness_weight_ ( correctness_weight ) {
+    }
+
+    void InitialSolution() {
+        CNN(); 
+
+        // Expecting at least 1 point in selected points
+        assert(!selected_points_.empty()); 
+
+        int n_attributes = selected_points_.begin()->attributes().size();
+        point_sum_       = vector<float>(n_attributes, 0);
+
+        // Point SUM initialization 
+        for (auto p : selected_points_) {
+            for (int i = 0; i < n_attributes; ++i) {
+                point_sum_[i] += p.attributes()[i]; 
+            }
+        }
     }
 
     // TODO: Use one of these as an initial solution
@@ -257,7 +296,8 @@ public:
         }
     }
 
-    // Function that modifies the map to generate a new neighbor solution map
+
+        // Function that modifies the map to generate a new neighbor solution map
     void NeighborhoodOperator(void) {
 
         //MeasureTime mt("NeighborhoodOperator");
@@ -275,17 +315,63 @@ public:
             }
 
 
-            const multiset<Point>& set_to_use = (random_to_pick_set == 1 ? selected_points_
-                                                                         : unselected_points_);
-
-            auto random_point_iterator =
-                std::next(std::begin(set_to_use),
-                          std::rand() % set_to_use.size());
-
-            Point random_point = *random_point_iterator;
+            //Point random_point = GetRandomPoint(random_to_pick_set); 
+            Point random_point = GetBestPoint(random_to_pick_set); 
             toggle(random_point, random_to_pick_set);
         }
     }
+
+
+    Point GetRandomPoint(int random_to_pick_set) {
+        const multiset<Point>& set_to_use = (random_to_pick_set == 1 ? selected_points_
+                                                                     : unselected_points_);
+        auto random_point_iterator =
+            std::next(std::begin(set_to_use),
+                      std::rand() % set_to_use.size());
+
+        return *random_point_iterator;
+    }
+
+    Point GetBestPoint(int random_to_pick_set) {
+        const multiset<Point>& set_to_use = (random_to_pick_set == 1 ? selected_points_
+                                                                     : unselected_points_);
+
+        int N = set_to_use.begin()->attributes().size(); 
+        vector<float> centroid(point_sum_); 
+        for (int i = 0; i < N; ++i) {
+            centroid[i] /= set_to_use.size(); 
+        }
+
+        int n_points = set_to_use.size() + (random_to_pick_set == 1 ? -1 : 1); 
+        for (auto p : set_to_use ) {
+            vector<float> tmp_centroid(point_sum_); 
+            
+            if (random_to_pick_set == 1) {
+                // Substract each attribute of the point to be removed
+                for (int i = 0; i < N; ++i) {
+                    tmp_centroid[i] -= p.attributes()[i];
+                }
+            } else  {
+                // Add each attribute of the point to be inserted
+                for (int i = 0; i < N; ++i) {
+                    tmp_centroid[i] += p.attributes()[i];
+                }
+            }
+
+            for (int i = 0; i < N; ++i) {
+                tmp_centroid[i] /= n_points; 
+            }
+
+            p.IncrementalCost(EuclideanDistance(centroid, tmp_centroid)); 
+        }
+
+        if (random_to_pick_set == 1) {
+            return *min_element(set_to_use.begin(), set_to_use.end(), CompareCosts); 
+        } else {
+            return *max_element(set_to_use.begin(), set_to_use.end(), CompareCosts); 
+        }
+    }
+
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
 
@@ -315,12 +401,22 @@ private:
     FRIEND_TEST(BallonPointTest, FitnessFunction);
 #endif
 
+    
     // Toggles points between selected and unselected points sets.
     void toggle(Point p, int set_to_use) {
+        int N = p.attributes().size(); 
         if (set_to_use == 1) {
+            // Substract each attribute of the point to be removed
+            for (int i = 0; i < N; ++i) {
+                point_sum_[i] -= p.attributes()[i];
+            }
             selected_points_.erase(p);
             unselected_points_.insert(p);
         } else {
+            // Add each attribute of the point to be inserted
+            for (int i = 0; i < N; ++i) {
+                point_sum_[i] += p.attributes()[i];
+            }
             unselected_points_.erase(p);
             selected_points_.insert(p);
         }
@@ -397,6 +493,7 @@ private:
     multiset<Point> selected_points_;
     multiset<Point> unselected_points_;
     float correctness_weight_;
+    vector<float> point_sum_;
     mutable int good_classifications_[N_THREADS];
 };
 

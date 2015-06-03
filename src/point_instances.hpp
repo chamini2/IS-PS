@@ -26,6 +26,8 @@ int g_max_label = 0;
 template <float (*distance_fun)(const vector<float>&, const vector<float>&)>
 class GenericPoint : public PointInterface<int> {
 public:
+    GenericPoint() : PointInterface<int>(0, vector<float>()) {
+    }
     GenericPoint(int class_label, vector<float> attributes) :
                     PointInterface<int> (class_label, attributes) {
         g_max_label = std::max(g_max_label, class_label);
@@ -61,6 +63,9 @@ public:
         return points;
     }
 
+    void IncrementalCost(float cost) { incremental_cost_ = cost; }
+    float IncrementalCost() const { return incremental_cost_; }
+
 private:
 
     static pair<int, vector<float> > ParseCSV(char* line) {
@@ -82,6 +87,8 @@ private:
         return make_pair(classLabel, attributes);
 
     }
+
+    float incremental_cost_; 
 };
 
 // Operator << for HammingDistance and EuclideanDistance
@@ -130,5 +137,6 @@ inline bool operator<(const GenericPoint<EuclideanDistance>& lhs,
 
     return false;
 }
+
 
 #endif

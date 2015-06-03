@@ -1,5 +1,4 @@
 top: clean program
-	g++ --version
 
 program: fitness classifiers
 	g++ program.cpp -std=c++11 -g -o program -pthread fitness.o classifiers.o

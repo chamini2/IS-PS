@@ -16,16 +16,16 @@
 - [x] on 2015-05-10 21:53:58 | Describr las aplicaciones
 
 # Implementación
+- [ ] Implementar perturbación inteligente para LS (A)
+    - [ ] Función de costo por punto añadido a la solución
+    - [ ] Función de costo por punto quitado de la solución
+- [ ] Implementar GRASP (B)
+    - [ ] Implementar algoritmo como tal
+    - [ ] Implementar GreedySolution: Función de costo por punto añadido a la solución
 - [ ] Calcular porcentaje de error de la solución final
 - [ ] Probar diferentes funciones de fitness
 - [ ] Probar de búsqueda local
 - [ ] Implementar perturbación de solución inteligente para ILS
-- [ ] Implementar perturbación inteligente para LS
-    - [ ] Función de costo por punto añadido a la solución
-    - [ ] Función de costo por punto quitado de la solución
-- [ ] Implementar GRASP
-    - [ ] Implementar algoritmo como tal
-    - [ ] Implementar GreedySolution: Función de costo por punto añadido a la solución
 - [ ] Ejecutar el algoritmo con instancias considerables
     - [ ] Ejecutar el algoritmo con instancias grandes
     - [ ] Ejecutar el algoritmo con instancias medianas

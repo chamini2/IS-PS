@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
         PopulationMap<GenericPoint<HammingDistance>, int,
                       OneNN, SquaredQuality> pop_map(points, 1);
 
-        pop_map.CNN();
+        pop_map.InitialSolution();
         cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush;
         PopulationMap<GenericPoint<HammingDistance>,
                       int, OneNN, SquaredQuality> best_map =
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
         PopulationMap<GenericPoint<EuclideanDistance>, int,
                       OneNN, WeightedQuality> pop_map(points, 1);
 
-        pop_map.CNN();
+        pop_map.InitialSolution();
         cout << "Original number of points: " << pop_map.SelectedPointsSize() << endl << flush;
         PopulationMap<GenericPoint<EuclideanDistance>,
                       int, OneNN, WeightedQuality> best_map = IteratedLocalSearch<GenericPoint<EuclideanDistance>,
