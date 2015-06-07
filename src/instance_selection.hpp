@@ -252,7 +252,7 @@ public:
         unselected_points_ = selected_points_;
         selected_points_.clear();
 
-        vector< vector<Point&> > classes_values(g_max_label);
+        vector< vector<Point> > classes_values(g_max_label);
         vector< bool > class_represented(g_max_label);
 
         // Separate points by classes
