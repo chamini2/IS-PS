@@ -200,7 +200,7 @@ public:
     // Initial solution to the Map
     void InitialSolution() {
         // Greedy
-        CNN();
+        MCNN();
     }
 
     // Resolve method that calls the metaheuristic function
@@ -239,18 +239,6 @@ public:
                     changed = true;
                 }
             }
-
-            // Code for batch proccessing
-            // for (Point p : unselected_points_) {
-            //     if (p.ClassLabel() != classify_(p, selected_points_)) {
-            //         points_to_remove.insert(p);
-            //         changed = true;
-            //     }
-            // }
-            // for (Point p : points_to_remove) {
-            //     selected_points_.insert(p);
-            //     unselected_points_.erase(p);
-            // }
         }
     }
 
@@ -265,7 +253,7 @@ public:
         selected_points_.clear();
 
         vector< vector<Point&> > classes_values(g_max_label);
-        vector< bool > already(g_max_label);
+        vector< bool > class_represented(g_max_label);
 
         // Separate points by classes
         for (auto p : selected_points_) {
@@ -287,22 +275,26 @@ public:
             multiset<Point> points_to_move;
             changed = false;
 
+            // Classify all the unselected points
             for (Point p : unselected_points_) {
+                // Store the ones wrongly classified
                 if (p.ClassLabel() != classify_(p, selected_points_)) {
                     points_to_move.insert(p);
                     changed = true;
                 }
             }
+
+            for (int i; i < g_max_label; ++i) {
+                class_represented[i] = false;
+            }
+
+            // Get a representative of each class of all the wrongly classified points
             for (Point p : points_to_move) {
-                if (!already[p.ClassLabel()]) {
-                    already[p.ClassLabel] = true;
+                if (!class_represented[p.ClassLabel()]) {
+                    class_represented[p.ClassLabel()] = true;
                     selected_points_.insert(p);
                     unselected_points_.erase(p);
                 }
-            }
-
-            for (int i; i < g_max_label; ++i) {
-                already[i] = false;
             }
         }
     }
@@ -319,17 +311,13 @@ public:
         multiset<Point> selected_points_copy = selected_points_;
 
         for (Point p : selected_points_copy) {
-            bool out = true;
             selected_points_.erase(p);
             for (Point i : all) {
-                if (p.ClassLabel() != classify_(p, selected_points_)) {
+                // If it classifies wrongly, insert it again
+                if (i.ClassLabel() != classify_(i, selected_points_)) {
                     selected_points_.insert(p);
-                    out = false;
                     break;
                 }
-            }
-
-            if (out) {
             }
         }
     }
