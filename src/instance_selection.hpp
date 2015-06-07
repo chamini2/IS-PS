@@ -4,6 +4,7 @@
 #define repeat(N) for(int i = 0; i < N; ++i)
 #define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
 #define N_THREADS 100
+
 // Metaheuristics flags
 #define LOCAL_SEARCH 0
 #define ITERATED_LOCAL_SEARCH 1
