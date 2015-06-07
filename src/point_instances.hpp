@@ -19,13 +19,20 @@ using std::multiset;
 #include "point_interface.hpp"
 #include "classifiers.hpp"
 
-int g_max_label = 0;
+extern int g_max_label;
 
 // Generic point class.
 // Template argument: Distance function to use
-template <float (*distance_fun)(const vector<float>&, const vector<float>&)>
 class GenericPoint : public PointInterface<int> {
 public:
+    GenericPoint(const GenericPoint& obj) {
+        class_label_      = obj.class_label_;
+        attributes_       = obj.attributes_;
+    }
+
+    GenericPoint() : PointInterface<int>(0, vector<float>()) {
+    }
+
     GenericPoint(int class_label, vector<float> attributes) :
                     PointInterface<int> (class_label, attributes) {
         g_max_label = std::max(g_max_label, class_label);
@@ -34,18 +41,16 @@ public:
     ~GenericPoint() {}
 
     float distance(const PointInterface<int>& obj) {
-        return distance_fun(attributes_, obj.attributes());
+        return EuclideanDistance(attributes_, obj.attributes());
     }
 
-    static multiset<GenericPoint<distance_fun> > load(const char* filename) {
-        printf("Reading data from file %s ... ", filename);
-        fflush(stdout);
+    static multiset<GenericPoint> load(const char* filename) {
 
         FILE *fp;
         char *line = NULL;
         size_t len = 0;
 
-        multiset<GenericPoint<distance_fun> > points;
+        multiset<GenericPoint> points;
 
         fp = fopen(filename, "r");
         assert(fp != NULL);
@@ -53,11 +58,9 @@ public:
         while (getline(&line, &len, fp) != -1) {
 
             auto inst_pair = ParseCSV(line);
-            points.insert(GenericPoint<distance_fun>(inst_pair.first, inst_pair.second));
+            points.insert(GenericPoint(inst_pair.first, inst_pair.second));
         }
 
-        printf("done\n");
-        fflush(stdout);
         return points;
     }
 
@@ -84,29 +87,10 @@ private:
     }
 };
 
-// Operator << for HammingDistance and EuclideanDistance
-std::ostream& operator<<(std::ostream& os, const GenericPoint<HammingDistance>& obj) {
-
-    for (float f : obj.attributes()) {
-        os << f << ", ";
-    }
-
-    os << obj.ClassLabel();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const GenericPoint<EuclideanDistance>& obj) {
-    for (float f : obj.attributes()) {
-        os << f << ", ";
-    }
-
-    os << obj.ClassLabel();
-    return os;
-}
 
 // Operator << for HammingDistance and EuclideanDistance
-inline bool operator<(const GenericPoint<HammingDistance>& lhs,
-                      const GenericPoint<HammingDistance>& rhs) {
+inline bool operator<(const GenericPoint& lhs,
+                      const GenericPoint& rhs) {
     int size = lhs.attributes().size();
 
     for (int i = 0; i < size; ++i) {
@@ -117,18 +101,4 @@ inline bool operator<(const GenericPoint<HammingDistance>& lhs,
 
     return false;
 }
-
-inline bool operator<(const GenericPoint<EuclideanDistance>& lhs,
-                      const GenericPoint<EuclideanDistance>& rhs) {
-    int size = lhs.attributes().size();
-
-    for (int i = 0; i < size; ++i) {
-        if (lhs.attributes()[i] != rhs.attributes()[i]) {
-            return lhs.attributes()[i] < rhs.attributes()[i];
-        }
-    }
-
-    return false;
-}
-
 #endif

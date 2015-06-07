@@ -16,7 +16,7 @@ class MeasureTime;
 // One Nearest Neighbors classifier function
 // Arguments: p of class Point which is the point representation of the problem
 // Return value: it returns a type Class which is the classifies Point
-template <typename Class, class Point>
+template <typename Point, class Class>
 Class OneNN(Point point, const multiset<Point>& data) {
     assert(data.size() > 0);
     //MeasureTime mt("OneNN");

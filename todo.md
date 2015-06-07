@@ -22,34 +22,61 @@
 - [x] on 2015-05-10 21:53:58 | Describr las aplicaciones
 
 # Implementación
-- [ ] Calcular porcentaje de error de la solución final
+- [ ] Implementar perturbación inteligente para LS (A)
+    - [ ] Función de costo por punto añadido a la solución
+    - [ ] Función de costo por punto quitado de la solución
+- [ ] Implementar GRASP (B)
+    - [ ] Implementar algoritmo como tal
+    - [ ] Implementar GreedySolution: Función de costo por punto añadido a la solución
 - [ ] Probar diferentes funciones de fitness
 - [ ] Probar de búsqueda local
 - [ ] Implementar perturbación de solución inteligente para ILS
-- [ ] Implementar perturbación inteligente para LS
-    - [ ] Función de costo por punto añadido a la solución
-    - [ ] Función de costo por punto quitado de la solución
-- [ ] Implementar GRASP
-    - [ ] Implementar algoritmo como tal
-    - [ ] Implementar GreedySolution: Función de costo por punto añadido a la solución
 - [ ] Ejecutar el algoritmo con instancias considerables
     - [ ] Ejecutar el algoritmo con instancias grandes
     - [ ] Ejecutar el algoritmo con instancias medianas
 - [ ] Realizar pruebas en LS
     - [ ] Correr pruebas small
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Correr pruebas medium
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Correr pruebas large
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Analizar resultados
 - [ ] Realizar pruebas en ILS
     - [ ] Correr pruebas small
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Correr pruebas medium
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Correr pruebas large
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Analizar resultados
 - [ ] Realizar pruebas en GRASP
     - [ ] Correr pruebas small
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Correr pruebas medium
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Correr pruebas large
+        - [ ] Euclidean, Weighted
+        - [ ] Euclidean, Euler
+        - [ ] Euclidean, Squared
     - [ ] Analizar resultados
+- [x] on 2015-06-03 04:51:50 | Calcular porcentaje de error de la solución final
 - [x] on 2015-05-11 13:12:08 | Probar representación de las soluciones del meta-problema
 - [x] on 2015-05-11 13:12:10 | Probar operador de vecindad
 - [x] on 2015-05-11 13:12:11 | Probar 1-NN
