@@ -2,10 +2,12 @@
 #define __INSTANCE_SELECTION_HPP__
 
 #define repeat(N) for(int i = 0; i < N; ++i)
-
 #define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
-
 #define N_THREADS 100
+// Metaheuristics flags
+#define LOCAL_SEARCH 0
+#define ITERATED_LOCAL_SEARCH 1
+#define GRASP 2
 
 // #include "classifiers.hpp"
 
@@ -63,20 +65,48 @@ using std::clock;
 
 #include "point_instances.hpp"
 
+// Forward declaration 
+#include "testing.hpp"
+ 
 // Class to measure time. The objects will serve as "function decorators"
 class MeasureTime {
 public:
     MeasureTime(string fn) {
         function_name_ = fn;
         begin_         = clock();
+        print_         = true; 
         ++deepness;
     }
 
+    MeasureTime(string fn, Result *result) {
+        function_name_ = fn;
+        begin_         = clock();
+        result_        = result; 
+        print_         = true; 
+        ++deepness;
+    }
+
+    MeasureTime(string fn, Result *result, bool print) {
+        function_name_ = fn;
+        begin_         = clock();
+        result_        = result; 
+        print_         = print; 
+        ++deepness;
+    }
+
+
     ~MeasureTime() {
         double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC;
-        repeat(deepness) { cout << "-"; }
-        cout << function_name_ << " : "
-             << elapsed_time << " seconds\n" << flush;
+        if (print_) {
+            repeat(deepness) { cout << "-"; }
+            cout << function_name_ << " : "
+                 << elapsed_time << " seconds\n" << flush;
+        }
+
+        if (result_ != NULL) {
+            result_->addTime(elapsed_time); 
+        } 
+
         --deepness;
     }
 
@@ -84,87 +114,97 @@ private:
     clock_t begin_;
     string function_name_;
     static int deepness;
+    Result *result_; 
+    bool print_; 
 };
 
-// Functions to compare two GenericPoints by their incremental cost
-template <typename Point>
-bool CompareCosts(const pair<Point, float>& lhs,
-                  const pair<Point, float>& rhs) {
-    return lhs.second < rhs.second; 
-}
 
-int MeasureTime::deepness = 0;
 
-// Template class to handle IS-PS solution representation
+// Template class to handle IS-pS solution representation
 // Template arguments:
 // * Point: Representation of the classification problem points
 // * Class: Representation of the classification problem classes
-// * classify: Function that classifies the points (Ex: KNN)
-template <typename Point,
-          typename Class,
-          Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float, float, float)>
+template <typename Point, typename Class>
 class PopulationMap {
 public:
+    // Empty constructor
     PopulationMap() { }
+    // Copy constructor
     PopulationMap(const PopulationMap& obj) {
         points_to_toggle_   = obj.points_to_toggle_;
         selected_points_    = obj.selected_points_;
         unselected_points_  = obj.unselected_points_;
         correctness_weight_ = obj.correctness_weight_;
-        point_sum_          = obj.point_sum_;
-        class_frequency_    = obj.class_frequency_;
-        centroids_          = obj.centroids_;
-    }
-    // TODO: Generate (or not) initial solution
-    PopulationMap(multiset<Point> data,
-                  int points_to_toggle) : points_to_toggle_ ( points_to_toggle ),
-                                          selected_points_ ( data ),
-                                          correctness_weight_ ( 0.5 ) {
+        error_rate_         = obj.error_rate_; 
+        evaluate_           = obj.evaluate_; 
+        classify_           = obj.classify_; 
+        resolve_            = obj.resolve_; 
     }
 
-    PopulationMap(multiset<Point> data,
-                  int points_to_toggle,
-                  float correctness_weight) : points_to_toggle_ ( points_to_toggle ),
-                                              selected_points_ ( data ),
-                                              correctness_weight_ ( correctness_weight ) {
+    // Map <flag, metaheuristic function>
+    typedef PopulationMap<Point, Class> (*Metaheuristic)(const PopulationMap<Point,Class>&, int); 
+    typedef unordered_map<int,  Metaheuristic> MetaHeuristicMap; 
+    // Function pointers typedefs
+    typedef Class (*Classifier)(Point, const multiset<Point>&); 
+    typedef float (*Evaluator)(float, float, float); 
+
+    // Just for styling
+    typedef int MetaheuristicType; 
+
+    // Constructor without:
+    // * weight specification : default 0.5
+    // * resolver function : default LocalSearch
+    PopulationMap(multiset<Point> data, int points_to_toggle, 
+                  Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ), 
+                                                    selected_points_ ( data ), 
+                                                    correctness_weight_ ( 0.5 ), 
+                                                    classify_ (cls), 
+                                                    evaluate_ (eval),
+                                                    resolve_ (LOCAL_SEARCH) {
     }
 
+    // Constructor without:
+    // * resolver function : default LocalSearch
+    PopulationMap(multiset<Point> data, int points_to_toggle, 
+                  float correctness_weight, Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ), 
+                                                                              selected_points_ ( data ), 
+                                                                              correctness_weight_ ( correctness_weight ), 
+                                                                              classify_ (cls), 
+                                                                              evaluate_ (eval),
+                                                                              resolve_ (LOCAL_SEARCH) {
+    }
+
+    // Constructor without:
+    // * weight specification : default 0.5
+    PopulationMap(multiset<Point> data, int points_to_toggle, 
+                  Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ), 
+                                                    selected_points_ ( data ), 
+                                                    correctness_weight_ ( 0.5 ), 
+                                                    classify_ (cls), 
+                                                    evaluate_ (eval),
+                                                    resolve_ (mhm[mht]) {
+    }
+
+    // Constructor with all arguments
+    PopulationMap(multiset<Point> data, int points_to_toggle, 
+                  float correctness_weight, Classifier cls, 
+                  Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ), 
+                                                           selected_points_ ( data ), 
+                                                           correctness_weight_ ( correctness_weight ), 
+                                                           classify_ (cls), 
+                                                           evaluate_ (eval),
+                                                           resolve_ (mhm[mht]) {
+    }
+
+    // Initial solution to the Map
     void InitialSolution() {
         // Greedy
         CNN(); 
-
-        // Expecting at least 1 point in selected points
-        assert(!selected_points_.empty()); 
-
-        int n_attributes = selected_points_.begin()->attributes().size();
-
-        for (auto p : selected_points_) {
-            ++class_frequency_[p.ClassLabel()]; 
-            vector<float>& class_sum = point_sum_[p.ClassLabel()]; 
-            if (class_sum.empty()) {
-                class_sum = vector<float>(n_attributes, 0.0); 
-            }
-
-            for (int i = 0; i < n_attributes; ++i) {
-                class_sum[i] += p.attributes()[i]; 
-            }
-        }
-
-        for (auto sum : point_sum_) {
-            Class c = sum.first; 
-            vector<float> avg = point_sum_[c]; 
-            int n_points = class_frequency_[c]; 
-            for (int i = 0; i < n_attributes; ++i) {
-                avg[i] /= n_points; 
-            }
-
-            centroids_[c] = avg; 
-        }
-
     }
 
-    // TODO: Use one of these as an initial solution
+    // Resolve method that calls the metaheuristic function
+    PopulationMap<Point, Class> resolve() { return resolve_(*this, 1000); }
+
     void CNN() {
 
         // Decorator to measure time
@@ -192,7 +232,7 @@ public:
             for (auto curr = unselected_points_.begin(); curr != unselected_points_.end(); ) {
                 Point p = *curr;
                 curr++;
-                if (p.ClassLabel() != classify(p, selected_points_)) {
+                if (p.ClassLabel() != classify_(p, selected_points_)) {
                     selected_points_.insert(p);
                     unselected_points_.erase(p);
                     changed = true;
@@ -201,7 +241,7 @@ public:
 
             // Code for batch proccessing
             // for (Point p : unselected_points_) {
-            //     if (p.ClassLabel() != classify(p, selected_points_)) {
+            //     if (p.ClassLabel() != classify_(p, selected_points_)) {
             //         points_to_remove.insert(p);
             //         changed = true;
             //     }
@@ -215,7 +255,7 @@ public:
 
     void MCNN() {
 
-        MeasureTime mt("MCNN");
+        //MeasureTime mt("MCNN");
 
         srand(time(NULL));
 
@@ -226,10 +266,12 @@ public:
         vector< vector<Point&> > classes_values(g_max_label);
         vector< bool > already(g_max_label);
 
+        // Separate points by classes
         for (auto p : selected_points_) {
             classes_values[p.ClassLabel()].push_back(p);
         }
 
+        // Pick a random represent from each class
         for (auto cv : classes_values) {
             if (cv.size() > 0) {
                 Point p = cv[rand() % cv.size()];
@@ -244,7 +286,7 @@ public:
             changed = false;
 
             for (Point p : unselected_points_) {
-                if (p.ClassLabel() != classify(p, selected_points_)) {
+                if (p.ClassLabel() != classify_(p, selected_points_)) {
                     points_to_move.insert(p);
                     changed = true;
                 }
@@ -278,7 +320,7 @@ public:
             bool out = true;
             selected_points_.erase(p);
             for (Point i : all) {
-                if (p.ClassLabel() != classify(p, selected_points_)) {
+                if (p.ClassLabel() != classify_(p, selected_points_)) {
                     selected_points_.insert(p);
                     out = false;
                     break;
@@ -350,49 +392,6 @@ public:
         return *random_point_iterator;
     }
 
-    Point GetBestPoint(int random_to_pick_set) {
-        const multiset<Point>& set_to_use = (random_to_pick_set == 1 ? selected_points_
-                                                                     : unselected_points_);
-
-        int N = set_to_use.begin()->attributes().size(); 
-        map<Point, float> cost_map; 
-
-        for (const Point& p : set_to_use) {
-
-            int n_points = class_frequency_[p.ClassLabel()]; 
-            vector<float> centroid = centroids_[p.ClassLabel()]; 
-            if (centroid.empty()) {
-                return p; 
-            }
-            vector<float> tmp_centroid(point_sum_[p.ClassLabel()]); 
-            
-            if (random_to_pick_set == 1) {
-                // Substract each attribute of the point to be removed
-                for (int i = 0; i < N; ++i) {
-                    tmp_centroid[i] -= p.attributes()[i];
-                }
-                --n_points; 
-            } else  {
-                // Add each attribute of the point to be inserted
-                for (int i = 0; i < N; ++i) {
-                    tmp_centroid[i] += p.attributes()[i];
-                }
-                ++n_points; 
-            }
-
-            for (int i = 0; i < N; ++i) {
-                tmp_centroid[i] /= n_points; 
-            }
-
-            cost_map[p] = EuclideanDistance(centroid, tmp_centroid); 
-        }
-
-        if (random_to_pick_set == 1) {
-            return min_element(cost_map.begin(), cost_map.end(), CompareCosts<Point>)->first; 
-        } else {
-            return max_element(cost_map.begin(), cost_map.end(), CompareCosts<Point>)->first;  
-        }
-    }
 
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
@@ -403,9 +402,7 @@ public:
         float classification_correctness = RunClassifier(selected_points_, unselected_points_);
         float reduction_percentage       = GetReductionPercentage();
 
-
-
-        return fitness(classification_correctness, reduction_percentage, correctness_weight_);
+        return evaluate_(classification_correctness, reduction_percentage, correctness_weight_);
     }
 
 
@@ -420,14 +417,10 @@ public:
     int SelectedPointsSize() const { return selected_points_.size(); }
     int UnselectedPointsSize() const { return unselected_points_.size(); }
 
+
+
+
 private:
-
-    friend class BallonPointTest;
-#ifndef TEST_PRIVATE_ATTRIBUTES
-    FRIEND_TEST(BallonPointTest, TogglingPoints);
-    FRIEND_TEST(BallonPointTest, FitnessFunction);
-#endif
-
     // Toggles points between selected and unselected points sets.
     void toggle(Point p, int set_to_use) {
         if (set_to_use == 1) {
@@ -442,7 +435,7 @@ private:
     // Thread function to be used in parallel
     void ClassifyPoint(int thread, const Point& p, const multiset<Point>& training_set) const {
 
-        if (p.ClassLabel() == classify(p, training_set)) {
+        if (p.ClassLabel() == classify_(p, training_set)) {
             ++good_classifications_[thread];
         }
     }
@@ -490,7 +483,7 @@ private:
 
         // TODO: Parallelize this for
         for (const Point& p: testing_set) {
-            if (p.ClassLabel() == classify(p, training_set)) {
+            if (p.ClassLabel() == classify_(p, training_set)) {
                 ++correct;
             }
 
@@ -504,47 +497,42 @@ private:
                                                         selected_points_.size());
     }
 
+
+    friend class BallonPointTest;
+#ifndef TEST_PRIVATE_ATTRIBUTES
+    FRIEND_TEST(BallonPointTest, TogglingPoints);
+    FRIEND_TEST(BallonPointTest, FitnessFunction);
+#endif
+
+    // Class private members
+    // XXX: IF NEW ATTRIBUTES ARE ADDED, ADD TO COPY CONSTRUCTOR
     int points_to_toggle_;
     multiset<Point> selected_points_;
     multiset<Point> unselected_points_;
     float correctness_weight_;
     float error_rate_; 
-    unordered_map<Class, vector<float> > point_sum_;
-    unordered_map<Class, int> class_frequency_;
-    unordered_map<Class, vector<float> > centroids_; 
+    Classifier classify_; 
+    Evaluator evaluate_; 
+    Metaheuristic resolve_; 
     mutable int good_classifications_[N_THREADS];
 
+    static MetaHeuristicMap mhm; 
 };
 
-template <typename Point,
-          typename Class,
-          Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float,float,float)>
-std::ostream& operator<<(std::ostream& os, const PopulationMap<Point, Class, classify, fitness>& obj) {
-    os << "Number of points selected " << obj.SelectedPointsSize() << endl;
-    os << "Points: " << endl;
-    for (Point p : obj.selected_points()) {
-        os << p << endl;
-    }
-
-    return os;
-}
 
 // Performs a local search on the current map
-template <typename Point,
-          typename Class,
-          Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float,float,float)>
-    PopulationMap<Point,Class,classify,fitness>
-        LocalSearchFirstFound(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+template <typename Point, typename Class>
+PopulationMap<Point,Class> LocalSearchFirstFound(const PopulationMap<Point,Class>& orig_map, int iterations) {
     // At least 1 iteration
     assert(iterations > 0);
     int curr_iterations = 0;
 
+    PopulationMap<Point, Class> map(orig_map); 
+
     float curr_quality  = map.EvaluateQuality();
 
     while (curr_iterations < iterations) {
-        PopulationMap<Point, Class, classify, fitness> copy_map(map);
+        PopulationMap<Point, Class> copy_map(map);
 
         // Get the quality of the modified map
         copy_map.NeighborhoodOperator();
@@ -563,16 +551,13 @@ template <typename Point,
     return map;
 }
 
-template <typename Point,
-          typename Class,
-          Class (*classify)(Point, const multiset<Point>&),
-          float (*fitness)(float,float,float)>
-    PopulationMap<Point,Class,classify,fitness>
-        LocalSearchFirstFoundRec(const PopulationMap<Point,Class,classify,fitness>& map,
+template <typename Point, typename Class>
+    PopulationMap<Point,Class>
+        LocalSearchFirstFoundRec(const PopulationMap<Point,Class>& map,
                                  float map_quality,
                                  int curr_iterations,
                                  int max_iterations) {
-    PopulationMap<Point,Class,classify,fitness> copy_map(map);
+    PopulationMap<Point,Class> copy_map(map);
 
     if (curr_iterations == 0) {
         return map;
@@ -582,42 +567,34 @@ template <typename Point,
     float copy_quality = copy_map.EvaluateQuality();
 
     return copy_quality > map_quality ?
-    LocalSearchFirstFoundRec<Point,Class,classify,fitness>(copy_map,
-                                                           copy_quality,
-                                                           max_iterations,
-                                                           max_iterations) :
-    LocalSearchFirstFoundRec<Point,Class,classify,fitness>(map,
-                                                           map_quality,
-                                                           curr_iterations - 1,
-                                                           max_iterations);
+    LocalSearchFirstFoundRec<Point,Class>(copy_map, copy_quality, 
+                                          max_iterations, max_iterations) :
+    LocalSearchFirstFoundRec<Point,Class>(map, map_quality,
+                                          curr_iterations - 1, max_iterations);
 }
 
 // PopulationMap LocalSearchBestOfAll(const PopulationMap&);
 // PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
 // PopulationMap LocalSearchTopSolutions(const PopulationMap&, int);  // The argument is the number of best solutions to keep
 
-template <typename Point,
-         typename Class,
-         Class (*classify)(Point, const multiset<Point>&),
-         float (*fitness)(float,float,float)>
-    PopulationMap<Point,Class,classify,fitness>
-        IteratedLocalSearch(PopulationMap<Point,Class,classify,fitness>& map, int iterations) {
+template <typename Point, typename Class>
+PopulationMap<Point,Class> IteratedLocalSearch(const PopulationMap<Point,Class>& map, int iterations) {
 
     const int local_search_its = 20;
 
-    PopulationMap<Point,Class,classify,fitness> initial_solution(map);
+    PopulationMap<Point,Class> initial_solution(map);
     initial_solution.RandomSolution();
 
-    PopulationMap<Point,Class,classify,fitness> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
+    PopulationMap<Point,Class> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
 
     float curr_quality = best_solution.EvaluateQuality();
 
     for (int it = 0; it < iterations; ++it) {
 
-        PopulationMap<Point,Class,classify,fitness>& perturbated_solution(best_solution);
+        PopulationMap<Point,Class>& perturbated_solution(best_solution);
         perturbated_solution.RandomSolution();
 
-        const PopulationMap<Point,Class,classify,fitness>& candidate_solution = LocalSearchFirstFound<Point, Class, classify, fitness>(perturbated_solution, local_search_its);
+        const PopulationMap<Point,Class>& candidate_solution = LocalSearchFirstFound<Point, Class>(perturbated_solution, local_search_its);
         float candidate_quality = candidate_solution.EvaluateQuality();
 
         // If the quality is better than the previous map, we found a new map

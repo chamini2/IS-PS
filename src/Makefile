@@ -1,24 +1,27 @@
 top: clean program
 
 program: testing
-	g++ program.cpp -std=c++11 -O2 -o program -pthread testing.o fitness.o classifiers.o
+	g++ program.cpp instance_selection.o fitness.o classifiers.o testing.o -std=c++11 -g -o program -pthread ${OPTIMIZATION_FLAGS} 
 
 fitness: fitness.cpp fitness.hpp
-	g++ fitness.cpp -std=c++11 -pthread -O2 -c
+	g++ fitness.cpp -std=c++11 -pthread -g -c ${OPTIMIZATION_FLAGS}
 
 classifiers: classifiers.cpp classifiers.hpp
-	g++ classifiers.cpp -std=c++11 -pthread -O2 -c
+	g++ classifiers.cpp -std=c++11 -pthread -g -c ${OPTIMIZATION_FLAGS}  
 
-testing: testing.cpp testing.hpp fitness classifiers
-	g++ testing.cpp fitness.o classifiers.o -std=c++11 -pthread -O2 -c 
+testing: testing.cpp testing.hpp instance_selection
+	g++ testing.cpp -std=c++11 -pthread -g -c ${OPTIMIZATION_FLAGS} 
+
+instance_selection: instance_selection.cpp instance_selection.hpp fitness classifiers 
+	g++ instance_selection.cpp -std=c++11 -pthread -g -c ${OPTIMIZATION_FLAGS} 
 
 run_program: clean program
-	@./program ../data/small/glass/glass.data euclidean
+	@./program ./tests.txt
 
 
 tests: fitness
 	g++ instance_selection_unittest.cpp -std=c++11 -I./gtest-1.7.0/include \
-			gtest-1.7.0/src/gtest-all.o -o instance_selection_unittest -lpthread fitness.o
+			gtest-1.7.0/src/gtest-all.o -o instance_selection_unittest -lpthread fitness.o ${OPTIMIZATION_FLAGS}
 
 run_tests: tests
 	@./instance_selection_unittest

@@ -25,6 +25,7 @@ using std::make_pair;
 
 const char *distance_functions[] = { "hamming", "euclidean" };
 
+// TODO: Change these two functions to Test class as static functions
 vector<string> ParseCSV(char* line) {
     char *field;
     vector<string> attributes;
@@ -56,9 +57,6 @@ vector<Test> load(const char* filename) {
             Test t(ParseCSV(line)); 
             result.push_back(t); 
         }
-
-        printf("done\n");
-        fflush(stdout);
 
         return result; 
 }

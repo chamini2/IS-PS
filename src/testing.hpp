@@ -15,8 +15,9 @@ using std::string;
 
 using std::pair; 
 
-struct Result {
+class Result {
     public:
+        Result() {}
         Result(pair<int, int> n_points, pair<float, float> cc, 
                pair<float, float> rp,   pair<float, float> sq) : src_points(n_points.first),
                                                                  dst_points(n_points.second),
@@ -27,22 +28,23 @@ struct Result {
                                                                  src_sq(sq.first),
                                                                  dst_sq(sq.second) {
     } 
+    void addTime(double t) { time = t; }
+
+    void addPoints(pair<int,int>); 
+    void addReduction(pair<float,float>); 
+    void addClassification(pair<float,float>); 
+    void addQuality(pair<float,float>); 
+
     int src_points, dst_points;
     float src_cc, dst_cc;
     float src_rp, dst_rp;
     float src_sq, dst_sq; 
+    double time; 
 };
 
 class Test {
 public:
-    Test(vector<string> attributes) : attributes_ (attributes) {
-
-        cout << "Creating test with: \n"; 
-
-        for (auto attr : attributes) {
-            cout << " - " << attr << endl; 
-        }
-    }
+    Test(vector<string> attributes) : attributes_ (attributes) {}
 
     Result run();
     vector<string> attributes_; 
