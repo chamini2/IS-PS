@@ -19,7 +19,7 @@
 #include <cstdio>
 
 #include <iostream>
-using std::make_pair; 
+using std::make_pair;
 
 #include <vector>
 using std::vector;
@@ -28,10 +28,10 @@ using std::vector;
 using std::multiset;
 
 #include <unordered_map>
-using std::unordered_map; 
+using std::unordered_map;
 
 #include <map>
-using std::map; 
+using std::map;
 
 #include <iostream>
 using std::cout;
@@ -66,32 +66,32 @@ using std::clock;
 
 #include "point_instances.hpp"
 
-// Forward declaration 
+// Forward declaration
 #include "testing.hpp"
- 
+
 // Class to measure time. The objects will serve as "function decorators"
 class MeasureTime {
 public:
     MeasureTime(string fn) {
         function_name_ = fn;
         begin_         = clock();
-        print_         = true; 
+        print_         = true;
         ++deepness;
     }
 
     MeasureTime(string fn, Result *result) {
         function_name_ = fn;
         begin_         = clock();
-        result_        = result; 
-        print_         = true; 
+        result_        = result;
+        print_         = true;
         ++deepness;
     }
 
     MeasureTime(string fn, Result *result, bool print) {
         function_name_ = fn;
         begin_         = clock();
-        result_        = result; 
-        print_         = print; 
+        result_        = result;
+        print_         = print;
         ++deepness;
     }
 
@@ -105,8 +105,8 @@ public:
         }
 
         if (result_ != NULL) {
-            result_->addTime(elapsed_time); 
-        } 
+            result_->addTime(elapsed_time);
+        }
 
         --deepness;
     }
@@ -115,13 +115,13 @@ private:
     clock_t begin_;
     string function_name_;
     static int deepness;
-    Result *result_; 
-    bool print_; 
+    Result *result_;
+    bool print_;
 };
 
 
 
-// Template class to handle IS-pS solution representation
+// Template class to handle IS/PS solution representation
 // Template arguments:
 // * Point: Representation of the classification problem points
 // * Class: Representation of the classification problem classes
@@ -136,63 +136,63 @@ public:
         selected_points_    = obj.selected_points_;
         unselected_points_  = obj.unselected_points_;
         correctness_weight_ = obj.correctness_weight_;
-        error_rate_         = obj.error_rate_; 
-        evaluate_           = obj.evaluate_; 
-        classify_           = obj.classify_; 
-        resolve_            = obj.resolve_; 
+        error_rate_         = obj.error_rate_;
+        evaluate_           = obj.evaluate_;
+        classify_           = obj.classify_;
+        resolve_            = obj.resolve_;
     }
 
     // Map <flag, metaheuristic function>
-    typedef PopulationMap<Point, Class> (*Metaheuristic)(const PopulationMap<Point,Class>&, int); 
-    typedef unordered_map<int,  Metaheuristic> MetaHeuristicMap; 
+    typedef PopulationMap<Point, Class> (*Metaheuristic)(const PopulationMap<Point,Class>&, int);
+    typedef unordered_map<int,  Metaheuristic> MetaHeuristicMap;
     // Function pointers typedefs
-    typedef Class (*Classifier)(Point, const multiset<Point>&); 
-    typedef float (*Evaluator)(float, float, float); 
+    typedef Class (*Classifier)(Point, const multiset<Point>&);
+    typedef float (*Evaluator)(float, float, float);
 
     // Just for styling
-    typedef int MetaheuristicType; 
+    typedef int MetaheuristicType;
 
     // Constructor without:
     // * weight specification : default 0.5
     // * resolver function : default LocalSearch
-    PopulationMap(multiset<Point> data, int points_to_toggle, 
-                  Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ), 
-                                                    selected_points_ ( data ), 
-                                                    correctness_weight_ ( 0.5 ), 
-                                                    classify_ (cls), 
+    PopulationMap(multiset<Point> data, int points_to_toggle,
+                  Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ),
+                                                    selected_points_ ( data ),
+                                                    correctness_weight_ ( 0.5 ),
+                                                    classify_ (cls),
                                                     evaluate_ (eval),
                                                     resolve_ (LOCAL_SEARCH) {
     }
 
     // Constructor without:
     // * resolver function : default LocalSearch
-    PopulationMap(multiset<Point> data, int points_to_toggle, 
-                  float correctness_weight, Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ), 
-                                                                              selected_points_ ( data ), 
-                                                                              correctness_weight_ ( correctness_weight ), 
-                                                                              classify_ (cls), 
+    PopulationMap(multiset<Point> data, int points_to_toggle,
+                  float correctness_weight, Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ),
+                                                                              selected_points_ ( data ),
+                                                                              correctness_weight_ ( correctness_weight ),
+                                                                              classify_ (cls),
                                                                               evaluate_ (eval),
                                                                               resolve_ (LOCAL_SEARCH) {
     }
 
     // Constructor without:
     // * weight specification : default 0.5
-    PopulationMap(multiset<Point> data, int points_to_toggle, 
-                  Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ), 
-                                                    selected_points_ ( data ), 
-                                                    correctness_weight_ ( 0.5 ), 
-                                                    classify_ (cls), 
+    PopulationMap(multiset<Point> data, int points_to_toggle,
+                  Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
+                                                    selected_points_ ( data ),
+                                                    correctness_weight_ ( 0.5 ),
+                                                    classify_ (cls),
                                                     evaluate_ (eval),
                                                     resolve_ (mhm[mht]) {
     }
 
     // Constructor with all arguments
-    PopulationMap(multiset<Point> data, int points_to_toggle, 
-                  float correctness_weight, Classifier cls, 
-                  Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ), 
-                                                           selected_points_ ( data ), 
-                                                           correctness_weight_ ( correctness_weight ), 
-                                                           classify_ (cls), 
+    PopulationMap(multiset<Point> data, int points_to_toggle,
+                  float correctness_weight, Classifier cls,
+                  Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
+                                                           selected_points_ ( data ),
+                                                           correctness_weight_ ( correctness_weight ),
+                                                           classify_ (cls),
                                                            evaluate_ (eval),
                                                            resolve_ (mhm[mht]) {
     }
@@ -200,7 +200,7 @@ public:
     // Initial solution to the Map
     void InitialSolution() {
         // Greedy
-        CNN(); 
+        CNN();
     }
 
     // Resolve method that calls the metaheuristic function
@@ -272,7 +272,7 @@ public:
             classes_values[p.ClassLabel()].push_back(p);
         }
 
-        // Pick a random represent from each class
+        // Pick a random representative from each class
         for (auto cv : classes_values) {
             // Maybe the class didn't exist
             if (cv.size() > 0) {
@@ -377,8 +377,8 @@ public:
             }
 
 
-            Point random_point = GetRandomPoint(random_to_pick_set); 
-            //Point random_point = GetBestPoint(random_to_pick_set); 
+            Point random_point = GetRandomPoint(random_to_pick_set);
+            //Point random_point = GetBestPoint(random_to_pick_set);
             toggle(random_point, random_to_pick_set);
         }
     }
@@ -409,7 +409,7 @@ public:
 
 
     pair<float,float> SolutionStatistics() {
-        return make_pair(RunClassifier(selected_points_, unselected_points_), GetReductionPercentage()); 
+        return make_pair(RunClassifier(selected_points_, unselected_points_), GetReductionPercentage());
     }
 
     multiset<Point> selected_points() const { return selected_points_; }
@@ -512,100 +512,13 @@ private:
     multiset<Point> selected_points_;
     multiset<Point> unselected_points_;
     float correctness_weight_;
-    float error_rate_; 
-    Classifier classify_; 
-    Evaluator evaluate_; 
-    Metaheuristic resolve_; 
+    float error_rate_;
+    Classifier classify_;
+    Evaluator evaluate_;
+    Metaheuristic resolve_;
     mutable int good_classifications_[N_THREADS];
 
-    static MetaHeuristicMap mhm; 
+    static MetaHeuristicMap mhm;
 };
 
-
-// Performs a local search on the current map
-template <typename Point, typename Class>
-PopulationMap<Point,Class> LocalSearchFirstFound(const PopulationMap<Point,Class>& orig_map, int iterations) {
-    // At least 1 iteration
-    assert(iterations > 0);
-    int curr_iterations = 0;
-
-    PopulationMap<Point, Class> map(orig_map); 
-
-    float curr_quality  = map.EvaluateQuality();
-
-    while (curr_iterations < iterations) {
-        PopulationMap<Point, Class> copy_map(map);
-
-        // Get the quality of the modified map
-        copy_map.NeighborhoodOperator();
-        float copy_quality = copy_map.EvaluateQuality();
-
-        // If the quality is better than the previous map, we found a new map
-        if (curr_quality < copy_quality) {
-            map             = copy_map;
-            curr_iterations = 0;
-            curr_quality    = map.EvaluateQuality();
-        } else {
-            ++curr_iterations;
-        }
-    }
-
-    return map;
-}
-
-template <typename Point, typename Class>
-    PopulationMap<Point,Class>
-        LocalSearchFirstFoundRec(const PopulationMap<Point,Class>& map,
-                                 float map_quality,
-                                 int curr_iterations,
-                                 int max_iterations) {
-    PopulationMap<Point,Class> copy_map(map);
-
-    if (curr_iterations == 0) {
-        return map;
-    }
-
-    copy_map.NeighborhoodOperator();
-    float copy_quality = copy_map.EvaluateQuality();
-
-    return copy_quality > map_quality ?
-    LocalSearchFirstFoundRec<Point,Class>(copy_map, copy_quality, 
-                                          max_iterations, max_iterations) :
-    LocalSearchFirstFoundRec<Point,Class>(map, map_quality,
-                                          curr_iterations - 1, max_iterations);
-}
-
-// PopulationMap LocalSearchBestOfAll(const PopulationMap&);
-// PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
-// PopulationMap LocalSearchTopSolutions(const PopulationMap&, int);  // The argument is the number of best solutions to keep
-
-template <typename Point, typename Class>
-PopulationMap<Point,Class> IteratedLocalSearch(const PopulationMap<Point,Class>& map, int iterations) {
-
-    const int local_search_its = 20;
-
-    PopulationMap<Point,Class> initial_solution(map);
-    initial_solution.RandomSolution();
-
-    PopulationMap<Point,Class> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
-
-    float curr_quality = best_solution.EvaluateQuality();
-
-    for (int it = 0; it < iterations; ++it) {
-
-        PopulationMap<Point,Class>& perturbated_solution(best_solution);
-        perturbated_solution.RandomSolution();
-
-        const PopulationMap<Point,Class>& candidate_solution = LocalSearchFirstFound<Point, Class>(perturbated_solution, local_search_its);
-        float candidate_quality = candidate_solution.EvaluateQuality();
-
-        // If the quality is better than the previous map, we found a new map
-        if (curr_quality < candidate_quality) {
-            best_solution = candidate_solution;
-            curr_quality  = candidate_quality;
-        }
-    }
-
-    return best_solution;
-}
 #endif
