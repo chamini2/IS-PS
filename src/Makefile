@@ -15,9 +15,11 @@ testing: testing.cpp testing.hpp instance_selection
 instance_selection: instance_selection.cpp instance_selection.hpp fitness classifiers 
 	g++ instance_selection.cpp -std=c++11 -pthread -g -c ${OPTIMIZATION_FLAGS} 
 
-run_program: clean program
-	@./program ./tests.txt
+run_ls: clean program
+	@./program ls_tests.txt
 
+run_ils_grasp: clean program
+	@./program ils_grasp_tests.txt
 
 tests: fitness
 	g++ instance_selection_unittest.cpp -std=c++11 -I./gtest-1.7.0/include \
