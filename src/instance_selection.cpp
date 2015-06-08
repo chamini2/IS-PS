@@ -7,7 +7,7 @@ PopulationMap<Point,Class> LocalSearchFirstFound(const PopulationMap<Point,Class
     assert(iterations > 0);
     int curr_iterations = 0;
 
-    PopulationMap<Point, Class> map(orig_map);
+    PopulationMap<Point, Class> map(orig_map); 
 
     float curr_quality  = map.EvaluateQuality();
 
@@ -15,15 +15,18 @@ PopulationMap<Point,Class> LocalSearchFirstFound(const PopulationMap<Point,Class
         PopulationMap<Point, Class> copy_map(map);
 
         // Get the quality of the modified map
-        copy_map.NeighborhoodOperator();
+        copy_map.NeighborhoodOperator(true);
         float copy_quality = copy_map.EvaluateQuality();
 
         // If the quality is better than the previous map, we found a new map
         if (curr_quality < copy_quality) {
             map             = copy_map;
+            map.reset(); 
             curr_iterations = 0;
             curr_quality    = map.EvaluateQuality();
         } else {
+            map.SetToPerturb(copy_map.SetToPerturb()); 
+            map.UnusedPointsToToggle(copy_map.UnusedPointsToToggle()); 
             ++curr_iterations;
         }
     }
@@ -43,15 +46,19 @@ template <typename Point, typename Class>
         return map;
     }
 
-    copy_map.NeighborhoodOperator();
+    copy_map.NeighborhoodOperator(false);
     float copy_quality = copy_map.EvaluateQuality();
 
     return copy_quality > map_quality ?
-    LocalSearchFirstFoundRec<Point,Class>(copy_map, copy_quality,
+    LocalSearchFirstFoundRec<Point,Class>(copy_map, copy_quality, 
                                           max_iterations, max_iterations) :
     LocalSearchFirstFoundRec<Point,Class>(map, map_quality,
                                           curr_iterations - 1, max_iterations);
 }
+
+// PopulationMap LocalSearchBestOfAll(const PopulationMap&);
+// PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
+// PopulationMap LocalSearchTopSolutions(const PopulationMap&, int);  // The argument is the number of best solutions to keep
 
 template <typename Point, typename Class>
 PopulationMap<Point,Class> IteratedLocalSearch(const PopulationMap<Point,Class>& map, int iterations) {
@@ -82,10 +89,6 @@ PopulationMap<Point,Class> IteratedLocalSearch(const PopulationMap<Point,Class>&
 
     return best_solution;
 }
-
-// PopulationMap LocalSearchBestOfAll(const PopulationMap&);
-// PopulationMap LocalSearchBestOfPartial(const PopulationMap&, int); // The argument is the percentage from 1 to 100
-// PopulationMap LocalSearchTopSolutions(const PopulationMap&, int);  // The argument is the number of best solutions to keep
 
 int MeasureTime::deepness = 0;
 template<>

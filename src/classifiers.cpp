@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-float EuclideanDistance(const vector<float>& lhs, const vector<float>& rhs) {
+float EuclideanDistance(const vector<double>& lhs, const vector<double>& rhs) {
     assert(lhs.size() == rhs.size());
 
     int N = lhs.size();
@@ -16,7 +16,7 @@ float EuclideanDistance(const vector<float>& lhs, const vector<float>& rhs) {
     return sqrt(accum);
 }
 
-float HammingDistance(const vector<float>& lhs, const vector<float>& rhs) {
+float HammingDistance(const vector<double>& lhs, const vector<double>& rhs) {
     assert(lhs.size() == rhs.size());
 
     int N = lhs.size();

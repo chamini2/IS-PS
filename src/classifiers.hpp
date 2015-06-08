@@ -36,8 +36,8 @@ Class OneNN(Point point, const multiset<Point>& data) {
 
 
 // Distances
-float EuclideanDistance(const vector<float>&, const vector<float>&);
-float HammingDistance(const vector<float>&, const vector<float>&);
+float EuclideanDistance(const vector<double>&, const vector<double>&);
+float HammingDistance(const vector<double>&, const vector<double>&);
 
 // TODO
 template <typename Class, class Point>

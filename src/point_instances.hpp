@@ -30,10 +30,10 @@ public:
         attributes_       = obj.attributes_;
     }
 
-    GenericPoint() : PointInterface<int>(0, vector<float>()) {
+    GenericPoint() : PointInterface<int>(0, vector<double>()) {
     }
 
-    GenericPoint(int class_label, vector<float> attributes) :
+    GenericPoint(int class_label, vector<double> attributes) :
                     PointInterface<int> (class_label, attributes) {
         g_max_label = std::max(g_max_label, class_label);
     }
@@ -66,9 +66,9 @@ public:
 
 private:
 
-    static pair<int, vector<float> > ParseCSV(char* line) {
+    static pair<int, vector<double> > ParseCSV(char* line) {
         char *next, *field;
-        vector<float> attributes;
+        vector<double> attributes;
 
         field = strtok(line, ",");
         next = strtok(NULL, ",");
@@ -88,7 +88,6 @@ private:
 };
 
 
-// Operator << for HammingDistance and EuclideanDistance
 inline bool operator<(const GenericPoint& lhs,
                       const GenericPoint& rhs) {
     int size = lhs.attributes().size();
