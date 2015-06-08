@@ -248,24 +248,24 @@ public:
 
     void MCNN() {
 
-        //MeasureTime mt("MCNN");
-
+        // MeasureTime mt("MCNN");
         srand(time(NULL));
 
         // Start with the empty set C `selected_points_`
         unselected_points_ = selected_points_;
         selected_points_.clear();
 
-        vector< vector<Point> > classes_values(g_max_label);
-        vector< bool > class_represented(g_max_label);
+        int classes_n = g_max_label + 1;
+        vector< vector<Point> > class_values(classes_n);
+        vector< bool > class_represented(classes_n);
 
         // Separate points by classes
-        for (auto p : selected_points_) {
-            classes_values[p.ClassLabel()].push_back(p);
+        for (auto p : unselected_points_) {
+            class_values[p.ClassLabel()].push_back(p);
         }
 
         // Pick a random representative from each class
-        for (auto cv : classes_values) {
+        for (auto cv : class_values) {
             // Maybe the class didn't exist
             if (cv.size() > 0) {
                 Point p = cv[rand() % cv.size()];
@@ -288,7 +288,7 @@ public:
                 }
             }
 
-            for (int i; i < g_max_label; ++i) {
+            for (int i = 0; i < classes_n; ++i) {
                 class_represented[i] = false;
             }
 
