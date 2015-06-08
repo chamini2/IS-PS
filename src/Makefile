@@ -21,9 +21,9 @@ run_ls: clean program
 run_ils_grasp: clean program
 	@./program ils_grasp_tests.txt
 
-tests: fitness
+tests: fitness instance_selection classifiers
 	g++ instance_selection_unittest.cpp -std=c++11 -I./gtest-1.7.0/include \
-			gtest-1.7.0/src/gtest-all.o -o instance_selection_unittest -lpthread fitness.o ${OPTIMIZATION_FLAGS}
+			gtest-1.7.0/src/gtest-all.o -o instance_selection_unittest -pthread fitness.o instance_selection.o classifiers.o ${OPTIMIZATION_FLAGS}
 
 run_tests: tests
 	@./instance_selection_unittest

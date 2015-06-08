@@ -11,7 +11,7 @@ template <typename Class>
 class PointInterface {
 public:
     PointInterface() {}
-    PointInterface(Class class_label, vector<float> attributes) :
+    PointInterface(Class class_label, vector<double> attributes) :
                             class_label_ ( class_label ),
                             attributes_ ( attributes ) {
     }
@@ -19,9 +19,9 @@ public:
     // Returns the class label of type Class
     Class ClassLabel() const { return class_label_; }
     virtual float distance(const PointInterface<Class>&)=0;
-    vector<float> attributes() const { return attributes_; }
+    vector<double> attributes() const { return attributes_; }
 protected:
     Class class_label_;
-    vector<float> attributes_;
+    vector<double> attributes_;
 };
 #endif
