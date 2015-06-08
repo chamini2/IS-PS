@@ -75,6 +75,7 @@ public:
     MeasureTime(string fn) {
         function_name_ = fn;
         begin_         = clock();
+        result_        = NULL;
         print_         = true;
         ++deepness;
     }
@@ -167,34 +168,37 @@ public:
     // Constructor without:
     // * resolver function : default LocalSearch
     PopulationMap(multiset<Point> data, int points_to_toggle,
-                  float correctness_weight, Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ),
-                                                                              selected_points_ ( data ),
-                                                                              correctness_weight_ ( correctness_weight ),
-                                                                              classify_ (cls),
-                                                                              evaluate_ (eval),
-                                                                              resolve_ (LOCAL_SEARCH) {
+                  float correctness_weight, Classifier cls, Evaluator eval)
+                    : points_to_toggle_ ( points_to_toggle ),
+                      selected_points_ ( data ),
+                      correctness_weight_ ( correctness_weight ),
+                      classify_ (cls),
+                      evaluate_ (eval),
+                      resolve_ (LOCAL_SEARCH) {
     }
 
     // Constructor without:
     // * weight specification : default 0.5
     PopulationMap(multiset<Point> data, int points_to_toggle,
-                  Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
-                                                    selected_points_ ( data ),
-                                                    correctness_weight_ ( 0.5 ),
-                                                    classify_ (cls),
-                                                    evaluate_ (eval),
-                                                    resolve_ (mhm[mht]) {
+                  Classifier cls, Evaluator eval, MetaheuristicType mht)
+                    : points_to_toggle_ ( points_to_toggle ),
+                      selected_points_ ( data ),
+                      correctness_weight_ ( 0.5 ),
+                      classify_ (cls),
+                      evaluate_ (eval),
+                      resolve_ (mhm[mht]) {
     }
 
     // Constructor with all arguments
     PopulationMap(multiset<Point> data, int points_to_toggle,
                   float correctness_weight, Classifier cls,
-                  Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
-                                                           selected_points_ ( data ),
-                                                           correctness_weight_ ( correctness_weight ),
-                                                           classify_ (cls),
-                                                           evaluate_ (eval),
-                                                           resolve_ (mhm[mht]) {
+                  Evaluator eval, MetaheuristicType mht)
+                    : points_to_toggle_ ( points_to_toggle ),
+                      selected_points_ ( data ),
+                      correctness_weight_ ( correctness_weight ),
+                      classify_ (cls),
+                      evaluate_ (eval),
+                      resolve_ (mhm[mht]) {
     }
 
     // Initial solution to the Map
@@ -210,12 +214,12 @@ public:
 
         // Decorator to measure time
         //MeasureTime mt("CNN");
+        srand(time(NULL));
 
         // Start with the empty set C `selected_points_`
         unselected_points_ = selected_points_;
         selected_points_.clear();
 
-        srand(time(NULL));
         auto random_point_iterator =
             std::next(std::begin(unselected_points_),
                       std::rand() % unselected_points_.size());
