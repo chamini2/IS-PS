@@ -19,7 +19,7 @@ typedef unordered_map<string, string> PathMap;
 EvaluatorMap em = {
                     { "eul", &EulerQuality },
                     { "weight", &WeightedQuality },
-                    { "qualityuared", &qualityuaredQuality }
+                    { "qualityuared", &SquaredQuality }
                   };
 
 // Metaheuristics map

@@ -31,7 +31,7 @@ class Result {
     void addTime(double t) { time = t; }
 
     void addPoints(pair<int,int>);
-    void addReductiion(pair<float,float>);
+    void addReduction(pair<float,float>);
     void addClassification(pair<float,float>);
     void addQuality(pair<float,float>);
 
