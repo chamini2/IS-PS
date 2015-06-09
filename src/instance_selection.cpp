@@ -66,22 +66,24 @@ PopulationMap<Point,Class> IteratedLocalSearch(const PopulationMap<Point,Class>&
     const int local_search_its = 20;
 
     PopulationMap<Point,Class> initial_solution(map);
-    initial_solution.RandomSolution();
 
     PopulationMap<Point,Class> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
-
     float curr_quality = best_solution.EvaluateQuality();
 
     for (int it = 0; it < iterations; ++it) {
 
-        PopulationMap<Point,Class>& perturbated_solution(best_solution);
-        perturbated_solution.RandomSolution();
+        PopulationMap<Point,Class> perturbated_solution(best_solution);
+        perturbated_solution.reset(); 
+
+        // TODO: add diversification if the solution is not improving a lot (define 'a lot')
+        perturbated_solution.NeighborhoodOperator(false); 
 
         const PopulationMap<Point,Class>& candidate_solution = LocalSearchFirstFound<Point, Class>(perturbated_solution, local_search_its);
         float candidate_quality = candidate_solution.EvaluateQuality();
 
+
         // If the quality is better than the previous map, we found a new map
-        if (curr_quality < candidate_quality) {
+        if (candidate_quality > curr_quality) {
             best_solution = candidate_solution;
             curr_quality  = candidate_quality;
         }
@@ -90,11 +92,45 @@ PopulationMap<Point,Class> IteratedLocalSearch(const PopulationMap<Point,Class>&
     return best_solution;
 }
 
+#include "fitness.hpp"
+
+// XXX: Maybe 1000 iterations is too much
+template<typename Point, typename Class>
+PopulationMap<Point,Class> GreedyRandomizedAdaptiveSearch(const PopulationMap<Point,Class>& map, 
+                                                          int iterations) {
+
+    // Alpha to determine greediness
+    const float alpha = 0.5; 
+    // Original data set 
+    multiset<Point> data(map.data());
+
+    float best_quality = map.EvaluateQuality(); 
+    PopulationMap<Point,int> best_map; 
+    for (int i = 0; i < iterations; ++i) {
+        // Build virgin map 
+        PopulationMap<Point,Class> copy_map(data, 1, &OneNN<Point,Class>, &EulerQuality); 
+        // Generate random solution
+        copy_map.GreedyRandomAlgorithm(alpha); 
+
+        // Perform local search to improve result
+        PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(copy_map, 20); 
+
+        // Evaluate and keep if better
+        float curr_quality = candidate.EvaluateQuality();
+        if (curr_quality > best_quality) {
+            best_quality = curr_quality; 
+            best_map     = copy_map; 
+        }
+    }
+
+    return best_map; 
+}
+
 int MeasureTime::deepness = 0;
 template<>
 PopulationMap<GenericPoint,int>::MetaHeuristicMap PopulationMap<GenericPoint,int>::mhm = {
     { LOCAL_SEARCH, &LocalSearchFirstFound<GenericPoint,int> },
-    { ITERATED_LOCAL_SEARCH, &IteratedLocalSearch<GenericPoint,int> }
-    //{ GRASP, &GRASP<GenericPoint,int> }
+    { ITERATED_LOCAL_SEARCH, &IteratedLocalSearch<GenericPoint,int> },
+    { GRASP, &GreedyRandomizedAdaptiveSearch<GenericPoint,int> }
 };
 
