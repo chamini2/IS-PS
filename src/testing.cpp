@@ -6,20 +6,20 @@
 #include "classifiers.hpp"
 
 
-using std::make_pair; 
+using std::make_pair;
 
 #include <unordered_map>
-using std::unordered_map; 
+using std::unordered_map;
 
-typedef unordered_map<string, PopulationMap<GenericPoint, int>::Evaluator> EvaluatorMap; 
-typedef unordered_map<string, int> MetaHeuristicTypeMap; 
-typedef unordered_map<string, string> PathMap; 
+typedef unordered_map<string, PopulationMap<GenericPoint, int>::Evaluator> EvaluatorMap;
+typedef unordered_map<string, int> MetaHeuristicTypeMap;
+typedef unordered_map<string, string> PathMap;
 
 // Objectif function map
-EvaluatorMap em = { 
-                    { "eul", &EulerQuality }, 
-                    { "weight", &WeightedQuality }, 
-                    { "squared", &SquaredQuality } 
+EvaluatorMap em = {
+                    { "eul", &EulerQuality },
+                    { "weight", &WeightedQuality },
+                    { "qualityuared", &qualityuaredQuality }
                   };
 
 // Metaheuristics map
@@ -44,77 +44,77 @@ int g_max_label = 0;
 Result Test::run() {
 
 
-    Result r; 
+    Result r;
     MeasureTime mt("Test", &r, false);
 
-    pair<float, float> stats, rstats; 
-    pair<int, int> n_points; 
-    pair<float, float> cc, rp, sq; 
+    pair<float, float> stats, rstats;
+    pair<int, int> n_points;
+    pair<float, float> correct, reducti, quality;
 
 
     // attributes_[0] = dataset to test
     // attributes_[1] = Metaheuristic to use
     // attributes_[2] = Evaluator function
-    
-    multiset<GenericPoint> points = GenericPoint::load(paths[attributes_[0]].c_str()); 
-    PopulationMap<GenericPoint, int> pop_map(points, 1, &OneNN<GenericPoint, int>, 
-                                             em[attributes_[2]], mhtm[attributes_[1]]); 
 
-    pop_map.InitialSolution(); 
-    stats = pop_map.SolutionStatistics(); 
+    multiset<GenericPoint> points = GenericPoint::load(paths[attributes_[0]].c_str());
+    PopulationMap<GenericPoint, int> pop_map(points, 1, &OneNN<GenericPoint, int>,
+                                             em[attributes_[2]], mhtm[attributes_[1]]);
 
-    PopulationMap<GenericPoint, int> best_map = pop_map.resolve(); 
-    rstats = best_map.SolutionStatistics(); 
+    pop_map.InitialSolution();
+    stats = pop_map.SolutionStatistics();
+
+    PopulationMap<GenericPoint, int> best_map = pop_map.resolve();
+    rstats = best_map.SolutionStatistics();
 
     n_points = make_pair(pop_map.SelectedPointsSize(), best_map.SelectedPointsSize());
-    cc       = make_pair(stats.first, rstats.first);
-    rp       = make_pair(stats.second, rstats.second);
-    sq       = make_pair(pop_map.EvaluateQuality(), best_map.EvaluateQuality());
+    correct  = make_pair(stats.first, rstats.first);
+    reducti  = make_pair(stats.second, rstats.second);
+    quality  = make_pair(pop_map.EvaluateQuality(), best_map.EvaluateQuality());
 
-    r.addPoints(n_points); 
-    r.addClassification(cc);
-    r.addReduction(rp);
-    r.addQuality(sq); 
+    r.addPoints(n_points);
+    r.addClassification(correct);
+    r.addReduction(reducti);
+    r.addQuality(quality);
 
-    return r; 
+    return r;
 }
 
 std::ostream& operator<<(std::ostream& os, const Test& obj) {
     for (auto attr : obj.attributes_) {
-        os << attr << ","; 
+        os << attr << ",";
     }
 
-    return os; 
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Result& obj) {
     os << obj.src_points << ","
-       << obj.src_cc << ","
-       << obj.src_rp << ","
-       << obj.src_sq << ","
+       << obj.src_correct << ","
+       << obj.src_reducti << ","
+       << obj.src_quality << ","
        << obj.dst_points << ","
-       << obj.dst_cc << ","
-       << obj.dst_rp << ","
-       << obj.dst_sq << ","
-       << obj.time; 
+       << obj.dst_correct << ","
+       << obj.dst_reducti << ","
+       << obj.dst_quality << ","
+       << obj.time;
 
-    return os; 
-}
-
-void Result::addPoints(pair<int,int> points) { 
-    src_points = points.first; 
-    dst_points = points.second; 
+    return os;
 }
 
-void Result::addReduction(pair<float,float> rp) {
-    src_rp = rp.first; 
-    dst_rp = rp.second; 
+void Result::addPoints(pair<int,int> points) {
+    src_points = points.first;
+    dst_points = points.second;
 }
-void Result::addClassification(pair<float,float> cc) {
-    src_cc = cc.first; 
-    dst_cc = cc.second; 
+
+void Result::addReduction(pair<float,float> reducti) {
+    src_reducti = reducti.first;
+    dst_reducti = reducti.second;
 }
-void Result::addQuality(pair<float,float> sq) {
-    src_sq = sq.first; 
-    dst_sq = sq.second; 
+void Result::addClassification(pair<float,float> correct) {
+    src_correct = correct.first;
+    dst_correct = correct.second;
+}
+void Result::addQuality(pair<float,float> quality) {
+    src_quality = quality.first;
+    dst_quality = quality.second;
 }
