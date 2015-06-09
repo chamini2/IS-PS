@@ -1,36 +1,44 @@
+# lines starting with a '#' are comments
+# and empty lines are ignored too
+
 glass,ils,weight
 glass,ils,eul
 glass,ils,squared
-glass,grasp,weight
-glass,grasp,eul
-glass,grasp,squared
+# glass,grasp,weight
+# glass,grasp,eul
+# glass,grasp,squared
+
 iris,ils,weight
 iris,ils,eul
 iris,ils,squared
-iris,grasp,weight
-iris,grasp,eul
-iris,grasp,squared
+# iris,grasp,weight
+# iris,grasp,eul
+# iris,grasp,squared
+
 blogger,ils,weight
 blogger,ils,eul
 blogger,ils,squared
-blogger,grasp,weight
-blogger,grasp,eul
-blogger,grasp,squared
+# blogger,grasp,weight
+# blogger,grasp,eul
+# blogger,grasp,squared
+
 bcw,ils,weight
 bcw,ils,eul
 bcw,ils,squared
-bcw,grasp,weight
-bcw,grasp,eul
-bcw,grasp,squared
+# bcw,grasp,weight
+# bcw,grasp,eul
+# bcw,grasp,squared
+
 australian,ils,weight
 australian,ils,eul
 australian,ils,squared
-australian,grasp,weight
-australian,grasp,eul
-australian,grasp,squared
+# australian,grasp,weight
+# australian,grasp,eul
+# australian,grasp,squared
+
 pima,ils,weight
 pima,ils,eul
 pima,ils,squared
-pima,grasp,weight
-pima,grasp,eul
-pima,grasp,squared
+# pima,grasp,weight
+# pima,grasp,eul
+# pima,grasp,squared
