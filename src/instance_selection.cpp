@@ -74,7 +74,7 @@ template <typename Point, typename Class>
     PopulationMap<Point,Class> best_solution = LocalSearchFirstFound(initial_solution, local_search_its);
     float curr_quality = best_solution.EvaluateQuality();
 
-    for (int it = 0; it < iterations; ++it) {
+    repeat (iterations) {
 
         PopulationMap<Point,Class> perturbated_solution(best_solution);
         perturbated_solution.reset();
@@ -99,32 +99,37 @@ template <typename Point, typename Class>
 #include "fitness.hpp"
 
 // XXX: Maybe 1000 iterations is too much
+// FIXME: Does nothing (returns the same map, the problem is probably in GreedyRandomAlgorithm)
 template<typename Point, typename Class>
     PopulationMap<Point,Class>
         GreedyRandomizedAdaptiveSearch(const PopulationMap<Point,Class>& map,
                                        int iterations) {
 
+    const int local_search_its = 20;
+
     // Alpha to determine greediness
     const float alpha = 0.5;
+
     // Original data set
     multiset<Point> data(map.data());
 
     float best_quality = map.EvaluateQuality();
-    PopulationMap<Point,int> best_map;
-    for (int i = 0; i < iterations; ++i) {
+    PopulationMap<Point,int> best_map = map;
+    repeat (iterations) {
         // Build virgin map
-        PopulationMap<Point,Class> copy_map(data, 1, map.classifier(), map.evaluator());
+        PopulationMap<Point,Class> curr_map(data, map.PointsToToggle(), map.classifier(), map.evaluator());
+
         // Generate random solution
-        copy_map.GreedyRandomAlgorithm(alpha);
+        curr_map.GreedyRandomAlgorithm(alpha);
 
         // Perform local search to improve result
-        PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(copy_map, 20);
+        PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
 
         // Evaluate and keep if better
         float curr_quality = candidate.EvaluateQuality();
         if (curr_quality > best_quality) {
             best_quality = curr_quality;
-            best_map     = copy_map;
+            best_map     = curr_map;
         }
     }
 
