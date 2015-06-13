@@ -135,7 +135,7 @@ bool DescendingCentroidComparetor(const pair<Point, float>& lhs, const pair<Poin
 // * Point: Representation of the classification problem points
 // * Class: Representation of the classification problem classes
 template <typename Point, typename Class>
-class PopulationMap {
+    class PopulationMap {
 public:
     // Map <flag, metaheuristic function>
     typedef PopulationMap<Point, Class> (*Metaheuristic)(const PopulationMap<Point,Class>&, int);
@@ -495,7 +495,7 @@ public:
     // XXX: 1000 iterations get to segfault
     void GreedyRandomAlgorithm(float alpha) {
 
-        // Empty selected points, so we can chose from the ground
+        // Empty selected points, so we can choose from the ground
         unselected_points_ = selected_points_;
         selected_points_.clear();
         ComputeCentroidsAndTotals();
@@ -519,7 +519,7 @@ public:
         }
 
         // At least 5 point in the candidates
-        if (candidates_end < candidates_start + 5) {
+        if (candidates_start + 5 > candidates_end) {
             candidates_end = candidates_start + 5;
         }
 
@@ -528,13 +528,12 @@ public:
         auto last  = unused_point_to_toggle_.begin() + candidates_end;
         unused_point_to_toggle_ = vector<pair<Point,float> >(first, last);
 
-
         // While we still have candidates
         while (!unused_point_to_toggle_.empty()) {
 
             // Get min and max
             float c_min = unused_point_to_toggle_.back().second;
-            float c_max = unused_point_to_toggle_.begin()->second;
+            float c_max = unused_point_to_toggle_.front().second;
 
             // Build RCL
             vector<Point> RCL;
@@ -550,6 +549,7 @@ public:
                 candidate = unused_point_to_toggle_.back();
             }
 
+            // XXX: This shouldn't happen, at least `c_min` should enter
             if (RCL.empty()) {
                 break;
             }
@@ -640,6 +640,7 @@ public:
     Classifier classifier() const { return classify_; }
     Evaluator evaluator() const { return evaluate_; }
 
+    int PointsToToggle() const { return points_to_toggle_; }
 
 private:
     // Toggles points between selected and unselected points sets.

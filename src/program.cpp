@@ -33,32 +33,39 @@ vector<string> ParseCSV(char* line) {
     field = strtok(line, ",");
     while (field != NULL) {
         if (field[strlen(field) - 1] == '\n') {
-            field[strlen(field) - 1] = '\0'; 
+            field[strlen(field) - 1] = '\0';
         }
         attributes.push_back(field);
         field = strtok(NULL, ",");
     }
 
-    return attributes; 
+    return attributes;
 }
 
 vector<Test> load(const char* filename) {
         FILE *fp;
         char *line = NULL;
         size_t len = 0;
+        int read_chars;
 
         vector<Test> result;
 
         fp = fopen(filename, "r");
         assert(fp != NULL);
 
-        while (getline(&line, &len, fp) != -1) {
+        while ((read_chars = getline(&line, &len, fp)) != -1) {
+            // '^ *#' is the regular expression for comment lines
+            int pos = 0;
+            while (line[pos] == ' ') { ++pos; }
 
-            Test t(ParseCSV(line)); 
-            result.push_back(t); 
+            // If it's a comment or an empty line
+            if (line[pos] == '#' || pos + 1 == read_chars) { continue; }
+
+            Test t(ParseCSV(line));
+            result.push_back(t);
         }
 
-        return result; 
+        return result;
 }
 
 
@@ -70,10 +77,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    vector<Test> tests = load(argv[1]); 
+    vector<Test> tests = load(argv[1]);
 
     for (Test t : tests) {
-        cout << t << t.run() << endl; 
+        cout << t << t.run() << endl;
     }
 
     return 0;

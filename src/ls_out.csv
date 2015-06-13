@@ -1,3 +1,4 @@
+name,search,fitness,points,function,reduction,quality,points',function',reduction',quality',time
 glass,ls,weight,100,1,0.530516,0.765258,88,1,0.586854,0.793427,1.24866
 glass,ls,eul,102,1,0.521127,0.398028,89,0.983871,0.58216,0.449969,1.06847
 glass,ls,squared,104,1,0.511737,0.261875,86,0.984252,0.596244,0.344398,1.93838
