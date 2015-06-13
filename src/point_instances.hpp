@@ -61,6 +61,9 @@ public:
             points.insert(GenericPoint(inst_pair.first, inst_pair.second));
         }
 
+        free(fp); 
+        free(line); 
+
         return points;
     }
 
