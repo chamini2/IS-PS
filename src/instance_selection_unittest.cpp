@@ -71,7 +71,7 @@ TEST_F(GenericPointTest, FitnessFunction) {
 
     EXPECT_EQ(classification_correctness, 1);
 
-    GenericPoint p = *pop_map.selected_points().begin();
+    GenericPoint p = *pop_map.SelectedPoints().begin();
     copy_map.ComputeCentroidsAndTotals(); 
     copy_map.toggle(p, 1);
     float reduction_percentage = (float) copy_map.GetReductionPercentage();
@@ -142,12 +142,13 @@ TEST_F(GenericPointTest, GettingBestPoint) {
     PopulationMap<GenericPoint, int> copy_map(pop_map);
     copy_map.ComputeCentroidsAndTotals(); 
 
-    GenericPoint p = copy_map.GetBestPoint(1); 
+    GenericPoint p = copy_map.GetBestPoint(1).first; 
+    copy_map.set_to_perturb_ = -1; 
     float distance = copy_map.ComputeCentroidDistance(p, 1); 
 
     for (GenericPoint elem : copy_map.selected_points_) {
         float elem_distance = copy_map.ComputeCentroidDistance(elem,1); 
-        EXPECT_GE(elem_distance, distance);  
+        EXPECT_LE(elem_distance, distance);  
     }
 
     EXPECT_LT(0, p.attributes().size()); 
@@ -172,20 +173,33 @@ TEST_F(GenericPointTest, NeighborhoodOperatorIntelligentTwice) {
 
     copy_map.ComputeCentroidsAndTotals(); 
 
-    GenericPoint p = copy_map.GetBestPoint(1); 
+    GenericPoint p = copy_map.GetBestPoint(1).first; 
     EXPECT_EQ(copy_map.unselected_points_.find(p), copy_map.unselected_points_.end());
 
     copy_map.toggle(p, 1);
-    GenericPoint np = copy_map.GetBestPoint(1); 
+    GenericPoint np = copy_map.GetBestPoint(1).first; 
     EXPECT_NE(copy_map.unselected_points_.find(p), copy_map.unselected_points_.end());
     EXPECT_EQ(copy_map.unselected_points_.find(np), copy_map.unselected_points_.end());
 
     EXPECT_NE(p.attributes(), np.attributes()); 
 }
+
+TEST_F(GenericPointTest, PickRandomSet) {
+    PopulationMap<GenericPoint, int> copy_map(pop_map);
+    multiset<GenericPoint> data(copy_map.data()); 
+    multiset<GenericPoint> random_set = copy_map.PickRandomSet(); 
+
+    // Expecting at least one element
+    EXPECT_LT(0, random_set.size()); 
+
+    for (GenericPoint p : random_set) {
+        EXPECT_TRUE(data.find(p) != data.end()); 
+    }
+}
 #endif
 TEST_F(GenericPointTest, Classifier) {
-    GenericPoint p = *pop_map.selected_points().begin();
-    bool resulting_class = OneNN<GenericPoint, int>(p, pop_map.selected_points());
+    GenericPoint p = *pop_map.SelectedPoints().begin();
+    bool resulting_class = OneNN<GenericPoint, int>(p, pop_map.SelectedPoints());
     EXPECT_EQ(p.ClassLabel(), resulting_class);
 }
 

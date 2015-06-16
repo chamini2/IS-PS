@@ -2,7 +2,7 @@
 #define __INSTANCE_SELECTION_HPP__
 
 #define repeat(N) for(int i = 0; i < N; ++i)
-#define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
+#define TEST_PRIVATE_ATTRIBUTES 1 // 1 => enable testing in private members of the classes
 #define N_THREADS 100
 
 // Metaheuristics flags
@@ -806,8 +806,31 @@ private:
     }
 
 
-    friend class BallonPointTest;
+    // Function to pick a random set of points from the map's data
+    multiset<Point> PickRandomSet() {
+        multiset<Point> data = this->data(); 
+        multiset<Point> random_set; 
+
+        srand(time(NULL));
+
+        for (auto itr = data.begin(); itr != data.end(); ++itr) {
+            int pick_point = rand() % 3;
+
+            // High probability to be in the set (to avoid empty sets)
+            if (pick_point != 0) {
+                random_set.insert(*itr);
+            }        
+        }
+
+        if (random_set.empty()) {
+            random_set.insert(*data.begin()); 
+        }
+
+        return random_set; 
+    }
+
 #if TEST_PRIVATE_ATTRIBUTES == 1
+    friend class GenericPointTest;
     FRIEND_TEST(GenericPointTest, FitnessFunction);
     FRIEND_TEST(GenericPointTest, TogglingPoints);
     FRIEND_TEST(GenericPointTest, ComputingCentroids);
@@ -815,6 +838,7 @@ private:
     FRIEND_TEST(GenericPointTest, GettingBestPoint);
     FRIEND_TEST(GenericPointTest, NeighborhoodOperatorWithIntelligentPerturbation);
     FRIEND_TEST(GenericPointTest, NeighborhoodOperatorIntelligentTwice);
+    FRIEND_TEST(GenericPointTest, PickRandomSet);
 #endif
 
     // Class private members
