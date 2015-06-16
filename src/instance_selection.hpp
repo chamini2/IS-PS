@@ -535,7 +535,7 @@ public:
 
     }
 
-    // XXX: 1000 iterations get to segfault
+    // FIXME: INCONSISTENT DATA
     static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data, 
                                                              float alpha, Classifier cls, 
                                                              Evaluator eval, MetaheuristicType mht) {

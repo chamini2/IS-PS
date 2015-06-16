@@ -105,35 +105,37 @@ template<typename Point, typename Class>
         GreedyRandomizedAdaptiveSearch(const PopulationMap<Point,Class>& map,
                                        int iterations) {
 
-    //const int local_search_its = 20;
+    // LS iterations
+    const int local_search_its = 20;
 
-    //// Alpha to determine greediness
-    //const float alpha = 0.5;
+    // Alpha to determine greediness
+    const float alpha = 0.5;
 
-    //// Original data set
-    //multiset<Point> data(map.data());
+    // Original data set
+    multiset<Point> data(map.data());
 
-    //float best_quality = map.EvaluateQuality();
-    //PopulationMap<Point,int> best_map = map;
-    //repeat (iterations) {
-        //// Build virgin map
-        //PopulationMap<Point,Class> curr_map(data, map.PointsToToggle(), map.classifier(), map.evaluator());
+    PopulationMap<Point,Class> best_map = map;
+    double best_quality                 = best_map.EvaluateQuality();
 
-        //// Generate random solution
-        //curr_map.GreedyRandomAlgorithm(alpha);
+    repeat (iterations) {
+        // Build virgin map
+        PopulationMap<Point, Class> curr_map = 
+            PopulationMap<Point, Class>::GreedyRandomAlgorithm(data, alpha, map.classifier(), map.evaluator(), map.mht()); 
 
-        //// Perform local search to improve result
-        //PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
+        assert(curr_map.data().size() == data.size());
 
-        //// Evaluate and keep if better
-        //float curr_quality = candidate.EvaluateQuality();
-        //if (curr_quality > best_quality) {
-            //best_quality = curr_quality;
-            //best_map     = curr_map;
-        //}
-    //}
+        // Perform local search to improve result
+        PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
 
-    /*return best_map;*/
+        // Evaluate and keep if better
+        double curr_quality = candidate.EvaluateQuality();
+        if (curr_quality > best_quality) {
+            best_quality = curr_quality;
+            best_map     = candidate;
+        }
+    }
+
+    return best_map;
 }
 
 int MeasureTime::deepness = 0;
