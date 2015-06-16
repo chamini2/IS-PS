@@ -132,7 +132,11 @@ TEST_F(GenericPointTest, ComputingCentroidDistance) {
     copy_map.ComputeCentroidsAndTotals(); 
 
     GenericPoint p = *copy_map.selected_points_.begin(); 
-    float distance = copy_map.ComputeCentroidDistance(p, 1); 
+    float distance = copy_map.ComputeCentroidDistance(p, 
+                                                      copy_map.class_centroids_[p.ClassLabel()], 
+                                                      copy_map.class_totals_[p.ClassLabel()],
+                                                      copy_map.class_frequencies_[p.ClassLabel()],
+                                                      1);
 
     EXPECT_GT(0.0935,distance);
     EXPECT_LT(0.0933, distance);
@@ -144,11 +148,19 @@ TEST_F(GenericPointTest, GettingBestPoint) {
 
     GenericPoint p = copy_map.GetBestPoint(1).first; 
     copy_map.set_to_perturb_ = -1; 
-    float distance = copy_map.ComputeCentroidDistance(p, 1); 
+    float distance = copy_map.ComputeCentroidDistance(p,  
+                                                      copy_map.class_centroids_[p.ClassLabel()], 
+                                                      copy_map.class_totals_[p.ClassLabel()],
+                                                      copy_map.class_frequencies_[p.ClassLabel()],
+                                                      1);
 
     for (GenericPoint elem : copy_map.selected_points_) {
-        float elem_distance = copy_map.ComputeCentroidDistance(elem,1); 
-        EXPECT_LE(elem_distance, distance);  
+        float elem_distance = copy_map.ComputeCentroidDistance(elem, 
+                                                               copy_map.class_centroids_[elem.ClassLabel()], 
+                                                               copy_map.class_totals_[elem.ClassLabel()],
+                                                               copy_map.class_frequencies_[elem.ClassLabel()],
+                                                               1);
+        EXPECT_GE(elem_distance, distance);  
     }
 
     EXPECT_LT(0, p.attributes().size()); 
@@ -187,15 +199,40 @@ TEST_F(GenericPointTest, NeighborhoodOperatorIntelligentTwice) {
 TEST_F(GenericPointTest, PickRandomSet) {
     PopulationMap<GenericPoint, int> copy_map(pop_map);
     multiset<GenericPoint> data(copy_map.data()); 
-    multiset<GenericPoint> random_set = copy_map.PickRandomSet(); 
+    auto sets = PopulationMap<GenericPoint,int>::PickRandomSet(data);
+    multiset<GenericPoint> random_set = sets.first;
+    multiset<GenericPoint> rest = sets.second;
+
 
     // Expecting at least one element
     EXPECT_LT(0, random_set.size()); 
+    EXPECT_EQ(random_set.size() + rest.size(), data.size()); 
 
     for (GenericPoint p : random_set) {
         EXPECT_TRUE(data.find(p) != data.end()); 
     }
 }
+
+TEST_F(GenericPointTest, EvaluateIncrementalCostEmpty) {
+    PopulationMap<GenericPoint, int> copy_map(pop_map);
+    copy_map.ComputeCentroidsAndTotals(); 
+
+    vector<pair<GenericPoint, double> > inc_costs = PopulationMap<GenericPoint,int>::EvaluateIncrementalCost(copy_map.UnselectedPoints(),
+                                                                                                             copy_map.class_centroids_,
+                                                                                                             copy_map.class_totals_,
+                                                                                                             copy_map.class_frequencies_,
+                                                                                                             0); 
+    for (auto p : inc_costs) {
+        double distance = PopulationMap<GenericPoint,int>::ComputeCentroidDistance(p.first, 
+                                                                                  copy_map.class_centroids_[p.first.ClassLabel()], 
+                                                                                  copy_map.class_totals_[p.first.ClassLabel()],
+                                                                                  copy_map.class_frequencies_[p.first.ClassLabel()],
+                                                                                  0);
+        EXPECT_LT(p.second, distance + 0.0001); 
+        EXPECT_GT(p.second, distance - 0.0001); 
+    }
+}
+
 #endif
 TEST_F(GenericPointTest, Classifier) {
     GenericPoint p = *pop_map.SelectedPoints().begin();
@@ -214,6 +251,23 @@ TEST_F(GenericPointTest, NeighborhoodOperator) {
     // Toggled one point from random sets
     EXPECT_TRUE(number_of_selected_points == copy_map.SelectedPointsSize() + 1 ||
                 number_of_unselected_points == copy_map.UnselectedPointsSize() + 1);
+}
+
+TEST_F(GenericPointTest, GreedyRandomAlgorithm) {
+    multiset<GenericPoint> data(pop_map.data()); 
+
+    PopulationMap<GenericPoint, int> random_map = 
+        PopulationMap<GenericPoint, int>::GreedyRandomAlgorithm(data, 0.5, pop_map.classifier(), pop_map.evaluator(), pop_map.mht()); 
+
+    EXPECT_EQ(random_map.UnselectedPointsSize() + random_map.SelectedPointsSize(), data.size()); 
+
+    for (GenericPoint p : random_map.SelectedPoints()) {
+        EXPECT_TRUE(data.find(p) != data.end()); 
+    }
+
+    for (GenericPoint p : random_map.UnselectedPoints()) {
+        EXPECT_TRUE(data.find(p) != data.end()); 
+    }
 }
 
 int main(int argc, char *argv[]) {

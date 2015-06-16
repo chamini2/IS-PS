@@ -150,6 +150,22 @@ public:
     // Empty constructor
     PopulationMap() { }
 
+
+    // Constructor without:
+    // * weight specification : default 0.5
+    PopulationMap(multiset<Point> selected, multiset<Point> unselected, int points_to_toggle,
+                  Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
+                                                                           selected_points_ ( selected ),
+                                                                           unselected_points_ ( unselected ),
+                                                                           correctness_weight_ ( 0.5 ),
+                                                                           classify_ (cls),
+                                                                           evaluate_ (eval),
+                                                                           mht_ ( mht ), 
+                                                                           resolve_ (mhm[mht]),
+                                                                           set_to_perturb_ ( -1 ) {
+        n_point_attributes_ = selected.begin()->attributes().size(); 
+    }
+
     // Constructor without:
     // * weight specification : default 0.5
     // * resolver function : default LocalSearch
@@ -159,7 +175,10 @@ public:
                                                     correctness_weight_ ( 0.5 ),
                                                     classify_ (cls),
                                                     evaluate_ (eval),
+                                                    mht_ ( mht ), 
                                                     resolve_ (LOCAL_SEARCH) {
+
+        n_point_attributes_ = data.begin()->attributes().size(); 
     }
 
     // Constructor without:
@@ -170,8 +189,10 @@ public:
                                                                               correctness_weight_ ( correctness_weight ),
                                                                               classify_ (cls),
                                                                               evaluate_ (eval),
+                                                                              mht_ ( mht ), 
                                                                               resolve_ (LOCAL_SEARCH),
                                                                               set_to_perturb_ ( -1 ) {
+        n_point_attributes_ = data.begin()->attributes().size(); 
     }
 
     // Constructor without:
@@ -182,8 +203,10 @@ public:
                                                                            correctness_weight_ ( 0.5 ),
                                                                            classify_ (cls),
                                                                            evaluate_ (eval),
+                                                                           mht_ ( mht ), 
                                                                            resolve_ (mhm[mht]),
                                                                            set_to_perturb_ ( -1 ) {
+        n_point_attributes_ = data.begin()->attributes().size(); 
     }
 
     // Constructor with all arguments
@@ -195,6 +218,7 @@ public:
                                                            classify_ (cls),
                                                            evaluate_ (eval),
                                                            resolve_ (mhm[mht]),
+                                                           mht_ ( mht ), 
                                                            set_to_perturb_ ( -1 ) {
     }
 
@@ -414,9 +438,42 @@ public:
         return *random_point_iterator;
     }
 
-    pair<Point,float> GetBestPoint(int selected_points_set) {
+    static vector<pair<Point, double> > EvaluateIncrementalCost(const multiset<Point>& source,
+                                                                unordered_map<Class, vector<double> >& centroids,
+                                                                unordered_map<Class, vector<double> >& totals,
+                                                                unordered_map<Class, int>& frequencies,
+                                                                int remove_from_solution) {
+            // Pairs <Point, Centroid distance if removed/added>
+            vector<pair<Point, double> > centroid_distances;
 
-        int tmp_selected_set = (set_to_perturb_ != -1 ? set_to_perturb_ : selected_points_set);
+            centroid_distances.reserve(source.size());
+
+            for (Point p : source) {
+                float distance = ComputeCentroidDistance(p, 
+                                                         centroids[p.ClassLabel()], 
+                                                         totals[p.ClassLabel()],
+                                                         frequencies[p.ClassLabel()],
+                                                         remove_from_solution);
+                centroid_distances.push_back(make_pair(p, distance));
+            }
+
+            // If we intend to take a point from selected points,
+            // sort the points DESC to get the minimum last (back() member function)
+            if (remove_from_solution == 1)  {
+                sort(centroid_distances.begin(), centroid_distances.end(), 
+                                                 DescendingCentroidComparetor<Point>);
+            } else {
+                sort(centroid_distances.begin(), centroid_distances.end(), 
+                                                 AscendingCentroidComparetor<Point>);
+            }
+
+            return centroid_distances; 
+
+    }
+
+    pair<Point,float> GetBestPoint(int remove_from_solution) {
+
+        int tmp_selected_set = (set_to_perturb_ != -1 ? set_to_perturb_ : remove_from_solution);
         const multiset<Point>& set_to_use = (tmp_selected_set == 1 ? selected_points_
                                                                    : unselected_points_);
 
@@ -426,50 +483,36 @@ public:
         if (set_to_perturb_ == -1) {
 
             // Pairs <Point, Centroid distance if removed/added>
-            vector<pair<Point, float> > centroid_distances;
-
-            centroid_distances.reserve(set_to_use.size());
-
-            for (Point p : set_to_use) {
-                float distance = ComputeCentroidDistance(p,selected_points_set);
-                centroid_distances.push_back(make_pair(p, distance));
-            }
-
-            // If we intend to take a point from selected points,
-            // sort the points ASC to get the minimum first
-            if (selected_points_set == 1)  {
-                sort(centroid_distances.begin(), centroid_distances.end(), AscendingCentroidComparetor<Point>);
-            } else {
-                sort(centroid_distances.begin(), centroid_distances.end(), DescendingCentroidComparetor<Point>);
-            }
-
-
-            unused_point_to_toggle_ = centroid_distances;
+            unused_point_to_toggle_ = EvaluateIncrementalCost(set_to_use, 
+                                                              class_centroids_, 
+                                                              class_totals_, 
+                                                              class_frequencies_,
+                                                              remove_from_solution);
 
             // Update set_to_perturb in the object
-            set_to_perturb_ = selected_points_set;
+            set_to_perturb_ = remove_from_solution;
         }
 
-        pair<Point,float> picked_point = unused_point_to_toggle_.back();
+        pair<Point,double> picked_point = unused_point_to_toggle_.back();
         unused_point_to_toggle_.pop_back();
         return picked_point;
     }
 
-    pair<Point, float> GetBestPointBF(int selected_points_set) {
-        const multiset<Point>& set_to_use = (selected_points_set == 1 ? selected_points_
+    pair<Point, float> GetBestPointBF(int remove_from_solution) {
+        const multiset<Point>& set_to_use = (remove_from_solution == 1 ? selected_points_
                                                                      : unselected_points_);
 
         if (set_to_perturb_ == -1) {
             vector<pair<Point, float> > evaluations;
             for (Point p : set_to_use) {
                 PopulationMap<Point, Class> copy_map(*this);
-                copy_map.toggle(p, selected_points_set);
+                copy_map.toggle(p, remove_from_solution);
                 float score = copy_map.EvaluateQuality();
                 evaluations.push_back(make_pair(p, score));
             }
             // If we intend to take a point from selected points,
             // sort the points ASC to get the minimum first
-            if (selected_points_set == 1)  {
+            if (remove_from_solution == 1)  {
                 sort(evaluations.begin(), evaluations.end(), AscendingCentroidComparetor<Point>);
             } else {
                 sort(evaluations.begin(), evaluations.end(), DescendingCentroidComparetor<Point>);
@@ -481,11 +524,11 @@ public:
             }
 
             // Update set_to_perturb in the object
-            set_to_perturb_ = selected_points_set;
+            set_to_perturb_ = remove_from_solution;
 
         }
 
-        pair<Point, float> picked_point = unused_point_to_toggle_.back();
+        pair<Point, double> picked_point = unused_point_to_toggle_.back();
         unused_point_to_toggle_.pop_back();
 
         return picked_point;
@@ -493,82 +536,128 @@ public:
     }
 
     // XXX: 1000 iterations get to segfault
-    void GreedyRandomAlgorithm(float alpha) {
+    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data, float alpha, Classifier cls, Evaluator eval, MetaheuristicType mht) {
 
-        // Empty selected points, so we can choose from the ground
-        unselected_points_ = selected_points_;
-        selected_points_.clear();
-        ComputeCentroidsAndTotals();
+        // Need to calculate the centroids, totals and frequencies of the random set of candidates
+        unordered_map<Class, vector<double> > centroids;
+        unordered_map<Class, vector<double> > totals; 
+        unordered_map<Class, int> frequencies;
 
-        // Get the best point and put it back in the candidates vector
-        // so all costs are computed
-        set_to_perturb_ = -1;
-        pair<Point, float> p = GetBestPoint(0);
-        unused_point_to_toggle_.push_back(p);
+        auto sets = PickRandomSet(data); 
 
-        // Take random subvector of candidates
-        srand(time(NULL));
-        int candidates_start = rand() % (unused_point_to_toggle_.size() / 2);
-        int candidates_end   = rand() % unused_point_to_toggle_.size();
+        multiset<Point> candidates = sets.first;  // candidates to insert into the solution
+        multiset<Point> unselected(data); // Points not selected to be considered
 
-        // Inverted range should be switched
-        if (candidates_start > candidates_end) {
-            int tmp          = candidates_start;
-            candidates_start = candidates_end;
-            candidates_end   = tmp;
-        }
+        // Empty set of selected points to be fill with candidates
+        multiset<Point> selected; 
 
-        // At least 5 point in the candidates
-        if (candidates_start + 5 > candidates_end) {
-            candidates_end = candidates_start + 5;
-        }
+        // Compute centroid and totals to get the incremental cost
+        ComputeCentroidsAndTotals(selected, centroids, totals, frequencies); 
+        vector<pair<Point, double> > inc_costs = EvaluateIncrementalCost(candidates, centroids,
+                                                                         totals, frequencies, 0); 
 
-        // Get iterators to create new vector
-        auto first = unused_point_to_toggle_.begin() + candidates_start;
-        auto last  = unused_point_to_toggle_.begin() + candidates_end;
-        unused_point_to_toggle_ = vector<pair<Point,float> >(first, last);
+        while (!candidates.empty()) {
+            // Min and max costs to get the cost threshold
+            double c_max = inc_costs.back().second;
+            double c_min = inc_costs.begin()->second;
 
-        // While we still have candidates
-        while (!unused_point_to_toggle_.empty()) {
+            // Cost threshold. Alpha defines the greediness of the boundary
+            double min_cost  = c_max - alpha * (c_max - c_min);
 
-            // Get min and max
-            float c_min = unused_point_to_toggle_.back().second;
-            float c_max = unused_point_to_toggle_.front().second;
+            // Pick only candidates under the threshold
+            multiset<Point> RCL; 
+            int n_candidates = inc_costs.size(); 
+            for (int i = n_candidates - 1; i >= 0; --i) {
+                double curr_cost = inc_costs[i].second;
+                // If the point is not in the RCL, then is not selected to the 
+                // optimal solution
+                if (curr_cost < min_cost) {
+                    break; 
+                } 
 
-            // Build RCL
-            vector<Point> RCL;
-            pair<Point, float> candidate = unused_point_to_toggle_.back();
-            float min_cost = c_min + alpha * (c_max - c_min);
-
-            while (candidate.second <= min_cost) {
-                unused_point_to_toggle_.pop_back();
-                if (unused_point_to_toggle_.empty()) {
-                    break;
-                }
-                RCL.push_back(candidate.first);
-                candidate = unused_point_to_toggle_.back();
+                RCL.insert(inc_costs[i].first); 
             }
 
-            // XXX: This shouldn't happen, at least `c_min` should enter
-            if (RCL.empty()) {
-                break;
-            }
+            // RCL shouldn't be empty
+            assert(!RCL.empty()); 
 
-            // Pick random point from RCL
-            auto random_point_iterator =
-                std::next(std::begin(RCL),
-                          std::rand() % RCL.size());
+            // Pick a random point from RCL
+            auto random_point_iterator = std::next(std::begin(RCL), 
+                                                   std::rand() % RCL.size());
 
-            // Insert point into solution
-            toggle(*random_point_iterator, 0);
+            // Insert random point into solution and remove from RCL
+            selected.insert(*random_point_iterator); 
+            RCL.erase(random_point_iterator); 
 
-            // Force data recalculation
-            set_to_perturb_ = -1;
-            pair<Point, float> p = GetBestPoint(0);
-            unused_point_to_toggle_.push_back(p);
+            // Compute centroid and totals to get the incremental cost
+            ComputeCentroidsAndTotals(selected, centroids, totals, frequencies); 
+            inc_costs = EvaluateIncrementalCost(candidates, centroids,
+                                                totals, frequencies, 0); 
+
+            // XXX: Update candidates is ambiguous so we take the RCL as new
+            // candidates
+            candidates = RCL;
         }
+
+        // Get the unselected points by a set difference
+        for (Point p : selected) {
+            auto p_itr = unselected.find(p);
+
+            if (p_itr != unselected.end()) {
+                unselected.erase(p_itr); 
+            }
+        }
+
+        return PopulationMap<Point,Class>(selected, unselected, 1, cls, eval, mht);
     }
 
+
+    static void ComputeCentroidsAndTotals(const multiset<Point>& source,
+                                          unordered_map<Class, vector<double> >& centroids,
+                                          unordered_map<Class, vector<double> >& totals,
+                                          unordered_map<Class, int>& frequencies) {
+    
+        // Empty all maps
+        centroids.clear();
+        totals.clear();
+        frequencies.clear();
+
+        // empty solution is not an error
+        if (source.empty()) {
+            return;
+        }
+
+        for (Point p : source) {
+            Class c = p.ClassLabel();
+
+            ++frequencies[c];
+            vector<double>& class_total = totals[c];
+
+            // If the class hasn't been seen yet, create new vector with zeros
+            if (class_total.empty()) {
+                class_total = vector<double>(n_point_attributes_, 0.0);
+            }
+
+            const vector<double>& point_attributes = p.attributes();
+
+            for (int i = 0; i < n_point_attributes_; ++i) {
+                class_total[i] +=  point_attributes[i];
+            }
+        }
+
+        for (auto elem : totals) {
+            Class c = elem.first; 
+            vector<double> class_total = elem.second;
+            vector <double> centroid(n_point_attributes_);
+            int class_frequency = frequencies[c];
+
+            for (int i = 0; i < n_point_attributes_; ++i) {
+                centroid[i] = class_total[i] / class_frequency;
+            }
+            centroids[c] = centroid;
+        }
+    }
+    
     void ComputeCentroidsAndTotals() {
 
         // empty solution is not an error
@@ -576,7 +665,6 @@ public:
             return;
         }
 
-        int n_point_attributes = selected_points_.begin()->attributes().size();
 
         for (Point p : selected_points_) {
             Class c = p.ClassLabel();
@@ -586,12 +674,12 @@ public:
 
             // If the class hasn't been seen yet, create new vector with zeros
             if (class_total.empty()) {
-                class_total = vector<double>(n_point_attributes, 0.0);
+                class_total = vector<double>(n_point_attributes_, 0.0);
             }
 
             const vector<double>& point_attributes = p.attributes();
 
-            for (int i = 0; i < n_point_attributes; ++i) {
+            for (int i = 0; i < n_point_attributes_; ++i) {
                 class_total[i] +=  point_attributes[i];
             }
         }
@@ -633,12 +721,13 @@ public:
     int SetToPerturb() { return set_to_perturb_; }
     void SetToPerturb(int set) { set_to_perturb_ = set; }
 
-    vector<pair<Point, float> > UnusedPointsToToggle() { return unused_point_to_toggle_; }
-    void UnusedPointsToToggle(vector<pair<Point, float> > points) { unused_point_to_toggle_ = points; }
+    vector<pair<Point, double> > UnusedPointsToToggle() { return unused_point_to_toggle_; }
+    void UnusedPointsToToggle(vector<pair<Point, double> > points) { unused_point_to_toggle_ = points; }
 
 
     Classifier classifier() const { return classify_; }
     Evaluator evaluator() const { return evaluate_; }
+    MetaheuristicType mht() const { return mht_; }
 
     int PointsToToggle() const { return points_to_toggle_; }
 
@@ -758,35 +847,34 @@ private:
                                                         selected_points_.size());
     }
 
-        void RecalculateCentroid(Class c) {
-        int n_point_attributes = selected_points_.begin()->attributes().size();
-        vector <double> centroid(n_point_attributes);
+    void RecalculateCentroid(Class c) {
+        vector <double> centroid(n_point_attributes_);
         vector<double> class_total = class_totals_[c];
         int class_frequency = class_frequencies_[c];
 
-        for (int i = 0; i < n_point_attributes; ++i) {
+        for (int i = 0; i < n_point_attributes_; ++i) {
             centroid[i] = class_total[i] / class_frequency;
         }
 
         class_centroids_[c] = centroid;
     }
 
-    float ComputeCentroidDistance(const Point& p, int selected_points_set) {
-        const multiset<Point>& set_to_use = (selected_points_set == 1 ? selected_points_
-                                                                      : unselected_points_);
+    static float ComputeCentroidDistance(const Point& p, vector<double>& centroid, 
+                                         const vector<double>& total, 
+                                         int frenquency, int remove_from_solution) {
 
-        int n_point_attributes      = set_to_use.begin()->attributes().size();
-        int tmp_frequency           = class_frequencies_[p.ClassLabel()] + (selected_points_set == 1 ?  -1 : 1);
-        vector<double> tmp_centroid = class_totals_[p.ClassLabel()];
+        vector<double> tmp_centroid(total);
+
+        int tmp_frequency = frenquency + (remove_from_solution == 1 ?  -1 : 1);
 
         // If there isnt any point of class p in the total
         if (tmp_centroid.empty()){
-            tmp_centroid = vector<double>(n_point_attributes, 0.0);
+            tmp_centroid = vector<double>(n_point_attributes_, 0.0);
         }
 
-        for (int i = 0; i < n_point_attributes; ++i) {
+        for (int i = 0; i < n_point_attributes_; ++i) {
             // Removing from selected_points
-            if (selected_points_set == 1) {
+            if (remove_from_solution == 1) {
                 tmp_centroid[i] -= p.attributes()[i];
             } else {
                 tmp_centroid[i] += p.attributes()[i];
@@ -795,21 +883,19 @@ private:
             tmp_centroid[i] /= tmp_frequency;
         }
 
-        vector<double>& current_centroid = class_centroids_[p.ClassLabel()];
-
         // Empty centroid init on origin
-        if (current_centroid.empty()) {
-            current_centroid = vector<double>(n_point_attributes, 0.0);
+        if (centroid.empty()) {
+            centroid = vector<double>(n_point_attributes_, 0.0);
         }
 
-        return EuclideanDistance(tmp_centroid, class_centroids_[p.ClassLabel()]);
+        return EuclideanDistance(tmp_centroid, centroid);
     }
 
 
     // Function to pick a random set of points from the map's data
-    multiset<Point> PickRandomSet() {
-        multiset<Point> data = this->data(); 
+    static pair<multiset<Point>, multiset<Point> > PickRandomSet(const multiset<Point>& data) {
         multiset<Point> random_set; 
+        multiset<Point> rest; 
 
         srand(time(NULL));
 
@@ -817,17 +903,22 @@ private:
             int pick_point = rand() % 3;
 
             // High probability to be in the set (to avoid empty sets)
-            if (pick_point != 0) {
+            if (pick_point > 0) {
                 random_set.insert(*itr);
-            }        
+            } else {
+                rest.insert(*itr); 
+            }
         }
+
 
         if (random_set.empty()) {
             random_set.insert(*data.begin()); 
         }
 
-        return random_set; 
+        return make_pair(random_set, rest); 
     }
+
+    
 
 #if TEST_PRIVATE_ATTRIBUTES == 1
     friend class GenericPointTest;
@@ -839,6 +930,7 @@ private:
     FRIEND_TEST(GenericPointTest, NeighborhoodOperatorWithIntelligentPerturbation);
     FRIEND_TEST(GenericPointTest, NeighborhoodOperatorIntelligentTwice);
     FRIEND_TEST(GenericPointTest, PickRandomSet);
+    FRIEND_TEST(GenericPointTest, EvaluateIncrementalCostEmpty); 
 #endif
 
     // Class private members
@@ -852,13 +944,15 @@ private:
     int set_to_perturb_;                                    // (==1) selected_points_, (!=1) unselected_points_
 
     float error_rate_;                                      // Error rate of the final solution
-    vector<pair<Point, float> > unused_point_to_toggle_;                  // Points to toggle sorted by how do they improve the current solution
+    vector<pair<Point, double> > unused_point_to_toggle_;   // Points to toggle sorted by how do they improve the current solution
     unordered_map<Class, int> class_frequencies_;           // Number of elements per class
     unordered_map<Class, vector<double> > class_totals_;    // Sum of vector per class
     unordered_map<Class, vector<double> > class_centroids_; // Current centroid per class
     mutable int good_classifications_[N_THREADS];           // Good classifications per thread
 
+    MetaheuristicType mht_; 
     static MetaHeuristicMap mhm;                           // Map string -> metaheuristic function
+    static int n_point_attributes_; 
 };
 
 

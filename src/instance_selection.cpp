@@ -105,35 +105,35 @@ template<typename Point, typename Class>
         GreedyRandomizedAdaptiveSearch(const PopulationMap<Point,Class>& map,
                                        int iterations) {
 
-    const int local_search_its = 20;
+    //const int local_search_its = 20;
 
-    // Alpha to determine greediness
-    const float alpha = 0.5;
+    //// Alpha to determine greediness
+    //const float alpha = 0.5;
 
-    // Original data set
-    multiset<Point> data(map.data());
+    //// Original data set
+    //multiset<Point> data(map.data());
 
-    float best_quality = map.EvaluateQuality();
-    PopulationMap<Point,int> best_map = map;
-    repeat (iterations) {
-        // Build virgin map
-        PopulationMap<Point,Class> curr_map(data, map.PointsToToggle(), map.classifier(), map.evaluator());
+    //float best_quality = map.EvaluateQuality();
+    //PopulationMap<Point,int> best_map = map;
+    //repeat (iterations) {
+        //// Build virgin map
+        //PopulationMap<Point,Class> curr_map(data, map.PointsToToggle(), map.classifier(), map.evaluator());
 
-        // Generate random solution
-        curr_map.GreedyRandomAlgorithm(alpha);
+        //// Generate random solution
+        //curr_map.GreedyRandomAlgorithm(alpha);
 
-        // Perform local search to improve result
-        PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
+        //// Perform local search to improve result
+        //PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
 
-        // Evaluate and keep if better
-        float curr_quality = candidate.EvaluateQuality();
-        if (curr_quality > best_quality) {
-            best_quality = curr_quality;
-            best_map     = curr_map;
-        }
-    }
+        //// Evaluate and keep if better
+        //float curr_quality = candidate.EvaluateQuality();
+        //if (curr_quality > best_quality) {
+            //best_quality = curr_quality;
+            //best_map     = curr_map;
+        //}
+    //}
 
-    return best_map;
+    /*return best_map;*/
 }
 
 int MeasureTime::deepness = 0;
@@ -145,3 +145,5 @@ template<>
     { GRASP, &GreedyRandomizedAdaptiveSearch<GenericPoint,int> }
 };
 
+template<>
+int PopulationMap<GenericPoint, int>::n_point_attributes_ = -1; 
