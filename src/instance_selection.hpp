@@ -2,7 +2,7 @@
 #define __INSTANCE_SELECTION_HPP__
 
 #define repeat(N) for(int i = 0; i < N; ++i)
-#define TEST_PRIVATE_ATTRIBUTES 1 // 1 => enable testing in private members of the classes
+#define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
 #define N_THREADS 100
 
 // Metaheuristics flags
@@ -536,7 +536,9 @@ public:
     }
 
     // XXX: 1000 iterations get to segfault
-    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data, float alpha, Classifier cls, Evaluator eval, MetaheuristicType mht) {
+    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data, 
+                                                             float alpha, Classifier cls, 
+                                                             Evaluator eval, MetaheuristicType mht) {
 
         // Need to calculate the centroids, totals and frequencies of the random set of candidates
         unordered_map<Class, vector<double> > centroids;

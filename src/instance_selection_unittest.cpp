@@ -234,6 +234,7 @@ TEST_F(GenericPointTest, EvaluateIncrementalCostEmpty) {
 }
 
 #endif
+
 TEST_F(GenericPointTest, Classifier) {
     GenericPoint p = *pop_map.SelectedPoints().begin();
     bool resulting_class = OneNN<GenericPoint, int>(p, pop_map.SelectedPoints());
@@ -269,6 +270,7 @@ TEST_F(GenericPointTest, GreedyRandomAlgorithm) {
         EXPECT_TRUE(data.find(p) != data.end()); 
     }
 }
+
 
 int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);
