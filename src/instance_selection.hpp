@@ -42,6 +42,7 @@ using std::flush;
 #include <algorithm>
 using std::min_element;
 using std::max_element;
+using std::set_difference; 
 
 
 #include <string>
@@ -535,7 +536,7 @@ public:
 
     }
 
-    // FIXME: INCONSISTENT DATA
+    // FIXME: INCONSISTENT DATA. It returns one more element in the data (sometimes)
     static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data, 
                                                              float alpha, Classifier cls, 
                                                              Evaluator eval, MetaheuristicType mht) {
@@ -547,8 +548,7 @@ public:
 
         auto sets = PickRandomSet(data); 
 
-        multiset<Point> candidates = sets.first;  // candidates to insert into the solution
-        multiset<Point> unselected(data); // Points not selected to be considered
+        multiset<Point> candidates(sets.first);  // candidates to insert into the solution
 
         // Empty set of selected points to be fill with candidates
         multiset<Point> selected; 
@@ -572,7 +572,7 @@ public:
             for (int i = n_candidates - 1; i >= 0; --i) {
                 double curr_cost = inc_costs[i].second;
                 // If the point is not in the RCL, then is not selected to the 
-                // optimal solution
+                // solution
                 if (curr_cost < min_cost) {
                     break; 
                 } 
@@ -588,7 +588,7 @@ public:
                                                    std::rand() % RCL.size());
 
             // Insert random point into solution and remove from RCL
-            selected.insert(*random_point_iterator); 
+            selected.insert(Point(*random_point_iterator)); 
             RCL.erase(random_point_iterator); 
 
             // Compute centroid and totals to get the incremental cost
@@ -601,14 +601,16 @@ public:
             candidates = RCL;
         }
 
-        // Get the unselected points by a set difference
-        for (Point p : selected) {
-            auto p_itr = unselected.find(p);
+        multiset<Point> unselected; // Points not selected to be considered
 
-            if (p_itr != unselected.end()) {
-                unselected.erase(p_itr); 
-            }
-        }
+        // set_difference to get the remaining points outside the solution
+        set_difference(data.begin(), 
+                       data.end(), 
+                       selected.begin(), selected.end(), 
+                       std::inserter(unselected, unselected.begin())); 
+
+        //cout << selected.size() << " + " << unselected.size() << " = " << data.size() << endl << flush; 
+        
 
         return PopulationMap<Point,Class>(selected, unselected, 1, cls, eval, mht);
     }
@@ -704,7 +706,7 @@ public:
     }
 
 
-    pair<float,float> SolutionStatistics() {
+    pair<float,float> SolutionStatistics() const {
         return make_pair(RunClassifier(selected_points_, unselected_points_), GetReductionPercentage());
     }
 
@@ -720,10 +722,10 @@ public:
     int SelectedPointsSize() const { return selected_points_.size(); }
     int UnselectedPointsSize() const { return unselected_points_.size(); }
 
-    int SetToPerturb() { return set_to_perturb_; }
+    int SetToPerturb() const { return set_to_perturb_; }
     void SetToPerturb(int set) { set_to_perturb_ = set; }
 
-    vector<pair<Point, double> > UnusedPointsToToggle() { return unused_point_to_toggle_; }
+    vector<pair<Point, double> > UnusedPointsToToggle() const { return unused_point_to_toggle_; }
     void UnusedPointsToToggle(vector<pair<Point, double> > points) { unused_point_to_toggle_ = points; }
 
 
@@ -901,6 +903,7 @@ private:
 
         srand(time(NULL));
 
+        // XXX: Maybe here we should make the % of selected points a variable
         for (auto itr = data.begin(); itr != data.end(); ++itr) {
             int pick_point = rand() % 3;
 
@@ -913,6 +916,7 @@ private:
         }
 
 
+        // Avoid empty set
         if (random_set.empty()) {
             random_set.insert(*data.begin()); 
         }

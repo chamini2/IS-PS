@@ -63,7 +63,13 @@ vector<Test> load(const char* filename) {
 
             Test t(ParseCSV(line));
             result.push_back(t);
+
         }
+
+        fclose(fp); 
+        fp = NULL; 
+        free(line);
+        line = NULL; 
 
         return result;
 }

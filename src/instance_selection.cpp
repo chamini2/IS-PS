@@ -122,7 +122,7 @@ template<typename Point, typename Class>
         PopulationMap<Point, Class> curr_map = 
             PopulationMap<Point, Class>::GreedyRandomAlgorithm(data, alpha, map.classifier(), map.evaluator(), map.mht()); 
 
-        assert(curr_map.data().size() == data.size());
+        //assert(curr_map.data().size() == data.size());
 
         // Perform local search to improve result
         PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);

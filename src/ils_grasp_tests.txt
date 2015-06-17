@@ -1,12 +1,12 @@
 # lines starting with a '#' are comments
 # and empty lines are ignored too
 
-# glass,ils,weight
-# glass,ils,eul
-# glass,ils,squared
-glass,grasp,weight
-glass,grasp,eul
-glass,grasp,squared
+glass,ils,weight
+glass,ils,eul
+glass,ils,squared
+# glass,grasp,weight
+# glass,grasp,eul
+# glass,grasp,squared
 
 # iris,ils,weight
 # iris,ils,eul
