@@ -1,44 +1,111 @@
-# lines starting with a '#' are comments
-# and empty lines are ignored too
-
-glass,ils,weight
-glass,ils,eul
-glass,ils,squared
-# glass,grasp,weight
-# glass,grasp,eul
-# glass,grasp,squared
-
-# iris,ils,weight
-# iris,ils,eul
-# iris,ils,squared
-# iris,grasp,weight
-# iris,grasp,eul
-# iris,grasp,squared
-
-# blogger,ils,weight
-# blogger,ils,eul
-# blogger,ils,squared
-# blogger,grasp,weight
-# blogger,grasp,eul
-# blogger,grasp,squared
-
-# bcw,ils,weight
-# bcw,ils,eul
-# bcw,ils,squared
-# bcw,grasp,weight
-# bcw,grasp,eul
-# bcw,grasp,squared
-
-# australian,ils,weight
-# australian,ils,eul
-# australian,ils,squared
-# australian,grasp,weight
-# australian,grasp,eul
-# australian,grasp,squared
-
-# pima,ils,weight
-# pima,ils,eul
-# pima,ils,squared
-# pima,grasp,weight
-# pima,grasp,eul
-# pima,grasp,squared
+# path/to/training,path/to/testing,algorithm,fitnessfunction
+# glass ils
+../data/small/glass/glass-10-1tra.dat,../data/small/glass/glass-10-1tst.dat,ils,eul
+../data/small/glass/glass-10-2tra.dat,../data/small/glass/glass-10-2tst.dat,ils,eul
+../data/small/glass/glass-10-3tra.dat,../data/small/glass/glass-10-3tst.dat,ils,eul
+../data/small/glass/glass-10-4tra.dat,../data/small/glass/glass-10-4tst.dat,ils,eul
+../data/small/glass/glass-10-5tra.dat,../data/small/glass/glass-10-5tst.dat,ils,eul
+../data/small/glass/glass-10-6tra.dat,../data/small/glass/glass-10-6tst.dat,ils,eul
+../data/small/glass/glass-10-7tra.dat,../data/small/glass/glass-10-7tst.dat,ils,eul
+../data/small/glass/glass-10-8tra.dat,../data/small/glass/glass-10-8tst.dat,ils,eul
+../data/small/glass/glass-10-9tra.dat,../data/small/glass/glass-10-9tst.dat,ils,eul
+../data/small/glass/glass-10-10tra.dat,../data/small/glass/glass-10-10tst.dat,ils,eul
+# glass grasp
+../data/small/glass/glass-10-1tra.dat,../data/small/glass/glass-10-1tst.dat,grasp,eul
+../data/small/glass/glass-10-2tra.dat,../data/small/glass/glass-10-2tst.dat,grasp,eul
+../data/small/glass/glass-10-3tra.dat,../data/small/glass/glass-10-3tst.dat,grasp,eul
+../data/small/glass/glass-10-4tra.dat,../data/small/glass/glass-10-4tst.dat,grasp,eul
+../data/small/glass/glass-10-5tra.dat,../data/small/glass/glass-10-5tst.dat,grasp,eul
+../data/small/glass/glass-10-6tra.dat,../data/small/glass/glass-10-6tst.dat,grasp,eul
+../data/small/glass/glass-10-7tra.dat,../data/small/glass/glass-10-7tst.dat,grasp,eul
+../data/small/glass/glass-10-8tra.dat,../data/small/glass/glass-10-8tst.dat,grasp,eul
+../data/small/glass/glass-10-9tra.dat,../data/small/glass/glass-10-9tst.dat,grasp,eul
+../data/small/glass/glass-10-10tra.dat,../data/small/glass/glass-10-10tst.dat,grasp,eul
+# iris ils
+../data/small/iris/iris-10-1tra.dat,../data/small/iris/iris-10-1tst.dat,ils,eul
+../data/small/iris/iris-10-2tra.dat,../data/small/iris/iris-10-2tst.dat,ils,eul
+../data/small/iris/iris-10-3tra.dat,../data/small/iris/iris-10-3tst.dat,ils,eul
+../data/small/iris/iris-10-4tra.dat,../data/small/iris/iris-10-4tst.dat,ils,eul
+../data/small/iris/iris-10-5tra.dat,../data/small/iris/iris-10-5tst.dat,ils,eul
+../data/small/iris/iris-10-6tra.dat,../data/small/iris/iris-10-6tst.dat,ils,eul
+../data/small/iris/iris-10-7tra.dat,../data/small/iris/iris-10-7tst.dat,ils,eul
+../data/small/iris/iris-10-8tra.dat,../data/small/iris/iris-10-8tst.dat,ils,eul
+../data/small/iris/iris-10-9tra.dat,../data/small/iris/iris-10-9tst.dat,ils,eul
+../data/small/iris/iris-10-10tra.dat,../data/small/iris/iris-10-10tst.dat,ils,eul
+# iris grasp
+../data/small/iris/iris-10-1tra.dat,../data/small/iris/iris-10-1tst.dat,grasp,eul
+../data/small/iris/iris-10-2tra.dat,../data/small/iris/iris-10-2tst.dat,grasp,eul
+../data/small/iris/iris-10-3tra.dat,../data/small/iris/iris-10-3tst.dat,grasp,eul
+../data/small/iris/iris-10-4tra.dat,../data/small/iris/iris-10-4tst.dat,grasp,eul
+../data/small/iris/iris-10-5tra.dat,../data/small/iris/iris-10-5tst.dat,grasp,eul
+../data/small/iris/iris-10-6tra.dat,../data/small/iris/iris-10-6tst.dat,grasp,eul
+../data/small/iris/iris-10-7tra.dat,../data/small/iris/iris-10-7tst.dat,grasp,eul
+../data/small/iris/iris-10-8tra.dat,../data/small/iris/iris-10-8tst.dat,grasp,eul
+../data/small/iris/iris-10-9tra.dat,../data/small/iris/iris-10-9tst.dat,grasp,eul
+../data/small/iris/iris-10-10tra.dat,../data/small/iris/iris-10-10tst.dat,grasp,eul
+# australian ils
+../data/medium/australian/australian-10-1tra.dat,../data/medium/australian/australian-10-1tst.dat,ils,eul
+../data/medium/australian/australian-10-2tra.dat,../data/medium/australian/australian-10-2tst.dat,ils,eul
+../data/medium/australian/australian-10-3tra.dat,../data/medium/australian/australian-10-3tst.dat,ils,eul
+../data/medium/australian/australian-10-4tra.dat,../data/medium/australian/australian-10-4tst.dat,ils,eul
+../data/medium/australian/australian-10-5tra.dat,../data/medium/australian/australian-10-5tst.dat,ils,eul
+../data/medium/australian/australian-10-6tra.dat,../data/medium/australian/australian-10-6tst.dat,ils,eul
+../data/medium/australian/australian-10-7tra.dat,../data/medium/australian/australian-10-7tst.dat,ils,eul
+../data/medium/australian/australian-10-8tra.dat,../data/medium/australian/australian-10-8tst.dat,ils,eul
+../data/medium/australian/australian-10-9tra.dat,../data/medium/australian/australian-10-9tst.dat,ils,eul
+../data/medium/australian/australian-10-10tra.dat,../data/medium/australian/australian-10-10tst.dat,ils,eul
+# australian grasp
+../data/medium/australian/australian-10-1tra.dat,../data/medium/australian/australian-10-1tst.dat,grasp,eul
+../data/medium/australian/australian-10-2tra.dat,../data/medium/australian/australian-10-2tst.dat,grasp,eul
+../data/medium/australian/australian-10-3tra.dat,../data/medium/australian/australian-10-3tst.dat,grasp,eul
+../data/medium/australian/australian-10-4tra.dat,../data/medium/australian/australian-10-4tst.dat,grasp,eul
+../data/medium/australian/australian-10-5tra.dat,../data/medium/australian/australian-10-5tst.dat,grasp,eul
+../data/medium/australian/australian-10-6tra.dat,../data/medium/australian/australian-10-6tst.dat,grasp,eul
+../data/medium/australian/australian-10-7tra.dat,../data/medium/australian/australian-10-7tst.dat,grasp,eul
+../data/medium/australian/australian-10-8tra.dat,../data/medium/australian/australian-10-8tst.dat,grasp,eul
+../data/medium/australian/australian-10-9tra.dat,../data/medium/australian/australian-10-9tst.dat,grasp,eul
+../data/medium/australian/australian-10-10tra.dat,../data/medium/australian/australian-10-10tst.dat,grasp,eul
+# wdbc ils
+../data/medium/wdbc/wdbc-10-1tra.dat,../data/medium/wdbc/wdbc-10-1tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-2tra.dat,../data/medium/wdbc/wdbc-10-2tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-3tra.dat,../data/medium/wdbc/wdbc-10-3tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-4tra.dat,../data/medium/wdbc/wdbc-10-4tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-5tra.dat,../data/medium/wdbc/wdbc-10-5tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-6tra.dat,../data/medium/wdbc/wdbc-10-6tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-7tra.dat,../data/medium/wdbc/wdbc-10-7tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-8tra.dat,../data/medium/wdbc/wdbc-10-8tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-9tra.dat,../data/medium/wdbc/wdbc-10-9tst.dat,ils,eul
+../data/medium/wdbc/wdbc-10-10tra.dat,../data/medium/wdbc/wdbc-10-10tst.dat,ils,eul
+# wdbc grasp
+../data/medium/wdbc/wdbc-10-1tra.dat,../data/medium/wdbc/wdbc-10-1tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-2tra.dat,../data/medium/wdbc/wdbc-10-2tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-3tra.dat,../data/medium/wdbc/wdbc-10-3tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-4tra.dat,../data/medium/wdbc/wdbc-10-4tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-5tra.dat,../data/medium/wdbc/wdbc-10-5tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-6tra.dat,../data/medium/wdbc/wdbc-10-6tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-7tra.dat,../data/medium/wdbc/wdbc-10-7tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-8tra.dat,../data/medium/wdbc/wdbc-10-8tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-9tra.dat,../data/medium/wdbc/wdbc-10-9tst.dat,grasp,eul
+../data/medium/wdbc/wdbc-10-10tra.dat,../data/medium/wdbc/wdbc-10-10tst.dat,grasp,eul
+# pima ils
+../data/medium/pima/pima-10-1tra.dat,../data/medium/pima/pima-10-1tst.dat,ils,eul
+../data/medium/pima/pima-10-2tra.dat,../data/medium/pima/pima-10-2tst.dat,ils,eul
+../data/medium/pima/pima-10-3tra.dat,../data/medium/pima/pima-10-3tst.dat,ils,eul
+../data/medium/pima/pima-10-4tra.dat,../data/medium/pima/pima-10-4tst.dat,ils,eul
+../data/medium/pima/pima-10-5tra.dat,../data/medium/pima/pima-10-5tst.dat,ils,eul
+../data/medium/pima/pima-10-6tra.dat,../data/medium/pima/pima-10-6tst.dat,ils,eul
+../data/medium/pima/pima-10-7tra.dat,../data/medium/pima/pima-10-7tst.dat,ils,eul
+../data/medium/pima/pima-10-8tra.dat,../data/medium/pima/pima-10-8tst.dat,ils,eul
+../data/medium/pima/pima-10-9tra.dat,../data/medium/pima/pima-10-9tst.dat,ils,eul
+../data/medium/pima/pima-10-10tra.dat,../data/medium/pima/pima-10-10tst.dat,ils,eul
+# pima grasp
+../data/medium/pima/pima-10-1tra.dat,../data/medium/pima/pima-10-1tst.dat,grasp,eul
+../data/medium/pima/pima-10-2tra.dat,../data/medium/pima/pima-10-2tst.dat,grasp,eul
+../data/medium/pima/pima-10-3tra.dat,../data/medium/pima/pima-10-3tst.dat,grasp,eul
+../data/medium/pima/pima-10-4tra.dat,../data/medium/pima/pima-10-4tst.dat,grasp,eul
+../data/medium/pima/pima-10-5tra.dat,../data/medium/pima/pima-10-5tst.dat,grasp,eul
+../data/medium/pima/pima-10-6tra.dat,../data/medium/pima/pima-10-6tst.dat,grasp,eul
+../data/medium/pima/pima-10-7tra.dat,../data/medium/pima/pima-10-7tst.dat,grasp,eul
+../data/medium/pima/pima-10-8tra.dat,../data/medium/pima/pima-10-8tst.dat,grasp,eul
+../data/medium/pima/pima-10-9tra.dat,../data/medium/pima/pima-10-9tst.dat,grasp,eul
+../data/medium/pima/pima-10-10tra.dat,../data/medium/pima/pima-10-10tst.dat,grasp,eul
