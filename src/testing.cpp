@@ -12,7 +12,7 @@ using std::make_pair;
 using std::unordered_map;
 
 typedef unordered_map<string, PopulationMap<GenericPoint, int>::Evaluator> EvaluatorMap;
-typedef unordered_map<string, int> MetaHeuristicTypeMap;
+typedef unordered_map<string, MetaheuristicType> MetaHeuristicTypeMap;
 typedef unordered_map<string, string> PathMap;
 
 // Objectif function map
@@ -23,7 +23,7 @@ EvaluatorMap em = {
                   };
 
 // Metaheuristics map
-MetaHeuristicTypeMap mhtm = {
+MetaHeuristicTypeMap mthm = {
                                 { "ls", LOCAL_SEARCH },
                                 { "ils", ITERATED_LOCAL_SEARCH },
                                 { "grasp", GRASP }
@@ -57,14 +57,14 @@ Result Test::run() {
     // attributes_[3] = Evaluator function
 
     // Read points
-    multiset<GenericPoint> points = GenericPoint::load(attributes_[0].c_str());
+    set<GenericPoint> points(GenericPoint::load(attributes_[0].c_str())); 
     PopulationMap<GenericPoint, int> pop_map(points, 1, &OneNN<GenericPoint, int>,
-                                             em[attributes_[3]], mhtm[attributes_[2]]);
+                                             em[attributes_[3]], mthm[attributes_[2]]);
 
     pop_map.InitialSolution();
 
     // Read testing set
-    multiset<GenericPoint> testing_set = GenericPoint::load(attributes_[1].c_str());
+    set<GenericPoint> testing_set(GenericPoint::load(attributes_[1].c_str())); 
     stats = pop_map.SolutionStatistics(testing_set);
 
     PopulationMap<GenericPoint, int> best_map = pop_map.resolve();

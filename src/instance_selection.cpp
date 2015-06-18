@@ -112,7 +112,7 @@ template<typename Point, typename Class>
     const float alpha = 0.5;
 
     // Original data set
-    multiset<Point> data(map.data());
+    set<Point> data(map.data());
 
     PopulationMap<Point,Class> best_map = map;
     double best_quality                 = best_map.EvaluateQuality();

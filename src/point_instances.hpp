@@ -13,7 +13,7 @@ using std::pair;
 using std::ostream;
 
 #include <set>
-using std::multiset;
+using std::set;
 
 #include <cassert>
 #include "point_interface.hpp"
@@ -44,14 +44,14 @@ public:
         return EuclideanDistance(attributes_, obj.attributes());
     }
 
-    static multiset<GenericPoint> load(const char* filename) {
+    static set<GenericPoint> load(const char* filename) {
 
         FILE *fp;
         char *line = NULL;
         size_t len = 0;
         int read_chars;
 
-        multiset<GenericPoint> points;
+        set<GenericPoint> points;
 
         fp = fopen(filename, "r");
         assert(fp != NULL);

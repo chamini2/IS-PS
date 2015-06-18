@@ -6,7 +6,7 @@ using std::cout;
 using std::endl;
 #include <cstdio>
 #include <set>
-using std::multiset;
+using std::set;
 
 #include <vector>
 using std::vector;
@@ -17,7 +17,7 @@ class MeasureTime;
 // Arguments: p of class Point which is the point representation of the problem
 // Return value: it returns a type Class which is the classifies Point
 template <typename Point, class Class>
-Class OneNN(Point point, const multiset<Point>& data) {
+Class OneNN(Point point, const set<Point>& data) {
     assert(data.size() > 0);
     //MeasureTime mt("OneNN");
     const Point *min = &(*data.begin());
@@ -41,6 +41,6 @@ float HammingDistance(const vector<double>&, const vector<double>&);
 
 // TODO
 template <typename Class, class Point>
-Class KNN(Point point, const multiset<Point>& data);
+Class KNN(Point point, const set<Point>& data);
 
 #endif

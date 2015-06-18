@@ -25,6 +25,9 @@
 - [ ] Implementar perturbación de solución inteligente para ILS
 - [ ] Implementar GGA 
 - [ ] Implementar SGA
+- [ ] Implementar Selection para algoritmo genético
+- [ ] Implementar Crossover para algoritmo genético 
+- [ ] Implementar Mutate para algoritmo genético
 - [ ] Realizar pruebas en LS
     - [ ] Correr pruebas large (alpha = 0.5)
         - [ ] Euclidean, Weighted
@@ -73,6 +76,7 @@
 - [x] on 2015-06-17 16:48:59 | Implementar GRASP (B)
     - [x] on 2015-06-17 16:48:59 | Implementar algoritmo como tal
     - [x] on 2015-06-17 16:48:59 | Implementar GreedySolution: Función de costo por punto añadido a la solución
+- [x] on 2015-06-18 18:39:20 | Cambiar de Multiset a Set
 - [x] on 2015-06-18 00:56:31 | Empeorar solucion de MCNN (Hace la mayoría del trabajo y la metaheuristica pierde protagonismo)
 - [x] on 2015-06-18 00:56:38 | Utilizar diferentes testing sets para evaluar las soluciones
 - [x] on 2015-06-17 23:07:00 | Agregar factor de peso a Euler y Squared

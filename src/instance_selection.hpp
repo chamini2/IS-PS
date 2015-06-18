@@ -8,10 +8,6 @@
 #define TOGGLE_OUT 1
 #define TOGGLE_IN 0
 
-// Metaheuristics flags
-#define LOCAL_SEARCH 0
-#define ITERATED_LOCAL_SEARCH 1
-#define GRASP 2
 
 // #include "classifiers.hpp"
 
@@ -28,7 +24,7 @@ using std::make_pair;
 using std::vector;
 
 #include <set>
-using std::multiset;
+using std::set;
 
 #include <unordered_map>
 using std::unordered_map;
@@ -134,6 +130,14 @@ bool DescendingCentroidComparetor(const pair<Point, float>& lhs, const pair<Poin
         return lhs.second > rhs.second;
 }
 
+
+// Just for styling
+typedef int MetaheuristicType;
+
+const MetaheuristicType LOCAL_SEARCH          = 0;
+const MetaheuristicType ITERATED_LOCAL_SEARCH = 0;
+const MetaheuristicType GRASP                 = 0;
+
 // Template class to handle IS-pS solution representation
 // Template arguments:
 // * Point: Representation of the classification problem points
@@ -145,11 +149,9 @@ public:
     typedef PopulationMap<Point, Class> (*Metaheuristic)(const PopulationMap<Point,Class>&, int);
     typedef unordered_map<int,  Metaheuristic> MetaHeuristicMap;
     // Function pointers typedefs
-    typedef Class (*Classifier)(Point, const multiset<Point>&);
+    typedef Class (*Classifier)(Point, const set<Point>&);
     typedef float (*Evaluator)(float, float, float);
 
-    // Just for styling
-    typedef int MetaheuristicType;
 
     // Empty constructor
     PopulationMap() { }
@@ -157,7 +159,7 @@ public:
 
     // Constructor without:
     // * weight specification : default 0.5
-    PopulationMap(multiset<Point> selected, multiset<Point> unselected, int points_to_toggle,
+    PopulationMap(set<Point> selected, set<Point> unselected, int points_to_toggle,
                   Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
                                                                            selected_points_ ( selected ),
                                                                            unselected_points_ ( unselected ),
@@ -173,7 +175,7 @@ public:
     // Constructor without:
     // * weight specification : default 0.5
     // * resolver function : default LocalSearch
-    PopulationMap(multiset<Point> data, int points_to_toggle,
+    PopulationMap(set<Point> data, int points_to_toggle,
                   Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ),
                                                     selected_points_ ( data ),
                                                     correctness_weight_ ( 0.5 ),
@@ -187,7 +189,7 @@ public:
 
     // Constructor without:
     // * resolver function : default LocalSearch
-    PopulationMap(multiset<Point> data, int points_to_toggle,
+    PopulationMap(set<Point> data, int points_to_toggle,
                   float correctness_weight, Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ),
                                                                               selected_points_ ( data ),
                                                                               correctness_weight_ ( correctness_weight ),
@@ -201,7 +203,7 @@ public:
 
     // Constructor without:
     // * weight specification : default 0.5
-    PopulationMap(multiset<Point> data, int points_to_toggle,
+    PopulationMap(set<Point> data, int points_to_toggle,
                   Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
                                                                            selected_points_ ( data ),
                                                                            correctness_weight_ ( 0.5 ),
@@ -214,7 +216,7 @@ public:
     }
 
     // Constructor with all arguments
-    PopulationMap(multiset<Point> data, int points_to_toggle,
+    PopulationMap(set<Point> data, int points_to_toggle,
                   float correctness_weight, Classifier cls,
                   Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
                                                            selected_points_ ( data ),
@@ -231,13 +233,14 @@ public:
         // Greedy
         MCNN();
         // Deteriorate solution so the metaheuristic can improve more
-        // const float insertion_percentage = 0.1;
-        // DeteriorateSolution(insertion_percentage);
+         const float insertion_percentage = 0.1;
+         DeteriorateSolution(insertion_percentage);
         // XXX: This should not be executing always, only when needed
         // but for now it's done always
         ComputeCentroidsAndTotals();
     }
 
+    // Function to deteriorate a solution randomly toggling points
     void DeteriorateSolution(float set_percentage) {
 
         int elements = unselected_points_.size() * set_percentage;
@@ -326,7 +329,7 @@ public:
 
         bool changed = true;
         while (changed) {
-            multiset<Point> points_to_move;
+            set<Point> points_to_move;
             changed = false;
 
             // Classify all the unselected points
@@ -359,10 +362,10 @@ public:
 
         CNN();
 
-        multiset<Point> all(selected_points_);
+        set<Point> all(selected_points_);
         all.insert(unselected_points_.begin(), unselected_points_.end());
 
-        multiset<Point> selected_points_copy = selected_points_;
+        set<Point> selected_points_copy = selected_points_;
 
         for (Point p : selected_points_copy) {
             selected_points_.erase(p);
@@ -382,7 +385,7 @@ public:
         //MeasureTime mt("RandomSolution");
 
         srand(time(NULL));
-        multiset<Point> data(selected_points_);
+        set<Point> data(selected_points_);
         data.insert(unselected_points_.begin(), unselected_points_.end());
 
         // Clear both sets
@@ -450,7 +453,7 @@ public:
 
     Point GetRandomPoint(int selected_points_set) {
 
-        const multiset<Point>& set_to_use = (selected_points_set == 1 ? selected_points_
+        const set<Point>& set_to_use = (selected_points_set == 1 ? selected_points_
                                                                       : unselected_points_);
         auto random_point_iterator =
             std::next(std::begin(set_to_use),
@@ -459,7 +462,7 @@ public:
         return *random_point_iterator;
     }
 
-    static vector<pair<Point, double> > EvaluateIncrementalCost(const multiset<Point>& source,
+    static vector<pair<Point, double> > EvaluateIncrementalCost(const set<Point>& source,
                                                                 unordered_map<Class, vector<double> >& centroids,
                                                                 unordered_map<Class, vector<double> >& totals,
                                                                 unordered_map<Class, int>& frequencies,
@@ -495,7 +498,7 @@ public:
     pair<Point,float> GetBestPoint(int remove_from_solution) {
 
         int tmp_selected_set = (set_to_perturb_ != -1 ? set_to_perturb_ : remove_from_solution);
-        const multiset<Point>& set_to_use = (tmp_selected_set == 1 ? selected_points_
+        const set<Point>& set_to_use = (tmp_selected_set == 1 ? selected_points_
                                                                    : unselected_points_);
 
 
@@ -520,7 +523,7 @@ public:
     }
 
     pair<Point, float> GetBestPointBF(int remove_from_solution) {
-        const multiset<Point>& set_to_use = (remove_from_solution == 1 ? selected_points_
+        const set<Point>& set_to_use = (remove_from_solution == 1 ? selected_points_
                                                                      : unselected_points_);
 
         if (set_to_perturb_ == -1) {
@@ -557,7 +560,7 @@ public:
     }
 
     // FIXME: INCONSISTENT DATA. It returns one more element in the data (sometimes)
-    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data,
+    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const set<Point>& data,
                                                              float alpha, Classifier cls,
                                                              Evaluator eval, MetaheuristicType mht) {
 
@@ -568,10 +571,10 @@ public:
 
         auto sets = PickRandomSet(data);
 
-        multiset<Point> candidates(sets.first);  // candidates to insert into the solution
+        set<Point> candidates(sets.first);  // candidates to insert into the solution
 
         // Empty set of selected points to be fill with candidates
-        multiset<Point> selected;
+        set<Point> selected;
 
         // Compute centroid and totals to get the incremental cost
         ComputeCentroidsAndTotals(selected, centroids, totals, frequencies);
@@ -587,7 +590,7 @@ public:
             double min_cost  = c_max - alpha * (c_max - c_min);
 
             // Pick only candidates under the threshold
-            multiset<Point> RCL;
+            set<Point> RCL;
             int n_candidates = inc_costs.size();
             for (int i = n_candidates - 1; i >= 0; --i) {
                 double curr_cost = inc_costs[i].second;
@@ -621,7 +624,7 @@ public:
             candidates = RCL;
         }
 
-        multiset<Point> unselected; // Points not selected to be considered
+        set<Point> unselected; // Points not selected to be considered
 
         // set_difference to get the remaining points outside the solution
         set_difference(data.begin(),
@@ -636,7 +639,7 @@ public:
     }
 
 
-    static void ComputeCentroidsAndTotals(const multiset<Point>& source,
+    static void ComputeCentroidsAndTotals(const set<Point>& source,
                                           unordered_map<Class, vector<double> >& centroids,
                                           unordered_map<Class, vector<double> >& totals,
                                           unordered_map<Class, int>& frequencies) {
@@ -718,7 +721,7 @@ public:
         return EvaluateQuality(unselected_points_);
     }
 
-    float EvaluateQuality(const multiset<Point>& testing_set) const {
+    float EvaluateQuality(const set<Point>& testing_set) const {
         float classification_correctness = RunClassifier(selected_points_, testing_set);
         float reduction_percentage       = GetReductionPercentage();
 
@@ -731,14 +734,14 @@ public:
         return SolutionStatistics(unselected_points_);
     }
 
-    pair<float,float> SolutionStatistics(const multiset<Point>& testing_set) const {
+    pair<float,float> SolutionStatistics(const set<Point>& testing_set) const {
         return make_pair(RunClassifier(selected_points_, testing_set), GetReductionPercentage());
     }
 
-    multiset<Point> SelectedPoints() const { return selected_points_; }
-    multiset<Point> UnselectedPoints() const { return unselected_points_; }
-    multiset<Point> data() const {
-        multiset<Point> data(selected_points_);
+    set<Point> SelectedPoints() const { return selected_points_; }
+    set<Point> UnselectedPoints() const { return unselected_points_; }
+    set<Point> data() const {
+        set<Point> data(selected_points_);
         data.insert(unselected_points_.begin(), unselected_points_.end());
         return data;
     }
@@ -764,7 +767,7 @@ private:
     // Toggles points between selected and unselected points sets.
     void toggle(Point p, int remove_from_solution) {
 
-        const multiset<Point>& non_empty_set = (selected_points_.empty() ? unselected_points_
+        const set<Point>& non_empty_set = (selected_points_.empty() ? unselected_points_
                                                                          : selected_points_);
         int n_point_attributes = non_empty_set.begin()->attributes().size();
         vector<double>& tmp_totals = class_totals_[p.ClassLabel()];
@@ -812,7 +815,7 @@ private:
     }
 
     // Thread function to be used in parallel
-    void ClassifyPoint(int thread, const Point& p, const multiset<Point>& training_set) const {
+    void ClassifyPoint(int thread, const Point& p, const set<Point>& training_set) const {
 
         if (p.ClassLabel() == classify_(p, training_set)) {
             ++good_classifications_[thread];
@@ -821,8 +824,8 @@ private:
 
     // Returns the percentage of correct classified points (from 0 to 1)
     // TODO: Consider to multiply by 100 the percentage
-    float RunClassifier(const multiset<Point>& training_set,
-                                    const multiset<Point>& testing_set) const {
+    float RunClassifier(const set<Point>& training_set,
+                                    const set<Point>& testing_set) const {
 
         //MeasureTime mt("RunClassifier");
         if (testing_set.empty()) {
@@ -922,9 +925,9 @@ private:
 
 
     // Function to pick a random set of points from the map's data
-    static pair<multiset<Point>, multiset<Point> > PickRandomSet(const multiset<Point>& data) {
-        multiset<Point> random_set;
-        multiset<Point> rest;
+    static pair<set<Point>, set<Point> > PickRandomSet(const set<Point>& data) {
+        set<Point> random_set;
+        set<Point> rest;
 
         srand(time(NULL));
 
@@ -966,8 +969,8 @@ private:
 
     // Class private members
     int points_to_toggle_;
-    multiset<Point> selected_points_;                       // Set of points in the solution
-    multiset<Point> unselected_points_;                     // Remaining points
+    set<Point> selected_points_;                       // Set of points in the solution
+    set<Point> unselected_points_;                     // Remaining points
     float correctness_weight_;                              // Weight of clasification and reduction in Weight objectif function
     Classifier classify_;                                   // Function that classifies the points
     Evaluator evaluate_;                                    // Function that evaluates a solution
