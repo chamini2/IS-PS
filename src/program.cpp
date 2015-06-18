@@ -43,35 +43,35 @@ vector<string> ParseCSV(char* line) {
 }
 
 vector<Test> load(const char* filename) {
-        FILE *fp;
-        char *line = NULL;
-        size_t len = 0;
-        int read_chars;
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    int read_chars;
 
-        vector<Test> result;
+    vector<Test> result;
 
-        fp = fopen(filename, "r");
-        assert(fp != NULL);
+    fp = fopen(filename, "r");
+    assert(fp != NULL);
 
-        while ((read_chars = getline(&line, &len, fp)) != -1) {
-            // '^ *#' is the regular expression for comment lines
-            int pos = 0;
-            while (line[pos] == ' ') { ++pos; }
+    while ((read_chars = getline(&line, &len, fp)) != -1) {
+        // '^ *#' is the regular expression for comment lines
+        int pos = 0;
+        while (line[pos] == ' ') { ++pos; }
 
-            // If it's a comment or an empty line
-            if (line[pos] == '#' || pos + 1 == read_chars) { continue; }
+        // If it's a comment or an empty line
+        if (line[pos] == '#' || pos + 1 == read_chars) { continue; }
 
-            Test t(ParseCSV(line));
-            result.push_back(t);
+        Test t(ParseCSV(line));
+        result.push_back(t);
 
-        }
+    }
 
-        fclose(fp); 
-        fp = NULL; 
-        free(line);
-        line = NULL; 
+    fclose(fp);
+    fp = NULL;
+    free(line);
+    line = NULL;
 
-        return result;
+    return result;
 }
 
 

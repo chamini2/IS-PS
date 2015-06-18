@@ -45,7 +45,7 @@ using std::flush;
 #include <algorithm>
 using std::min_element;
 using std::max_element;
-using std::set_difference; 
+using std::set_difference;
 
 
 #include <string>
@@ -164,10 +164,10 @@ public:
                                                                            correctness_weight_ ( 0.5 ),
                                                                            classify_ (cls),
                                                                            evaluate_ (eval),
-                                                                           mht_ ( mht ), 
+                                                                           mht_ ( mht ),
                                                                            resolve_ (mhm[mht]),
                                                                            set_to_perturb_ ( -1 ) {
-        n_point_attributes_ = selected.begin()->attributes().size(); 
+        n_point_attributes_ = selected.begin()->attributes().size();
     }
 
     // Constructor without:
@@ -179,10 +179,10 @@ public:
                                                     correctness_weight_ ( 0.5 ),
                                                     classify_ (cls),
                                                     evaluate_ (eval),
-                                                    mht_ ( mht ), 
+                                                    mht_ ( mht ),
                                                     resolve_ (LOCAL_SEARCH) {
 
-        n_point_attributes_ = data.begin()->attributes().size(); 
+        n_point_attributes_ = data.begin()->attributes().size();
     }
 
     // Constructor without:
@@ -193,10 +193,10 @@ public:
                                                                               correctness_weight_ ( correctness_weight ),
                                                                               classify_ (cls),
                                                                               evaluate_ (eval),
-                                                                              mht_ ( mht ), 
+                                                                              mht_ ( mht ),
                                                                               resolve_ (LOCAL_SEARCH),
                                                                               set_to_perturb_ ( -1 ) {
-        n_point_attributes_ = data.begin()->attributes().size(); 
+        n_point_attributes_ = data.begin()->attributes().size();
     }
 
     // Constructor without:
@@ -207,10 +207,10 @@ public:
                                                                            correctness_weight_ ( 0.5 ),
                                                                            classify_ (cls),
                                                                            evaluate_ (eval),
-                                                                           mht_ ( mht ), 
+                                                                           mht_ ( mht ),
                                                                            resolve_ (mhm[mht]),
                                                                            set_to_perturb_ ( -1 ) {
-        n_point_attributes_ = data.begin()->attributes().size(); 
+        n_point_attributes_ = data.begin()->attributes().size();
     }
 
     // Constructor with all arguments
@@ -222,7 +222,7 @@ public:
                                                            classify_ (cls),
                                                            evaluate_ (eval),
                                                            resolve_ (mhm[mht]),
-                                                           mht_ ( mht ), 
+                                                           mht_ ( mht ),
                                                            set_to_perturb_ ( -1 ) {
     }
 
@@ -231,8 +231,8 @@ public:
         // Greedy
         MCNN();
         // Deteriorate solution so the metaheuristic can improve more
-        const float insertion_percentage = 0.1; 
-        DeteriorateSolution(insertion_percentage); 
+        // const float insertion_percentage = 0.1;
+        // DeteriorateSolution(insertion_percentage);
         // XXX: This should not be executing always, only when needed
         // but for now it's done always
         ComputeCentroidsAndTotals();
@@ -240,7 +240,7 @@ public:
 
     void DeteriorateSolution(float set_percentage) {
 
-        int elements = unselected_points_.size() * set_percentage; 
+        int elements = unselected_points_.size() * set_percentage;
 
         srand(time(NULL));
         repeat(elements) {
@@ -248,7 +248,7 @@ public:
                 std::next(std::begin(unselected_points_),
                           std::rand() % unselected_points_.size());
 
-            toggle(*random_point_iterator, TOGGLE_IN); 
+            toggle(*random_point_iterator, TOGGLE_IN);
         }
     }
 
@@ -470,8 +470,8 @@ public:
             centroid_distances.reserve(source.size());
 
             for (Point p : source) {
-                float distance = ComputeCentroidDistance(p, 
-                                                         centroids[p.ClassLabel()], 
+                float distance = ComputeCentroidDistance(p,
+                                                         centroids[p.ClassLabel()],
                                                          totals[p.ClassLabel()],
                                                          frequencies[p.ClassLabel()],
                                                          remove_from_solution);
@@ -481,14 +481,14 @@ public:
             // If we intend to take a point from selected points,
             // sort the points DESC to get the minimum last (back() member function)
             if (remove_from_solution == 1)  {
-                sort(centroid_distances.begin(), centroid_distances.end(), 
+                sort(centroid_distances.begin(), centroid_distances.end(),
                                                  DescendingCentroidComparetor<Point>);
             } else {
-                sort(centroid_distances.begin(), centroid_distances.end(), 
+                sort(centroid_distances.begin(), centroid_distances.end(),
                                                  AscendingCentroidComparetor<Point>);
             }
 
-            return centroid_distances; 
+            return centroid_distances;
 
     }
 
@@ -504,9 +504,9 @@ public:
         if (set_to_perturb_ == -1) {
 
             // Pairs <Point, Centroid distance if removed/added>
-            unused_point_to_toggle_ = EvaluateIncrementalCost(set_to_use, 
-                                                              class_centroids_, 
-                                                              class_totals_, 
+            unused_point_to_toggle_ = EvaluateIncrementalCost(set_to_use,
+                                                              class_centroids_,
+                                                              class_totals_,
                                                               class_frequencies_,
                                                               remove_from_solution);
 
@@ -557,26 +557,26 @@ public:
     }
 
     // FIXME: INCONSISTENT DATA. It returns one more element in the data (sometimes)
-    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data, 
-                                                             float alpha, Classifier cls, 
+    static PopulationMap<Point, Class> GreedyRandomAlgorithm(const multiset<Point>& data,
+                                                             float alpha, Classifier cls,
                                                              Evaluator eval, MetaheuristicType mht) {
 
         // Need to calculate the centroids, totals and frequencies of the random set of candidates
         unordered_map<Class, vector<double> > centroids;
-        unordered_map<Class, vector<double> > totals; 
+        unordered_map<Class, vector<double> > totals;
         unordered_map<Class, int> frequencies;
 
-        auto sets = PickRandomSet(data); 
+        auto sets = PickRandomSet(data);
 
         multiset<Point> candidates(sets.first);  // candidates to insert into the solution
 
         // Empty set of selected points to be fill with candidates
-        multiset<Point> selected; 
+        multiset<Point> selected;
 
         // Compute centroid and totals to get the incremental cost
-        ComputeCentroidsAndTotals(selected, centroids, totals, frequencies); 
+        ComputeCentroidsAndTotals(selected, centroids, totals, frequencies);
         vector<pair<Point, double> > inc_costs = EvaluateIncrementalCost(candidates, centroids,
-                                                                         totals, frequencies, 0); 
+                                                                         totals, frequencies, 0);
 
         while (!candidates.empty()) {
             // Min and max costs to get the cost threshold
@@ -587,34 +587,34 @@ public:
             double min_cost  = c_max - alpha * (c_max - c_min);
 
             // Pick only candidates under the threshold
-            multiset<Point> RCL; 
-            int n_candidates = inc_costs.size(); 
+            multiset<Point> RCL;
+            int n_candidates = inc_costs.size();
             for (int i = n_candidates - 1; i >= 0; --i) {
                 double curr_cost = inc_costs[i].second;
-                // If the point is not in the RCL, then is not selected to the 
+                // If the point is not in the RCL, then is not selected to the
                 // solution
                 if (curr_cost < min_cost) {
-                    break; 
-                } 
+                    break;
+                }
 
-                RCL.insert(inc_costs[i].first); 
+                RCL.insert(inc_costs[i].first);
             }
 
             // RCL shouldn't be empty
-            assert(!RCL.empty()); 
+            assert(!RCL.empty());
 
             // Pick a random point from RCL
-            auto random_point_iterator = std::next(std::begin(RCL), 
+            auto random_point_iterator = std::next(std::begin(RCL),
                                                    std::rand() % RCL.size());
 
             // Insert random point into solution and remove from RCL
-            selected.insert(Point(*random_point_iterator)); 
-            RCL.erase(random_point_iterator); 
+            selected.insert(Point(*random_point_iterator));
+            RCL.erase(random_point_iterator);
 
             // Compute centroid and totals to get the incremental cost
-            ComputeCentroidsAndTotals(selected, centroids, totals, frequencies); 
+            ComputeCentroidsAndTotals(selected, centroids, totals, frequencies);
             inc_costs = EvaluateIncrementalCost(candidates, centroids,
-                                                totals, frequencies, 0); 
+                                                totals, frequencies, 0);
 
             // XXX: Update candidates is ambiguous so we take the RCL as new
             // candidates
@@ -624,13 +624,13 @@ public:
         multiset<Point> unselected; // Points not selected to be considered
 
         // set_difference to get the remaining points outside the solution
-        set_difference(data.begin(), 
-                       data.end(), 
-                       selected.begin(), selected.end(), 
-                       std::inserter(unselected, unselected.begin())); 
+        set_difference(data.begin(),
+                       data.end(),
+                       selected.begin(), selected.end(),
+                       std::inserter(unselected, unselected.begin()));
 
-        //cout << selected.size() << " + " << unselected.size() << " = " << data.size() << endl << flush; 
-        
+        //cout << selected.size() << " + " << unselected.size() << " = " << data.size() << endl << flush;
+
 
         return PopulationMap<Point,Class>(selected, unselected, 1, cls, eval, mht);
     }
@@ -640,7 +640,7 @@ public:
                                           unordered_map<Class, vector<double> >& centroids,
                                           unordered_map<Class, vector<double> >& totals,
                                           unordered_map<Class, int>& frequencies) {
-    
+
         // Empty all maps
         centroids.clear();
         totals.clear();
@@ -670,7 +670,7 @@ public:
         }
 
         for (auto elem : totals) {
-            Class c = elem.first; 
+            Class c = elem.first;
             vector<double> class_total = elem.second;
             vector <double> centroid(n_point_attributes_);
             int class_frequency = frequencies[c];
@@ -681,7 +681,7 @@ public:
             centroids[c] = centroid;
         }
     }
-    
+
     void ComputeCentroidsAndTotals() {
 
         // empty solution is not an error
@@ -715,7 +715,7 @@ public:
 
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
-        return EvaluateQuality(unselected_points_); 
+        return EvaluateQuality(unselected_points_);
     }
 
     float EvaluateQuality(const multiset<Point>& testing_set) const {
@@ -728,7 +728,7 @@ public:
 
     // Get current solution statistics
     pair<float,float> SolutionStatistics(void) const {
-        return SolutionStatistics(unselected_points_); 
+        return SolutionStatistics(unselected_points_);
     }
 
     pair<float,float> SolutionStatistics(const multiset<Point>& testing_set) const {
@@ -888,8 +888,8 @@ private:
         class_centroids_[c] = centroid;
     }
 
-    static float ComputeCentroidDistance(const Point& p, vector<double>& centroid, 
-                                         const vector<double>& total, 
+    static float ComputeCentroidDistance(const Point& p, vector<double>& centroid,
+                                         const vector<double>& total,
                                          int frenquency, int remove_from_solution) {
 
         vector<double> tmp_centroid(total);
@@ -923,8 +923,8 @@ private:
 
     // Function to pick a random set of points from the map's data
     static pair<multiset<Point>, multiset<Point> > PickRandomSet(const multiset<Point>& data) {
-        multiset<Point> random_set; 
-        multiset<Point> rest; 
+        multiset<Point> random_set;
+        multiset<Point> rest;
 
         srand(time(NULL));
 
@@ -936,20 +936,20 @@ private:
             if (pick_point > 0) {
                 random_set.insert(*itr);
             } else {
-                rest.insert(*itr); 
+                rest.insert(*itr);
             }
         }
 
 
         // Avoid empty set
         if (random_set.empty()) {
-            random_set.insert(*data.begin()); 
+            random_set.insert(*data.begin());
         }
 
-        return make_pair(random_set, rest); 
+        return make_pair(random_set, rest);
     }
 
-    
+
 
 #if TEST_PRIVATE_ATTRIBUTES == 1
     friend class GenericPointTest;
@@ -961,7 +961,7 @@ private:
     FRIEND_TEST(GenericPointTest, NeighborhoodOperatorWithIntelligentPerturbation);
     FRIEND_TEST(GenericPointTest, NeighborhoodOperatorIntelligentTwice);
     FRIEND_TEST(GenericPointTest, PickRandomSet);
-    FRIEND_TEST(GenericPointTest, EvaluateIncrementalCostEmpty); 
+    FRIEND_TEST(GenericPointTest, EvaluateIncrementalCostEmpty);
 #endif
 
     // Class private members
@@ -981,9 +981,9 @@ private:
     unordered_map<Class, vector<double> > class_centroids_; // Current centroid per class
     mutable int good_classifications_[N_THREADS];           // Good classifications per thread
 
-    MetaheuristicType mht_; 
+    MetaheuristicType mht_;
     static MetaHeuristicMap mhm;                           // Map string -> metaheuristic function
-    static int n_point_attributes_; 
+    static int n_point_attributes_;
 };
 
 #endif

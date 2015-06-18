@@ -49,22 +49,29 @@ public:
         FILE *fp;
         char *line = NULL;
         size_t len = 0;
+        int read_chars;
 
         multiset<GenericPoint> points;
 
         fp = fopen(filename, "r");
         assert(fp != NULL);
 
-        while (getline(&line, &len, fp) != -1) {
+        while ((read_chars = getline(&line, &len, fp)) != -1) {
+            // '^ *@' is the regular expression for comment lines
+            int pos = 0;
+            while (line[pos] == ' ') { ++pos; }
+
+            // If it's a comment or an empty line
+            if (line[pos] == '@' || pos + 1 == read_chars) { continue; }
 
             auto inst_pair = ParseCSV(line);
             points.insert(GenericPoint(inst_pair.first, inst_pair.second));
         }
 
-        fclose(fp); 
-        fp = NULL; 
-        free(line); 
-        line = NULL; 
+        fclose(fp);
+        fp = NULL;
+        free(line);
+        line = NULL;
 
         return points;
     }
@@ -103,6 +110,6 @@ inline bool operator<(const GenericPoint& lhs,
         }
     }
 
-    return lhs.ClassLabel() < rhs.ClassLabel(); 
+    return lhs.ClassLabel() < rhs.ClassLabel();
 }
 #endif
