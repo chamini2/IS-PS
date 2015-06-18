@@ -4,7 +4,7 @@
     - [ ] Todas las instancias
     - [ ] Aleatorio
     - [ ] CNN
-    - [ ] MCNN
+    - [ ] MCNN (Decir que se eligió esta dado que el resultado es aleatorio)
     - [ ] RNN
 - [x] on 2015-06-02 20:35:04 | Descripción de GRASP
 - [x] on 2015-06-02 19:38:08 | Descripción de diferentes perturbaciones de ILS
@@ -22,32 +22,23 @@
 - [x] on 2015-05-10 21:53:58 | Describr las aplicaciones
 
 # Implementación
-- [ ] Implementar perturbación inteligente para LS (A)
-    - [ ] Función de costo por punto añadido a la solución
-    - [ ] Función de costo por punto quitado de la solución
-- [ ] Implementar GRASP (B)
-    - [ ] Implementar algoritmo como tal
-    - [ ] Implementar GreedySolution: Función de costo por punto añadido a la solución
-- [ ] Probar diferentes funciones de fitness
-- [ ] Probar de búsqueda local
 - [ ] Implementar perturbación de solución inteligente para ILS
-- [ ] Ejecutar el algoritmo con instancias considerables
-    - [ ] Ejecutar el algoritmo con instancias grandes
-    - [ ] Ejecutar el algoritmo con instancias medianas
+- [ ] Implementar GGA 
+- [ ] Implementar SGA
 - [ ] Realizar pruebas en LS
-    - [ ] Correr pruebas small
-        - [ ] Euclidean, Weighted
-        - [ ] Euclidean, Euler
-        - [ ] Euclidean, Squared
-    - [ ] Correr pruebas medium
-        - [ ] Euclidean, Weighted
-        - [ ] Euclidean, Euler
-        - [ ] Euclidean, Squared
-    - [ ] Correr pruebas large
+    - [ ] Correr pruebas large (alpha = 0.5)
         - [ ] Euclidean, Weighted
         - [ ] Euclidean, Euler
         - [ ] Euclidean, Squared
     - [ ] Analizar resultados
+    - [x] on 2015-06-17 18:08:06 | Correr pruebas small
+        - [x] on 2015-06-17 18:08:06 | Euclidean, Weighted
+        - [x] on 2015-06-17 18:08:06 | Euclidean, Euler
+        - [x] on 2015-06-17 18:08:06 | Euclidean, Squared
+    - [x] on 2015-06-17 18:08:09 | Correr pruebas medium
+        - [x] on 2015-06-17 18:08:09 | Euclidean, Weighted
+        - [x] on 2015-06-17 18:08:09 | Euclidean, Euler
+        - [x] on 2015-06-17 18:08:09 | Euclidean, Squared
 - [ ] Realizar pruebas en ILS
     - [ ] Correr pruebas small
         - [ ] Euclidean, Weighted
@@ -76,6 +67,17 @@
         - [ ] Euclidean, Euler
         - [ ] Euclidean, Squared
     - [ ] Analizar resultados
+- [x] on 2015-06-17 16:48:51 | Implementar perturbación inteligente para LS (A)
+    - [x] on 2015-06-17 16:48:51 | Función de costo por punto añadido a la solución
+    - [x] on 2015-06-17 16:48:51 | Función de costo por punto quitado de la solución
+- [x] on 2015-06-17 16:48:59 | Implementar GRASP (B)
+    - [x] on 2015-06-17 16:48:59 | Implementar algoritmo como tal
+    - [x] on 2015-06-17 16:48:59 | Implementar GreedySolution: Función de costo por punto añadido a la solución
+- [x] on 2015-06-18 00:56:31 | Empeorar solucion de MCNN (Hace la mayoría del trabajo y la metaheuristica pierde protagonismo)
+- [x] on 2015-06-18 00:56:38 | Utilizar diferentes testing sets para evaluar las soluciones
+- [x] on 2015-06-17 23:07:00 | Agregar factor de peso a Euler y Squared
+- [x] on 2015-06-17 16:49:01 | Probar diferentes funciones de fitness
+- [x] on 2015-06-17 16:49:02 | Probar de búsqueda local
 - [x] on 2015-06-03 04:51:50 | Calcular porcentaje de error de la solución final
 - [x] on 2015-05-11 13:12:08 | Probar representación de las soluciones del meta-problema
 - [x] on 2015-05-11 13:12:10 | Probar operador de vecindad

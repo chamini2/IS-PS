@@ -61,8 +61,10 @@ public:
             points.insert(GenericPoint(inst_pair.first, inst_pair.second));
         }
 
-        free(fp); 
+        fclose(fp); 
+        fp = NULL; 
         free(line); 
+        line = NULL; 
 
         return points;
     }
@@ -101,6 +103,6 @@ inline bool operator<(const GenericPoint& lhs,
         }
     }
 
-    return false;
+    return lhs.ClassLabel() < rhs.ClassLabel(); 
 }
 #endif

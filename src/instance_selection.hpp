@@ -5,6 +5,9 @@
 #define TEST_PRIVATE_ATTRIBUTES 0 // 1 => enable testing in private members of the classes
 #define N_THREADS 100
 
+#define TOGGLE_OUT 1
+#define TOGGLE_IN 0
+
 // Metaheuristics flags
 #define LOCAL_SEARCH 0
 #define ITERATED_LOCAL_SEARCH 1
@@ -227,9 +230,26 @@ public:
     void InitialSolution() {
         // Greedy
         MCNN();
+        // Deteriorate solution so the metaheuristic can improve more
+        const float insertion_percentage = 0.1; 
+        DeteriorateSolution(insertion_percentage); 
         // XXX: This should not be executing always, only when needed
         // but for now it's done always
         ComputeCentroidsAndTotals();
+    }
+
+    void DeteriorateSolution(float set_percentage) {
+
+        int elements = unselected_points_.size() * set_percentage; 
+
+        srand(time(NULL));
+        repeat(elements) {
+            auto random_point_iterator =
+                std::next(std::begin(unselected_points_),
+                          std::rand() % unselected_points_.size());
+
+            toggle(*random_point_iterator, TOGGLE_IN); 
+        }
     }
 
     void reset() {
@@ -695,19 +715,24 @@ public:
 
     // Function that evaluates the current map's quality
     float EvaluateQuality(void) const {
+        return EvaluateQuality(unselected_points_); 
+    }
 
-        // Decorator to measure time
-        //MeasureTime mt("EvaluateQuality");
-
-        float classification_correctness = RunClassifier(selected_points_, unselected_points_);
+    float EvaluateQuality(const multiset<Point>& testing_set) const {
+        float classification_correctness = RunClassifier(selected_points_, testing_set);
         float reduction_percentage       = GetReductionPercentage();
 
         return evaluate_(classification_correctness, reduction_percentage, correctness_weight_);
     }
 
 
-    pair<float,float> SolutionStatistics() const {
-        return make_pair(RunClassifier(selected_points_, unselected_points_), GetReductionPercentage());
+    // Get current solution statistics
+    pair<float,float> SolutionStatistics(void) const {
+        return SolutionStatistics(unselected_points_); 
+    }
+
+    pair<float,float> SolutionStatistics(const multiset<Point>& testing_set) const {
+        return make_pair(RunClassifier(selected_points_, testing_set), GetReductionPercentage());
     }
 
     multiset<Point> SelectedPoints() const { return selected_points_; }
@@ -737,7 +762,7 @@ public:
 
 private:
     // Toggles points between selected and unselected points sets.
-    void toggle(Point p, int set_to_use) {
+    void toggle(Point p, int remove_from_solution) {
 
         const multiset<Point>& non_empty_set = (selected_points_.empty() ? unselected_points_
                                                                          : selected_points_);
@@ -751,10 +776,10 @@ private:
 
 
         if (set_to_perturb_ != -1) {
-            set_to_use = set_to_perturb_;
+            remove_from_solution = set_to_perturb_;
         }
 
-        if (set_to_use == 1) {
+        if (remove_from_solution) {
             auto p_itr = selected_points_.find(p);
             assert(p_itr != selected_points_.end());
             selected_points_.erase(p_itr);
@@ -960,6 +985,5 @@ private:
     static MetaHeuristicMap mhm;                           // Map string -> metaheuristic function
     static int n_point_attributes_; 
 };
-
 
 #endif

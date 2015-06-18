@@ -43,7 +43,6 @@ int g_max_label = 0;
 
 Result Test::run() {
 
-
     Result r;
     MeasureTime mt("Test", &r, false);
 
@@ -52,24 +51,30 @@ Result Test::run() {
     pair<float, float> correct, reducti, quality;
 
 
-    // attributes_[0] = dataset to test
-    // attributes_[1] = Metaheuristic to use
-    // attributes_[2] = Evaluator function
+    // attributes_[0] = Training dataset 
+    // attributes_[1] = Testing dataset 
+    // attributes_[2] = Metaheuristic to use
+    // attributes_[3] = Evaluator function
 
-    multiset<GenericPoint> points = GenericPoint::load(paths[attributes_[0]].c_str());
+    // Read points
+    multiset<GenericPoint> points = GenericPoint::load(attributes_[0].c_str());
     PopulationMap<GenericPoint, int> pop_map(points, 1, &OneNN<GenericPoint, int>,
-                                             em[attributes_[2]], mhtm[attributes_[1]]);
+                                             em[attributes_[3]], mhtm[attributes_[2]]);
 
     pop_map.InitialSolution();
-    stats = pop_map.SolutionStatistics();
+
+    // Read testing set
+    multiset<GenericPoint> testing_set = GenericPoint::load(attributes_[1].c_str());
+    stats = pop_map.SolutionStatistics(testing_set);
 
     PopulationMap<GenericPoint, int> best_map = pop_map.resolve();
-    rstats = best_map.SolutionStatistics();
+
+    rstats = best_map.SolutionStatistics(testing_set);
 
     n_points = make_pair(pop_map.SelectedPointsSize(), best_map.SelectedPointsSize());
     correct  = make_pair(stats.first, rstats.first);
     reducti  = make_pair(stats.second, rstats.second);
-    quality  = make_pair(pop_map.EvaluateQuality(), best_map.EvaluateQuality());
+    quality  = make_pair(pop_map.EvaluateQuality(testing_set), best_map.EvaluateQuality(testing_set));
 
     r.addPoints(n_points);
     r.addClassification(correct);
