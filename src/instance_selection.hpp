@@ -8,6 +8,8 @@
 #define TOGGLE_OUT 1
 #define TOGGLE_IN 0
 
+#define CLASSIFICATION_WEIGHT 0.9
+
 
 // #include "classifiers.hpp"
 
@@ -178,7 +180,7 @@ public:
     PopulationMap(set<Point> data, int points_to_toggle,
                   Classifier cls, Evaluator eval) : points_to_toggle_ ( points_to_toggle ),
                                                     selected_points_ ( data ),
-                                                    correctness_weight_ ( 0.5 ),
+                                                    correctness_weight_ ( CLASSIFICATION_WEIGHT ),
                                                     classify_ (cls),
                                                     evaluate_ (eval),
                                                     mht_ ( mht ),
@@ -206,7 +208,7 @@ public:
     PopulationMap(set<Point> data, int points_to_toggle,
                   Classifier cls, Evaluator eval, MetaheuristicType mht) : points_to_toggle_ ( points_to_toggle ),
                                                                            selected_points_ ( data ),
-                                                                           correctness_weight_ ( 0.5 ),
+                                                                           correctness_weight_ ( CLASSIFICATION_WEIGHT ),
                                                                            classify_ (cls),
                                                                            evaluate_ (eval),
                                                                            mht_ ( mht ),
