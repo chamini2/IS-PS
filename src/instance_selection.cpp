@@ -218,7 +218,9 @@ PopulationMap<GenericPoint,int>::MetaHeuristicMap
                 PopulationMap<GenericPoint,int>::mhm = {
                     { LOCAL_SEARCH, &LocalSearchFirstFound<GenericPoint,int> },
                     { ITERATED_LOCAL_SEARCH, &IteratedLocalSearch<GenericPoint,int> },
-                    { GRASP, &GreedyRandomizedAdaptiveSearch<GenericPoint,int> }
+                    { GRASP, &GreedyRandomizedAdaptiveSearch<GenericPoint,int> },
+                    { GGA, &GenerationalGeneticAlgorithm<GenericPoint,int> },
+                    { SGA, &SteadyStateGeneticAlgorithm<GenericPoint,int> }
                 };
 
 template<>

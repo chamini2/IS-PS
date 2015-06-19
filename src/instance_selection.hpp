@@ -139,8 +139,10 @@ bool DescendingCentroidComparetor(const pair<Point, float>& lhs, const pair<Poin
 typedef int MetaheuristicType;
 
 const MetaheuristicType LOCAL_SEARCH          = 0;
-const MetaheuristicType ITERATED_LOCAL_SEARCH = 0;
-const MetaheuristicType GRASP                 = 0;
+const MetaheuristicType ITERATED_LOCAL_SEARCH = 1;
+const MetaheuristicType GRASP                 = 2;
+const MetaheuristicType GGA                   = 3;
+const MetaheuristicType SGA                   = 4;
 
 // Template class to handle IS-pS solution representation
 // Template arguments:
