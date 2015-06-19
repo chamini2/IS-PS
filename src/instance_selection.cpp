@@ -67,7 +67,7 @@ template <typename Point, typename Class>
         IteratedLocalSearch(const PopulationMap<Point,Class>& map,
                             int iterations) {
 
-    const int local_search_its = 20;
+    const int local_search_its = 100;
 
     PopulationMap<Point,Class> initial_solution(map);
 
@@ -104,7 +104,7 @@ template<typename Point, typename Class>
                                        int iterations) {
 
     // LS iterations
-    const int local_search_its = 20;
+    const int local_search_its = 100;
 
     // Alpha to determine greediness
     const float alpha = 0.5;
