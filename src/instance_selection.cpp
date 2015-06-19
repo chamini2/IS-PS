@@ -98,8 +98,6 @@ template <typename Point, typename Class>
 
 #include "fitness.hpp"
 
-// XXX: Maybe 1000 iterations is too much
-// FIXME: Does nothing (returns the same map, the problem is probably in GreedyRandomAlgorithm)
 template<typename Point, typename Class>
     PopulationMap<Point,Class>
         GreedyRandomizedAdaptiveSearch(const PopulationMap<Point,Class>& map,
@@ -139,13 +137,14 @@ template<typename Point, typename Class>
 }
 
 int MeasureTime::deepness = 0;
+
 template<>
-    PopulationMap<GenericPoint,int>::MetaHeuristicMap
-        PopulationMap<GenericPoint,int>::mhm = {
-    { LOCAL_SEARCH, &LocalSearchFirstFound<GenericPoint,int> },
-    { ITERATED_LOCAL_SEARCH, &IteratedLocalSearch<GenericPoint,int> },
-    { GRASP, &GreedyRandomizedAdaptiveSearch<GenericPoint,int> }
-};
+PopulationMap<GenericPoint,int>::MetaHeuristicMap 
+                PopulationMap<GenericPoint,int>::mhm = {
+                    { LOCAL_SEARCH, &LocalSearchFirstFound<GenericPoint,int> },
+                    { ITERATED_LOCAL_SEARCH, &IteratedLocalSearch<GenericPoint,int> },
+                    { GRASP, &GreedyRandomizedAdaptiveSearch<GenericPoint,int> }
+                };
 
 template<>
 int PopulationMap<GenericPoint, int>::n_point_attributes_ = -1; 

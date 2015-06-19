@@ -29,16 +29,6 @@ MetaHeuristicTypeMap mthm = {
                                 { "grasp", GRASP }
                             };
 
-// Path to testing data map
-PathMap paths = {
-                    {"glass", "../data/small/glass/glass.data"},
-                    {"iris", "../data/small/iris/iris.data"},
-                    {"blogger", "../data/small/blogger/blogger.data"},
-                    {"bcw", "../data/medium/breast-cancer-wisconsin/breast-cancer-wisconsin.data"},
-                    {"australian", "../data/medium/australian/australian.dat"},
-                    {"pima", "../data/medium/pima-indians-diabetes/pima-indians-diabetes.data"}
-                };
-
 int g_max_label = 0;
 
 Result Test::run() {

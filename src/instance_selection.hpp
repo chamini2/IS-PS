@@ -740,6 +740,28 @@ public:
         return make_pair(RunClassifier(selected_points_, testing_set), GetReductionPercentage());
     }
 
+    // Genetic algorithm functions
+    
+    static set<PopulationMap<Point,Class> > GenerateRandomPopulation() {
+    }
+
+    static PopulationMap<Point,Class> GetBestSolution(const set<PopulationMap<Point,Class> >& population) {
+    }
+    
+    // Modifies current map in order to diversify the solution
+    void mutate(int perturbations, float mutation_percentage) {
+    }
+
+    // Selects two population maps from a population
+    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > 
+                                select(const set<PopulationMap<Point,Class> >& population) {
+    }
+
+    // Combines two population maps to create two childrens
+    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > 
+                                crossover(const vector<PopulationMap<Point,Class> >& parents) {
+    }
+
     set<Point> SelectedPoints() const { return selected_points_; }
     set<Point> UnselectedPoints() const { return unselected_points_; }
     set<Point> data() const {

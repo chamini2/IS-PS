@@ -22,12 +22,12 @@
 - [x] on 2015-05-10 21:53:58 | Describr las aplicaciones
 
 # Implementación
-- [ ] Implementar perturbación de solución inteligente para ILS
 - [ ] Implementar GGA 
 - [ ] Implementar SGA
 - [ ] Implementar Selection para algoritmo genético
 - [ ] Implementar Crossover para algoritmo genético 
 - [ ] Implementar Mutate para algoritmo genético
+- [ ] Implementar perturbación de solución inteligente para ILS
 - [ ] Realizar pruebas en LS
     - [ ] Correr pruebas large (alpha = 0.5)
         - [ ] Euclidean, Weighted
