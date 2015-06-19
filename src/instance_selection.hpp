@@ -66,6 +66,9 @@ using std::array;
 using std::clock_t;
 using std::clock;
 
+#include <iterator>
+using std::iterator;
+
 #include "point_instances.hpp"
 
 // Forward declaration
@@ -757,36 +760,36 @@ public:
     }
 
     // Genetic algorithm functions
-    
+
     // Generates a random populatio of PopulatioMaps
-    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int population_size, 
+    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int population_size,
                                                                      const set<Point>& data) {
 
-        set<PopulationMap<Point,Class> > population; 
+        set<PopulationMap<Point,Class> > population;
 
         srand(time(NULL));
         repeat(population_size) {
 
 
             // Generate random solution
-            PopulationMap<Point,Class> solution(data); 
-            solution.RandomSolution(); 
+            PopulationMap<Point,Class> solution(data);
+            solution.RandomSolution();
 
             // Insert into population
-            population.insert(solution); 
+            population.insert(solution);
         }
 
-        return population; 
+        return population;
     }
 
     // Gets the PopulationMap with best quality
     static PopulationMap<Point,Class> GetBestSolution(const set<PopulationMap<Point,Class> >& population) {
-        double best_score = -1; 
-        PopulationMap<Point,Class> best_solution; 
+        double best_score = -1;
+        PopulationMap<Point,Class> best_solution;
 
         for (auto pm : population) {
 
-            double curr_score = pm.EvaluateQuality(); 
+            double curr_score = pm.EvaluateQuality();
             if (curr_score > best_score) {
 
                 best_score    = curr_score;
@@ -794,18 +797,18 @@ public:
             }
         }
 
-        return best_solution; 
+        return best_solution;
     }
-    
+
     // Modifies current map in order to diversify the solution
     void mutate(int perturbations, float mutation_percentage) {
 
         repeat(perturbations) {
-            double prob = double(rand()) / RAND_MAX; 
-            // mutation_percentage = 0.6, then if 0 <= prob <= mutation_percentage is 
+            double prob = double(rand()) / RAND_MAX;
+            // mutation_percentage = 0.6, then if 0 <= prob <= mutation_percentage is
             // 60% of chances since prob is between 0 and 1
             if (prob <= mutation_percentage) {
-                NeighborhoodOperator(false); 
+                NeighborhoodOperator(false);
             }
         }
     }
@@ -813,7 +816,7 @@ public:
     // Selects two population maps from a population
     static vector<PopulationMap<Point,Class> > select(const set<PopulationMap<Point,Class> >& population) {
 
-        srand(time(NULL)); 
+        srand(time(NULL));
         // Parent's random selection
         auto parent1_itr = std::next(std::begin(population),
                                       std::rand() % population.size());
@@ -821,22 +824,64 @@ public:
         auto parent2_itr = std::next(std::begin(population),
                                       std::rand() % population.size());
 
-        vector<PopulationMap<Point,Class> > parents; 
-        parents.reserve(2); 
-        parents.push_back(*parent1_itr); 
-        parents.push_back(*parent2_itr); 
+        vector<PopulationMap<Point,Class> > parents;
+        parents.reserve(2);
+        parents.push_back(*parent1_itr);
+        parents.push_back(*parent2_itr);
 
-        return parents; 
+        return parents;
     }
 
     // Replaces two points of the population for the two childrens (according
     // to some criteria)
-    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > childrens, 
+    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > childrens,
                         set<PopulationMap<Point,Class> >& population) {
     }
     // Combines two population maps to create two childrens
-    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > 
-                                crossover(const vector<PopulationMap<Point,Class> >& parents) {
+    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> >
+                                crossover(const PopulationMap<Point,Class>& fstp,
+                                          const PopulationMap<Point,Class>& sndp) {
+        int fstp_break_point, sndp_break_point;
+        PopulationMap<Point,Class> fstc(fstp), sndc(sndp);
+        auto fstp_it = fstc.selected_points_.begin();
+        auto sndp_it = sndc.selected_points_.begin();
+
+        // Randomply determine how many instances from each we're going to change
+        srand(time(NULL));
+        fstp_break_point = rand() % fstc.selected_points_.size();
+        sndp_break_point = rand() % sndc.selected_points_.size();
+
+        // Take some instances from fst and put them in snd
+        repeat(fstp_break_point) {
+            auto random_point_iterator =
+                std::next(std::begin(fstp.selected_points_),
+                          std::rand() % fstp.selected_points_.size());
+
+            // Out of fstc
+            fstc.toggle(*random_point_iterator, TOGGLE_OUT);
+            if (sndc.unselected_points_.find(*random_point_iterator) ==
+                                            sndc.unselected_points_.end()) {
+                // In sndc, if it wasn't already there
+                sndc.toggle(*random_point_iterator, TOGGLE_IN);
+            }
+        }
+
+        // Take some instances from snd and put them in fst
+        repeat(sndp_break_point) {
+            auto random_point_iterator =
+                std::next(std::begin(sndp.selected_points_),
+                          std::rand() % sndp.selected_points_.size());
+
+            // Out of sndc
+            sndc.toggle(*random_point_iterator, TOGGLE_OUT);
+            if (fstc.unselected_points_.find(*random_point_iterator) ==
+                                            fstc.unselected_points_.end()) {
+                // In fstc, if it wasn't already there
+                fstc.toggle(*random_point_iterator, TOGGLE_IN);
+            }
+        }
+
+        return make_pair(fstc, sndc);
     }
 
     set<Point> SelectedPoints() const { return selected_points_; }
@@ -1093,6 +1138,6 @@ private:
 inline bool operator<(const PopulationMap<GenericPoint,int>& lhs,
                       const PopulationMap<GenericPoint,int>& rhs) {
 
-    return lhs.SelectedPoints() < rhs.SelectedPoints(); 
+    return lhs.SelectedPoints() < rhs.SelectedPoints();
 }
 #endif
