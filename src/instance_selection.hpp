@@ -133,6 +133,8 @@ bool DescendingCentroidComparetor(const pair<Point, float>& lhs, const pair<Poin
 }
 
 
+#include "fitness.hpp"
+
 // Just for styling
 typedef int MetaheuristicType;
 
@@ -174,6 +176,19 @@ public:
         n_point_attributes_ = selected.begin()->attributes().size();
     }
 
+
+    // Constructor with only the data
+    PopulationMap(set<Point> data) : points_to_toggle_ ( 1 ),
+                                     selected_points_ ( data ),
+                                     correctness_weight_ ( CLASSIFICATION_WEIGHT ),
+                                     classify_ (&OneNN<Point,Class>),
+                                     evaluate_ (&EulerQuality),
+                                     mht_ ( LOCAL_SEARCH ),
+                                     resolve_ (mhm[LOCAL_SEARCH]),
+                                     set_to_perturb_ ( -1 ) {
+
+        n_point_attributes_ = data.begin()->attributes().size();
+    }
     // Constructor without:
     // * weight specification : default 0.5
     // * resolver function : default LocalSearch
@@ -183,8 +198,8 @@ public:
                                                     correctness_weight_ ( CLASSIFICATION_WEIGHT ),
                                                     classify_ (cls),
                                                     evaluate_ (eval),
-                                                    mht_ ( mht ),
-                                                    resolve_ (LOCAL_SEARCH) {
+                                                    mht_ ( LOCAL_SEARCH ),
+                                                    resolve_ (mhm[LOCAL_SEARCH]) {
 
         n_point_attributes_ = data.begin()->attributes().size();
     }
@@ -197,7 +212,7 @@ public:
                                                                               correctness_weight_ ( correctness_weight ),
                                                                               classify_ (cls),
                                                                               evaluate_ (eval),
-                                                                              mht_ ( mht ),
+                                                                              mht_ ( LOCAL_SEARCH ),
                                                                               resolve_ (LOCAL_SEARCH),
                                                                               set_to_perturb_ ( -1 ) {
         n_point_attributes_ = data.begin()->attributes().size();
@@ -386,7 +401,6 @@ public:
         // Decorator to measure time
         //MeasureTime mt("RandomSolution");
 
-        srand(time(NULL));
         set<Point> data(selected_points_);
         data.insert(unselected_points_.begin(), unselected_points_.end());
 
@@ -742,19 +756,71 @@ public:
 
     // Genetic algorithm functions
     
-    static set<PopulationMap<Point,Class> > GenerateRandomPopulation() {
+    // Generates a random populatio of PopulatioMaps
+    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int population_size, 
+                                                                     const set<Point>& data) {
+
+        set<PopulationMap<Point,Class> > population; 
+
+        srand(time(NULL));
+        repeat(population_size) {
+
+
+            // Generate random solution
+            PopulationMap<Point,Class> solution(data); 
+            solution.RandomSolution(); 
+
+            // Insert into population
+            population.insert(solution); 
+        }
+
+        return population; 
     }
 
+    // Gets the PopulationMap with best quality
     static PopulationMap<Point,Class> GetBestSolution(const set<PopulationMap<Point,Class> >& population) {
+        double best_score = -1; 
+        PopulationMap<Point,Class> best_solution; 
+
+        for (auto pm : population) {
+
+            double curr_score = pm.EvaluateQuality(); 
+            if (curr_score > best_score) {
+
+                best_score    = curr_score;
+                best_solution = pm;
+            }
+        }
+
+        return best_solution; 
     }
     
     // Modifies current map in order to diversify the solution
     void mutate(int perturbations, float mutation_percentage) {
+
+        repeat(perturbations) {
+            double prob = double(rand()) / RAND_MAX; 
+            // mutation_percentage = 0.6, then if 0 <= prob <= mutation_percentage is 
+            // 60% of chances since prob is between 0 and 1
+            if (prob <= mutation_percentage) {
+                NeighborhoodOperator(false); 
+            }
+        }
     }
 
     // Selects two population maps from a population
     static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > 
                                 select(const set<PopulationMap<Point,Class> >& population) {
+
+        srand(time(NULL)); 
+        // Parent's random selection
+        auto parent1_itr = std::next(std::begin(population),
+                                      std::rand() % population.size());
+
+        auto parent2_itr = std::next(std::begin(population),
+                                      std::rand() % population.size());
+
+        return make_pair(*parent1_itr, *parent2_itr); 
     }
 
     // Combines two population maps to create two childrens
@@ -1013,4 +1079,9 @@ private:
     static int n_point_attributes_;
 };
 
+inline bool operator<(const PopulationMap<GenericPoint,int>& lhs,
+                      const PopulationMap<GenericPoint,int>& rhs) {
+
+    return lhs.SelectedPoints() < rhs.SelectedPoints(); 
+}
 #endif

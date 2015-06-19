@@ -112,4 +112,20 @@ inline bool operator<(const GenericPoint& lhs,
 
     return lhs.ClassLabel() < rhs.ClassLabel();
 }
+
+inline bool operator==(const GenericPoint& lhs,
+                       const GenericPoint& rhs) {
+
+    if (lhs.attributes().size() != rhs.attributes().size()) return false; 
+
+    int size = lhs.attributes().size();
+
+    for (int i = 0; i < size; ++i) {
+        if (lhs.attributes()[i] != rhs.attributes()[i]) {
+            return false;
+        }
+    }
+
+    return lhs.ClassLabel() == rhs.ClassLabel();
+}
 #endif

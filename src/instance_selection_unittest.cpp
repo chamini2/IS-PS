@@ -15,29 +15,25 @@ class GenericPointTest : public ::testing::Test {
         static void SetUpTestCase()
         {
             vector<pair<int, vector<double> > > points = {
-                                                { 1, { 0.0,0.0,1.0,0.0 } },
-                                                { 1, { 0.0,0.0,1.0,0.0 } },
+                                                { 1,{ 0.0,0.0,1.0,0.0 } },
                                                 { 0,{ 0.0,0.0,1.0,1.0 } },
                                                 { 0,{ 0.0,0.0,0.0,0.0 } },
                                                 { 0,{ 0.0,0.0,0.0,1.0 } },
-                                                { 1 ,{ 0.0,1.0,1.0,0.0 } },
-                                                { 1 ,{ 0.0,1.0,1.0,0.0 } },
+                                                { 1,{ 0.0,1.0,1.0,0.0 } },
                                                 { 0,{ 0.0,1.0,1.0,1.0 } },
                                                 { 0,{ 0.0,1.0,0.0,0.0 } },
                                                 { 0,{ 0.0,1.0,0.0,1.0 } },
-                                                { 1 ,{ 1.0,0.0,1.0,0.0 } },
-                                                { 1 ,{ 1.0,0.0,1.0,0.0 } },
+                                                { 1,{ 1.0,0.0,1.0,0.0 } },
                                                 { 0,{ 1.0,0.0,1.0,1.0 } },
                                                 { 0,{ 1.0,0.0,0.0,0.0 } },
                                                 { 0,{ 1.0,0.0,0.0,1.0 } },
-                                                { 1 ,{ 1.0,1.0,1.0,0.0 } },
-                                                { 1 ,{ 1.0,1.0,1.0,0.0 } },
+                                                { 1,{ 1.0,1.0,1.0,0.0 } },
                                                 { 0,{ 1.0,1.0,1.0,1.0 } },
                                                 { 0,{ 1.0,1.0,0.0,0.0 } },
                                                 { 0,{ 1.0,1.0,0.0,1.0 } }
                                                 };
 
-            multiset<GenericPoint> point_set;
+            set<GenericPoint> point_set;
 
             for (auto elem: points) {
                 point_set.insert(GenericPoint(elem.first, elem.second));
@@ -59,7 +55,7 @@ PopulationMap<GenericPoint, int> GenericPointTest::pop_map;
 
 TEST_F(GenericPointTest, PopulationMapConsistency) {
 
-    EXPECT_EQ(pop_map.TotalSize(), 20);
+    EXPECT_EQ(pop_map.TotalSize(), 16);
     EXPECT_EQ(pop_map.SelectedPointsSize() +  pop_map.UnselectedPointsSize(),
                                                             pop_map.TotalSize());
 }
@@ -198,10 +194,10 @@ TEST_F(GenericPointTest, NeighborhoodOperatorIntelligentTwice) {
 
 TEST_F(GenericPointTest, PickRandomSet) {
     PopulationMap<GenericPoint, int> copy_map(pop_map);
-    multiset<GenericPoint> data(copy_map.data()); 
+    set<GenericPoint> data(copy_map.data()); 
     auto sets = PopulationMap<GenericPoint,int>::PickRandomSet(data);
-    multiset<GenericPoint> random_set = sets.first;
-    multiset<GenericPoint> rest = sets.second;
+    set<GenericPoint> random_set = sets.first;
+    set<GenericPoint> rest = sets.second;
 
 
     // Expecting at least one element
@@ -255,7 +251,7 @@ TEST_F(GenericPointTest, NeighborhoodOperator) {
 }
 
 TEST_F(GenericPointTest, GreedyRandomAlgorithm) {
-    multiset<GenericPoint> data(pop_map.data()); 
+    set<GenericPoint> data(pop_map.data()); 
 
     PopulationMap<GenericPoint, int> random_map = 
         PopulationMap<GenericPoint, int>::GreedyRandomAlgorithm(data, 0.5, pop_map.classifier(), pop_map.evaluator(), pop_map.mht()); 
@@ -269,6 +265,44 @@ TEST_F(GenericPointTest, GreedyRandomAlgorithm) {
     for (GenericPoint p : random_map.UnselectedPoints()) {
         EXPECT_TRUE(data.find(p) != data.end()); 
     }
+}
+
+TEST_F(GenericPointTest, GenerateRandomPopulation) {
+
+    set<PopulationMap<GenericPoint,int> > population = 
+        PopulationMap<GenericPoint,int>::GenerateRandomPopulation(50, pop_map.data()); 
+
+    EXPECT_EQ(50, population.size()); 
+}
+
+TEST_F(GenericPointTest, GetBestSolutionFromRandomPopulation) {
+    set<PopulationMap<GenericPoint,int> > population = 
+        PopulationMap<GenericPoint,int>::GenerateRandomPopulation(50, pop_map.data()); 
+
+    PopulationMap<GenericPoint,int> best_solution(PopulationMap<GenericPoint,int>::GetBestSolution(population)); 
+
+    double best_score = best_solution.EvaluateQuality(); 
+    for (auto pm : population) {
+        EXPECT_LE(pm.EvaluateQuality(), best_score); 
+    }
+}
+
+TEST_F(GenericPointTest, SelectParentsFromPopulation) {
+    set<PopulationMap<GenericPoint,int> > population = 
+        PopulationMap<GenericPoint,int>::GenerateRandomPopulation(50, pop_map.data()); 
+
+    auto parents = PopulationMap<GenericPoint,int>::select(population); 
+
+    EXPECT_TRUE(population.find(parents.first) != population.end()); 
+    EXPECT_TRUE(population.find(parents.second) != population.end()); 
+}
+
+TEST_F(GenericPointTest, MutateChildren) {
+    PopulationMap<GenericPoint,int> copy_map(pop_map); 
+
+    copy_map.mutate(5, 1); 
+
+    EXPECT_NE(copy_map.SelectedPoints(), pop_map.SelectedPoints()); 
 }
 
 
