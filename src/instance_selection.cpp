@@ -136,6 +136,81 @@ template<typename Point, typename Class>
     return best_map;
 }
 
+template<typename Point, typename Class>
+    PopulationMap<Point,Class>
+        GenerationalGeneticAlgorithm(const PopulationMap<Point,Class>& map,
+                                       int iterations) {
+
+    // XXX: Need to decide the size
+    const int population_size = 100; 
+    // Need to decide the mutation params (for now is 50% of probability 
+    // and 10% of the data size perturbations
+    const float mutation_percentage = 0.5; 
+    const int mutation_perturbations = map.data().size() * 0.1; 
+
+    set<PopulationMap<Point,Class> > population = 
+        PopulationMap<Point,Class>::GenerateRandomPopulation(population_size, map.data()); 
+
+    PopulationMap<Point,Class> best_solution(PopulationMap<Point,Class>::GetBestSolution(population)); 
+
+    repeat(iterations) {
+        set<PopulationMap<Point,Class> > descendants; 
+
+        while (descendants.size() < population_size) {
+            auto parents   = PopulationMap<Point,Class>::select(population);
+            auto childrens = PopulationMap<Point,Class>::crossover(parents);
+
+            childrens.first.mutate(mutation_perturbations, mutation_percentage); 
+            childrens.second.mutate(mutation_perturbations, mutation_percentage); 
+
+            descendants.insert(childrens.first); 
+            descendants.insert(childrens.second); 
+        }
+
+        population = descendants; 
+
+        PopulationMap<Point,Class> new_best(PopulationMap<Point,Class>::GetBestSolution(population)); 
+        if (new_best.EvaluateQuality() > best_solution.EvaluateQuality()) {
+            best_solution = new_best; 
+        }
+    }
+
+    return best_solution; 
+}
+
+template<typename Point, typename Class>
+    PopulationMap<Point,Class>
+        SteadyStateGeneticAlgorithm(const PopulationMap<Point,Class>& map,
+                                       int iterations) {
+    // XXX: Need to decide the size
+    const int population_size = 100; 
+    // Need to decide the mutation params (for now is 50% of probability 
+    // and 10% of the data size perturbations
+    const float mutation_percentage = 0.5; 
+    const int mutation_perturbations = map.data().size() * 0.1; 
+
+    set<PopulationMap<Point,Class> > population = 
+        PopulationMap<Point,Class>::GenerateRandomPopulation(population_size, map.data()); 
+
+    PopulationMap<Point,Class> best_solution(PopulationMap<Point,Class>::GetBestSolution(population)); 
+
+    repeat(iterations) {
+        auto parents   = PopulationMap<Point,Class>::select(population);
+        auto childrens = PopulationMap<Point,Class>::crossover(parents);
+
+        childrens.first.mutate(mutation_perturbations, mutation_percentage); 
+        childrens.second.mutate(mutation_perturbations, mutation_percentage); 
+        PopulationMap<Point,Class>::replace(childrens, population); 
+
+        PopulationMap<Point,Class> new_best(PopulationMap<Point,Class>::GetBestSolution(population)); 
+        if (new_best.EvaluateQuality() > best_solution.EvaluateQuality()) {
+            best_solution = new_best; 
+        }
+
+    }
+
+    return best_solution; 
+}
 int MeasureTime::deepness = 0;
 
 template<>

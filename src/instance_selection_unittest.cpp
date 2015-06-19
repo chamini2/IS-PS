@@ -293,8 +293,8 @@ TEST_F(GenericPointTest, SelectParentsFromPopulation) {
 
     auto parents = PopulationMap<GenericPoint,int>::select(population); 
 
-    EXPECT_TRUE(population.find(parents.first) != population.end()); 
-    EXPECT_TRUE(population.find(parents.second) != population.end()); 
+    EXPECT_TRUE(population.find(parents[0]) != population.end()); 
+    EXPECT_TRUE(population.find(parents[1]) != population.end()); 
 }
 
 TEST_F(GenericPointTest, MutateChildren) {

@@ -809,8 +809,7 @@ public:
     }
 
     // Selects two population maps from a population
-    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > 
-                                select(const set<PopulationMap<Point,Class> >& population) {
+    static vector<PopulationMap<Point,Class> > select(const set<PopulationMap<Point,Class> >& population) {
 
         srand(time(NULL)); 
         // Parent's random selection
@@ -820,9 +819,19 @@ public:
         auto parent2_itr = std::next(std::begin(population),
                                       std::rand() % population.size());
 
-        return make_pair(*parent1_itr, *parent2_itr); 
+        vector<PopulationMap<Point,Class> > parents; 
+        parents.reserve(2); 
+        parents.push_back(*parent1_itr); 
+        parents.push_back(*parent2_itr); 
+
+        return parents; 
     }
 
+    // Replaces two points of the population for the two childrens (according
+    // to some criteria)
+    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > childrens, 
+                        set<PopulationMap<Point,Class> >& population) {
+    }
     // Combines two population maps to create two childrens
     static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > 
                                 crossover(const vector<PopulationMap<Point,Class> >& parents) {
