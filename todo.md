@@ -1,11 +1,32 @@
 # Informe
-- [ ] Hacer presentación
+- [ ] Hacer presentación final
+- [ ] Arreglar observaciones en el artículo
+    - [ ] Completar el abstract
+    - [x] on 2015-06-19 17:59:12 | La representación de la solución la define solo SP 
+    - [x] on 2015-06-19 18:00:03 | Cambiar valor de euler por número de euler
+    - [x] on 2015-06-19 18:21:04 | En perturbación aleatoria: habla de perturbar atributos, y es perturbar soluciones
+    - [x] on 2015-06-19 18:21:05 | En GRASP: habla de manera aleatoria recorre la mayor cantidad de vecindades. Aclarar
+    - [x] on 2015-06-19 18:21:07 | Algoritmo Greedy Aleatorio es diferente a GRASP
+- [ ] Explicar la selección random de la población
+- [ ] Agregar sección de conclusiones
+- [ ] Agregar sección de Experimentos
+    - [ ] Agregar resultados
+    - [ ] Agregar análisis de resultados
+    - [x] on 2015-06-20 18:39:16 | Explicar parámetros usados
+- [ ] Cambiar gráficas de funciones por las nuevas (con peso)
 - [ ] Agregar información de selección inicial al informe
     - [ ] Todas las instancias
     - [ ] Aleatorio
     - [ ] CNN
-    - [ ] MCNN (Decir que se eligió esta dado que el resultado es aleatorio)
+    - [ ] MCNN 
     - [ ] RNN
+    - [ ] Explicar deterioro de la solución inicial
+- [x] on 2015-06-20 12:43:45 | Agregar explicación de GGA 
+- [x] on 2015-06-20 12:43:46 | Agregar explicación de SGA
+- [x] on 2015-06-20 12:43:49 | Explicar Crossover
+- [x] on 2015-06-20 12:43:50 | Explicar Mutation
+- [x] on 2015-06-20 12:43:50 | Explicar Selection
+- [x] on 2015-06-19 19:04:43 | Explicar algoritmos evolutivos
 - [x] on 2015-06-02 20:35:04 | Descripción de GRASP
 - [x] on 2015-06-02 19:38:08 | Descripción de diferentes perturbaciones de ILS
     - [x] on 2015-06-02 19:38:08 | Comparación
