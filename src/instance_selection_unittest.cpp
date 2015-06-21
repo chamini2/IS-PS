@@ -305,6 +305,38 @@ TEST_F(GenericPointTest, MutateChildren) {
     EXPECT_NE(copy_map.SelectedPoints(), pop_map.SelectedPoints()); 
 }
 
+TEST(ClassifierTest, OneNNTestGood) {
+    
+    vector<double> attrs = { 0.0,0.0,1.0,0.0 }; 
+    int class_label = 1; 
+    GenericPoint p(class_label, attrs); 
+
+    set<GenericPoint> trs; 
+    trs.insert(p); 
+
+    int result_class = OneNN<GenericPoint,int>(p,trs); 
+    EXPECT_EQ(class_label, result_class); 
+}
+
+TEST(ClassifierTest, OneNNTestBad) {
+    
+    vector<double> attrs = { 0.0,0.0,1.0,0.0 }; 
+    int class_label = 1; 
+    GenericPoint p(class_label, attrs); 
+
+    set<GenericPoint> trs; 
+    trs.insert(p); 
+
+    vector<double> attrs_w = { 1.0,1.0,1.0,0.0 }; 
+    int class_label_w = 2; 
+    GenericPoint p_w(class_label_w, attrs_w); 
+
+    int result_class = OneNN<GenericPoint,int>(p_w,trs); 
+    EXPECT_NE(class_label_w, result_class); 
+    EXPECT_EQ(class_label, result_class); 
+}
+
+
 
 int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);

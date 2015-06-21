@@ -120,10 +120,15 @@ template<typename Point, typename Class>
         PopulationMap<Point, Class> curr_map =
             PopulationMap<Point, Class>::GreedyRandomAlgorithm(data, alpha, map.classifier(), map.evaluator(), map.mht());
 
+        if (curr_map.SelectedPoints().empty()) continue; 
+
         //assert(curr_map.data().size() == data.size());
 
         // Perform local search to improve result
         PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
+
+        if (candidate.SelectedPoints().empty()) continue; 
+
 
         // Evaluate and keep if better
         double curr_quality = candidate.EvaluateQuality();

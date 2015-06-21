@@ -743,6 +743,9 @@ public:
     }
 
     float EvaluateQuality(const set<Point>& testing_set) const {
+
+        if (selected_points_.empty()) return 0.0; 
+
         float classification_correctness = RunClassifier(selected_points_, testing_set);
         float reduction_percentage       = GetReductionPercentage();
 
@@ -1065,35 +1068,6 @@ private:
         if (testing_set.empty()) {
             return 0.0;
         }
-
-        // XXX: PARALLELISM IS SLOWER
-        /*memset(good_classifications_, 0, sizeof(good_classifications_));
-        thread classifiers[N_THREADS];
-
-        auto fun_ptr = &PopulationMap<Point, Class, classify, fitness>::ClassifyPoint;
-
-        // TODO: Parallelize this for
-        auto p = testing_set.begin();
-        for (int t = 0; p != testing_set.end(); ++p, t = (t + 1) % N_THREADS) {
-
-            classifiers[t] = thread(fun_ptr, this, t, *p, training_set);
-
-            // Wait all threads N_THREAD threads are used
-            if (t == N_THREADS - 1) {
-                for (int w = 0; w < N_THREADS; ++w) {
-                    classifiers[w].join();
-                }
-            }
-        }
-
-        // Collect the well classified points
-        int correct = 0;
-        for (int w = 0; w < N_THREADS; ++w) {
-            if (classifiers[w].joinable()) {
-                classifiers[w].join();
-            }
-            correct += good_classifications_[w];
-        }*/
 
         int correct = 0;
 
