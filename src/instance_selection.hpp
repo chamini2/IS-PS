@@ -832,12 +832,14 @@ public:
         return parents;
     }
 
-    // Replaces two points of the population for the two childrens (according
+    // Replaces two points of the population for the two children (according
     // to some criteria)
-    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > childrens,
+    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > children,
                         set<PopulationMap<Point,Class> >& population) {
+        return;
     }
-    // Combines two population maps to create two childrens
+
+    // Combines two population maps to create two children
     static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> >
                                 crossover(const PopulationMap<Point,Class>& fstp,
                                           const PopulationMap<Point,Class>& sndp) {
@@ -846,36 +848,37 @@ public:
         auto fstp_it = fstc.selected_points_.begin();
         auto sndp_it = sndc.selected_points_.begin();
 
-        // Randomply determine how many instances from each we're going to change
         srand(time(NULL));
-        fstp_break_point = rand() % fstc.selected_points_.size();
-        sndp_break_point = rand() % sndc.selected_points_.size();
 
+        // Randomly determine how many instances going to change
+        fstp_break_point = rand() % fstc.selected_points_.size();
         // Take some instances from fst and put them in snd
         repeat(fstp_break_point) {
             auto random_point_iterator =
-                std::next(std::begin(fstp.selected_points_),
-                          std::rand() % fstp.selected_points_.size());
+                std::next(std::begin(fstc.selected_points_),
+                          std::rand() % fstc.selected_points_.size());
 
             // Out of fstc
             fstc.toggle(*random_point_iterator, TOGGLE_OUT);
-            if (sndc.unselected_points_.find(*random_point_iterator) ==
-                                            sndc.unselected_points_.end()) {
+            if (sndc.selected_points_.find(*random_point_iterator) ==
+                                            sndc.selected_points_.end()) {
                 // In sndc, if it wasn't already there
                 sndc.toggle(*random_point_iterator, TOGGLE_IN);
             }
         }
 
+        // Randomly determine how many instances going to change
+        sndp_break_point = rand() % sndc.selected_points_.size();
         // Take some instances from snd and put them in fst
         repeat(sndp_break_point) {
             auto random_point_iterator =
-                std::next(std::begin(sndp.selected_points_),
-                          std::rand() % sndp.selected_points_.size());
+                std::next(std::begin(sndc.selected_points_),
+                          std::rand() % sndc.selected_points_.size());
 
             // Out of sndc
             sndc.toggle(*random_point_iterator, TOGGLE_OUT);
-            if (fstc.unselected_points_.find(*random_point_iterator) ==
-                                            fstc.unselected_points_.end()) {
+            if (fstc.selected_points_.find(*random_point_iterator) ==
+                                            fstc.selected_points_.end()) {
                 // In fstc, if it wasn't already there
                 fstc.toggle(*random_point_iterator, TOGGLE_IN);
             }
@@ -917,7 +920,6 @@ private:
                                                                          : selected_points_);
         int n_point_attributes = non_empty_set.begin()->attributes().size();
         vector<double>& tmp_totals = class_totals_[p.ClassLabel()];
-
 
         if (tmp_totals.empty()) {
             tmp_totals = vector<double>(n_point_attributes, 0.0);

@@ -41,20 +41,20 @@ Result Test::run() {
     pair<float, float> correct, reducti, quality;
 
 
-    // attributes_[0] = Training dataset 
-    // attributes_[1] = Testing dataset 
+    // attributes_[0] = Training dataset
+    // attributes_[1] = Testing dataset
     // attributes_[2] = Metaheuristic to use
     // attributes_[3] = Evaluator function
 
     // Read points
-    set<GenericPoint> points(GenericPoint::load(attributes_[0].c_str())); 
+    set<GenericPoint> points(GenericPoint::load(attributes_[0].c_str()));
     PopulationMap<GenericPoint, int> pop_map(points, 1, &OneNN<GenericPoint, int>,
                                              em[attributes_[3]], mthm[attributes_[2]]);
 
     pop_map.InitialSolution();
 
     // Read testing set
-    set<GenericPoint> testing_set(GenericPoint::load(attributes_[1].c_str())); 
+    set<GenericPoint> testing_set(GenericPoint::load(attributes_[1].c_str()));
     stats = pop_map.SolutionStatistics(testing_set);
 
     PopulationMap<GenericPoint, int> best_map = pop_map.resolve();
