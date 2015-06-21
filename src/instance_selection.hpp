@@ -743,6 +743,9 @@ public:
     }
 
     float EvaluateQuality(const set<Point>& testing_set) const {
+
+        if (selected_points_.empty()) return 0.0; 
+
         float classification_correctness = RunClassifier(selected_points_, testing_set);
         float reduction_percentage       = GetReductionPercentage();
 
