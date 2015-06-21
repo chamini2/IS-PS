@@ -834,26 +834,112 @@ public:
 
     // Replaces two points of the population for the two children (according
     // to some criteria)
-    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > children,
-                        set<PopulationMap<Point,Class> >& population) {
-        return;
+    static void replace(pair< PopulationMap<Point,Class>, PopulationMap<Point,Class> > children,
+                        set< PopulationMap<Point,Class> >& population) {
+
+        auto fst_remove_it = population.end();
+        auto snd_remove_it = population.end();
+        float fst_remove_eq, snd_remove_eq;
+
+        bool fst_out = population.find(fst) == population.end();
+        bool snd_out = population.find(snd) == population.end();
+
+        // Trying to insert elements already in the population
+        if (!fst_out && !snd_out) {
+            return;
+        }
+
+        // Find the two worst instances in the current population
+        for (auto it = population.begin(); it != population.end(); it++) {
+
+            float it_eq = it->EvaluateQuality();
+
+            // First instance to take
+            if (fst_remove_it == population.end()) {
+                fst_remove_it = it;
+                fst_remove_eq = it_eq;
+                continue;
+            }
+
+            // First instance to take
+            if (snd_remove_it == population.end()) {
+                snd_remove_it = it;
+                snd_remove_eq = it_eq;
+                continue;
+            }
+
+            if (it_eq < fst_remove_eq) {
+                // Found a new worst by comparing to fst
+                if (fst_remove_eq < snd_remove_eq) {
+                    // Keeping the worst two
+                    snd_remove_it = it;
+                    snd_remove_eq = it_eq;
+                } else {
+                    fst_remove_it = it;
+                    fst_remove_eq = it_eq;
+                }
+            } else if (it_eq < fst_remove_eq) {
+                snd_remove_it = it;
+                snd_remove_eq = it_eq;
+            }
+        }
+
+        // Insert both found, if they're not in the population yet
+        PopulationMap<Point,Class> fst, snd;
+        float fst_eq = fst.EvaluateQuality();
+        float snd_eq = snd.EvaluateQuality();
+
+        // fst has the smallest one
+        if (snd_eq < fst_eq) {
+            float temp_eq = fst_eq;
+            fst_eq = snd_eq;
+            snd_eq = temp_eq;
+
+            fst = children.second;
+            snd = children.first;
+        }
+
+        // fst has the smallest one
+        if (snd_remove_eq < fst_remove_eq) {
+            auto temp_eq = fst_remove_eq;
+            fst_remove_eq = snd_remove_eq;
+            snd_remove_eq = temp_eq;
+
+            auto temp_it = fst_remove_it;
+            fst_remove_it = snd_remove_it;
+            snd_remove_it = temp_it;
+        }
+
+        if ((fst_remove_eq < fst_eq) && fst_out) {
+            population.erase(fst_remove_it);
+            population.insert(fst);
+
+            if ((snd_remove_eq < snd_eq) && snd_out) {
+                population.erase(snd_remove_it);
+                population.insert(snd);
+            }
+        } else if ((fst_remove_eq < snd_eq) && snd_out) {
+            population.erase(fst_remove_it);
+            population.insert(snd);
+        }
+
     }
 
     // Combines two population maps to create two children
     static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> >
                                 crossover(const PopulationMap<Point,Class>& fstp,
                                           const PopulationMap<Point,Class>& sndp) {
-        int fstp_break_point, sndp_break_point;
+        int fst_break_point, snd_break_point;
         PopulationMap<Point,Class> fstc(fstp), sndc(sndp);
-        auto fstp_it = fstc.selected_points_.begin();
-        auto sndp_it = sndc.selected_points_.begin();
+        auto fst_it = fstc.selected_points_.begin();
+        auto snd_it = sndc.selected_points_.begin();
 
         srand(time(NULL));
 
-        // Randomly determine how many instances going to change
-        fstp_break_point = rand() % fstc.selected_points_.size();
+        // Randomly determine how many instances to take out
+        fst_break_point = rand() % fstc.selected_points_.size();
         // Take some instances from fst and put them in snd
-        repeat(fstp_break_point) {
+        repeat(fst_break_point) {
             auto random_point_iterator =
                 std::next(std::begin(fstc.selected_points_),
                           std::rand() % fstc.selected_points_.size());
@@ -867,10 +953,10 @@ public:
             }
         }
 
-        // Randomly determine how many instances going to change
-        sndp_break_point = rand() % sndc.selected_points_.size();
+        // Randomly determine how many instances to take out
+        snd_break_point = rand() % sndc.selected_points_.size();
         // Take some instances from snd and put them in fst
-        repeat(sndp_break_point) {
+        repeat(snd_break_point) {
             auto random_point_iterator =
                 std::next(std::begin(sndc.selected_points_),
                           std::rand() % sndc.selected_points_.size());
