@@ -127,6 +127,8 @@ template<typename Point, typename Class>
         // Perform local search to improve result
         PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
 
+        if (candidate.SelectedPoints().empty()) continue; 
+
 
         // Evaluate and keep if better
         double curr_quality = candidate.EvaluateQuality();
