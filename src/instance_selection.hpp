@@ -826,8 +826,8 @@ public:
 
         // Insert both found, if they're not in the population yet
         PopulationMap<Point,Class> fst, snd;
-        float fst_eq = fst.EvaluateQuality();
-        float snd_eq = snd.EvaluateQuality();
+        float fst_eq = children.first.EvaluateQuality();
+        float snd_eq = children.second.EvaluateQuality();
 
         // fst has the smallest one
         if (snd_eq < fst_eq) {
@@ -854,17 +854,34 @@ public:
             snd_remove_it = temp_it;
         }
 
-        if ((fst_remove_eq < fst_eq) && fst_out) {
-            population.erase(fst_remove_it);
-            population.insert(fst);
+        if (fst_remove_it != population.end()) {
 
-            if ((snd_remove_eq < snd_eq) && snd_out) {
-                population.erase(snd_remove_it);
+            if ((fst_remove_eq < fst_eq) && fst_out) {
+                population.erase(fst_remove_it);
+                population.insert(fst);
+
+                if (snd_remove_it != population.end()) {
+                    if ((snd_remove_eq < snd_eq) && snd_out) {
+                        population.erase(snd_remove_it);
+                        population.insert(snd);
+                    }
+                }
+            } else if ((fst_remove_eq < snd_eq) && snd_out) {
+                population.erase(fst_remove_it);
                 population.insert(snd);
             }
-        } else if ((fst_remove_eq < snd_eq) && snd_out) {
-            population.erase(fst_remove_it);
-            population.insert(snd);
+
+        } else {
+
+            if (snd_remove_it != population.end()) {
+                if ((snd_remove_eq < fst_eq) && fst_out) {
+                    population.erase(snd_remove_it);
+                    population.insert(fst);
+                } else if ((snd_remove_eq < snd_eq) && snd_out) {
+                    population.erase(snd_remove_it);
+                    population.insert(snd);
+                }
+            }
         }
 
     }

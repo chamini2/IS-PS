@@ -191,7 +191,7 @@ template<typename Point, typename Class>
     // XXX: Need to decide the size
     const int population_size = 100;
     // Need to decide the mutation params (for now is 50% of probability
-    // and 10% of the data size perturbations
+    // and 10% of the data size perturbations)
     const float mutation_percentage = 0.5;
     const int mutation_perturbations = map.data().size() * 0.1;
 
@@ -209,6 +209,7 @@ template<typename Point, typename Class>
         PopulationMap<Point,Class>::replace(children, population);
 
         PopulationMap<Point,Class> new_best(PopulationMap<Point,Class>::GetBestSolution(population));
+        cout << endl << new_best.EvaluateQuality() << " and " << best_solution.EvaluateQuality();
         if (new_best.EvaluateQuality() > best_solution.EvaluateQuality()) {
             best_solution = new_best;
         }
