@@ -163,14 +163,14 @@ template<typename Point, typename Class>
         set<PopulationMap<Point,Class> > descendants;
 
         while (descendants.size() < population_size) {
-            auto parents   = PopulationMap<Point,Class>::select(population);
-            auto childrens = PopulationMap<Point,Class>::crossover(parents[0], parents[1]);
+            auto parents = PopulationMap<Point,Class>::select(population);
+            auto children = PopulationMap<Point,Class>::crossover(parents[0], parents[1]);
 
-            childrens.first.mutate(mutation_perturbations, mutation_percentage);
-            childrens.second.mutate(mutation_perturbations, mutation_percentage);
+            children.first.mutate(mutation_perturbations, mutation_percentage);
+            children.second.mutate(mutation_perturbations, mutation_percentage);
 
-            descendants.insert(childrens.first);
-            descendants.insert(childrens.second);
+            descendants.insert(children.first);
+            descendants.insert(children.second);
         }
 
         population = descendants;
@@ -201,12 +201,12 @@ template<typename Point, typename Class>
     PopulationMap<Point,Class> best_solution(PopulationMap<Point,Class>::GetBestSolution(population));
 
     repeat(iterations) {
-        auto parents   = PopulationMap<Point,Class>::select(population);
-        auto childrens = PopulationMap<Point,Class>::crossover(parents[0], parents[1]);
+        auto parents  = PopulationMap<Point,Class>::select(population);
+        auto children = PopulationMap<Point,Class>::crossover(parents[0], parents[1]);
 
-        childrens.first.mutate(mutation_perturbations, mutation_percentage);
-        childrens.second.mutate(mutation_perturbations, mutation_percentage);
-        PopulationMap<Point,Class>::replace(childrens, population);
+        children.first.mutate(mutation_perturbations, mutation_percentage);
+        children.second.mutate(mutation_perturbations, mutation_percentage);
+        PopulationMap<Point,Class>::replace(children, population);
 
         PopulationMap<Point,Class> new_best(PopulationMap<Point,Class>::GetBestSolution(population));
         if (new_best.EvaluateQuality() > best_solution.EvaluateQuality()) {

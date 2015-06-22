@@ -203,8 +203,8 @@ public:
         // Greedy
         MCNN();
         // Deteriorate solution so the metaheuristic can improve more
-         const float insertion_percentage = 0.1;
-         DeteriorateSolution(insertion_percentage);
+        const float insertion_percentage = 0.1;
+        DeteriorateSolution(insertion_percentage);
         // XXX: This should not be executing always, only when needed
         // but for now it's done always
         ComputeCentroidsAndTotals();
