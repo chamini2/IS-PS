@@ -759,12 +759,30 @@ public:
     // Selects two population maps from a population
     static vector<PopulationMap<Point,Class> > select(const set<PopulationMap<Point,Class> >& population) {
 
+
+
         // Parent's random selection
         auto parent1_itr = std::next(std::begin(population),
                                       rand() % population.size());
 
+        while (parent1_itr->SelectedPointsSize() == 0 && 
+                parent1_itr->UnselectedPointsSize() == 0) {
+            parent1_itr = std::next(std::begin(population), 
+                                        rand() % population.size());
+        
+        }
+
         auto parent2_itr = std::next(std::begin(population),
                                       rand() % population.size());
+
+        while (parent2_itr->SelectedPointsSize() == 0 && 
+                parent2_itr->UnselectedPointsSize() == 0) {
+            parent2_itr = std::next(std::begin(population), 
+                                        rand() % population.size());
+        
+        }
+
+
 
         vector<PopulationMap<Point,Class> > parents;
         parents.reserve(2);
