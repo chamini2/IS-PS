@@ -189,7 +189,7 @@ template<typename Point, typename Class>
         SteadyStateGeneticAlgorithm(const PopulationMap<Point,Class>& map,
                                        int iterations) {
     // XXX: Need to decide the size
-    const int population_size = 100;
+    const int population_size = 50;
     // Need to decide the mutation params (for now is 50% of probability
     // and 10% of the data size perturbations)
     const float mutation_percentage = 0.5;
