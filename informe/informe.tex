@@ -38,9 +38,9 @@ El uso de clasificadores para determinar la clase de algún \textit{documento} e
 
 Entre las metaheurísticas probadas, tenemos Búsqueda Local, Búsqueda Local Iterada, GRASP y algoritmos evolutivos como GGA (Algoritmo Genético Generacional) y SGA (Algoritmo Genético Estacionario), y  dentro de ellas, se hizo uso de una función objetivo exponencial que prioriza la clasificación sobre la reducción para comparar soluciones y de una perturbación inteligente, la cual prioriza aquellos puntos que potencialmente mejoren más la solución.
 
-XXX INSERTAR RESUMEN DE RESULTADOS XXX
-XXX INSERTAR RESUMEN DE CONCLUSIONES XXX
+Búsqueda local mostró ser inferior a las metaheurísticas de trayectoria para la resolución del problema de selección de instancia, a pesar de que GRASP mostró un poco de inestabilidad con conjuntos de datos grandes e ILS una ejecución lenta.
 
+XXX Insertar resultados de algoritmos evolutivos XXX
 
 \end{abstract}
 
@@ -109,7 +109,19 @@ En los experimentos realizados en este estudio, se consideró el uso de búsqued
 \end{figure}
 
 \section{Metaheurísticas a implementar}
-En esta sección se hablará de las metaheurísticas que fueron implementadas con sus respectivas modificaciones para tratar el problema de selección de instancia. A continuación se hablará de búsqueda local (LS), búsqueda local iterada (ILS), GRASP, y algoritmos evolutivos como GGA y SGA.
+En esta sección se hablará de las metaheurísticas que fueron implementadas con sus respectivas modificaciones para tratar el problema de selección de instancia. A continuación se hablará de la solución inicial a la cual será aplicada la metaheurística, y lluego de las metaheurísticas búsqueda local (LS), búsqueda local iterada (ILS), GRASP, y algoritmos evolutivos como GGA y SGA.
+
+\subsection{Solución inicial}
+
+En este trabajo se consideraron varias soluciones iniciales a implementar:  
+\begin{itemize}
+\item Selección de todos los puntos: Se inicia de una solución que contenga todos los puntos del conjunto TR.
+\item Selección aleatoria: Se inicia de una solución que contenga un porcentaje de los puntos de TR seleccionados de forma aleatoria.
+\item CNN: Se aplica el algoritmo CNN para obtener la solución inicial.
+\item MCNN: Se aplica el algoritmo MCNN para obtener la solución inicial.
+\end{itemize}
+
+De todas estas se decidió implementar MCNN puesto que la misma es una solución bastante buena y balanceada en cuanto a las clases que contiene. El único inconveniente es que puede generar una solución cercana al óptimo, lo que impide que la metaheurística realice una reducción considerable con respecto al original. Es por esto que se añadió un \textit{deterioro} a esta solución, añandiendo de forma aleatoria un 10\% de los puntos del conjunto total a la solución obtenida.
 \subsection{Búsqueda local (LS)}\label{sect:ls}
 
 La búsqueda local consiste en partir de una solución inicial, que va a ser modificada por un operador de vecindad que genera otra solución factible. Luego, la solución actual se compara con la solución generada a través de una función de evaluación de calidad, y se desecha la peor de ambas para recurrir en el mismo proceso con la restante.
@@ -186,23 +198,6 @@ Para la selección de las instancias a intercambiar, se tomaron en cuenta dos es
 \subsection{Búsqueda local iterada (ILS)}
 La búsqueda local iterada se trata de realizar una búsqueda local sobre una solución inicial para obtener una mejor solución, la cual se perturba para generar una nueva solución inicial que se utiliza para realizar el mismo proceso. La solución perturbada puede ser mejor o peor que la solución generada por la búsqueda local, dado que lo que se quiere obtener al realizar dicha perturbación es expandir el espacio de búsqueda (lo que puede generar una solución peor pero que al realizar la búsqueda local sobre ella, lleve a un valor mejor que el encontrado) o mejorar aún más la solución actual.
 
-En los experimentos a realizar en esta metaheurística se tomaron en cuenta 2 formas de perturbación de soluciones:
-
-\begin{itemize}
-    \item [\textbf{Perturbación aleatoria}:] Se perturba de forma aleatoria pero reservada, es decir, sólo se cambia una pequeña cantidad de atributos al azar de la solucion a perturbar para que la misma se mantenga en la misma localidad.
-    \item [\textbf{Perturbación \textit{Greedy}}:] Se perturba la solución con un algoritmo \textit{Greedy} como \textit{CNN }o \textit{MCNN}, los cuales generan soluciones aleatorias que pueden tener una cantidad de cambios considerables. Esta perturbación puede generar soluciones incluso peores que la inicial, pero que diversifica el espacio de búsqueda para acceder a otras localidades.
-\end{itemize}
-
-La idea detrás de estos tipos de perturbación es mejorar las soluciones que se puedan encontrar con el algoritmo. Una vez ejecutada una búsqueda local, existen dos escenarios posibles: El primero es que la búsqueda no llegó a generar el mejor valor local, para lo cual se ejecuta el primer tipo de perturbación intentando así alcanzarlo. Y el segundo es que la búsqueda local sí consiguipo el mejor valor local, por lo que es necesario salir del mismo para ampliar el espacio de búsqueda cayendo en otra localidad de búsqueda y para ello se ejecuta el segundo tipo de perturbación. Para una referencia visual, ver la figura~\ref{fig:perturbaciones}.
-
-% FIGURA DE TIPOS DE PERTURBACIÓN
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\linewidth]{perturbaciones}
-    \caption{Ejemplo de tipos de perturbación. Rojo: Perturbación aleatoria y resultado, Azul: Perturbación Greedy y resultado}
-    \label{fig:perturbaciones}
-\end{figure}
-
 \subsection{\textit{\textbf{Greedy Randomized Adaptive Search Procedures}} (GRASP)}
 
 GRASP (por sus siglas en inglés \textit{Greedy Randomized Adaptive Search Procedures}) es una metaheurística de trayectoria que hace uso de un algoritmo \textit{Greedy} aleatorio para generar soluciones diversas y de esta forma recorrer la mayor cantidad de vecindades del espacio de búsqueda. En cada iteración se hace uso de dicho algoritmo para generar una solución aleatoria y luego a esta se le aplica una búsqueda local para intentar mejorarla (Véase el algoritmo~\ref{alg:grasp}). Cabe destacar que toda solución es generada desde cero y no depende de ninguna solución anterior, por lo que se pueden explorar distintas vecindades y llegar a un mejor resultado.
@@ -263,7 +258,7 @@ Los algoritmos genéticos son metaheurísticas que hacen alusión a la metáfora
 \item \textbf{Selección}: Este operador permite definir qué individuos van a participar en la recombinación o cruce y a su vez, los genes que pasarán a las siguientes generaciones. Simula el proceso de selección natural.
 \end{itemize}
 
-En nuestor caso particular, la mutación consiste en perturbar la solución que representa el individuo $n$ veces, la selección es completamente aleatoria, y la recombinación/cruce es XXX INSERTAR DESCRIPCION DE RECOMBINACION/CRUCE XXX
+En nuestor caso particular, la mutación consiste en perturbar la solución que representa el individuo $n$ veces, la selección es completamente aleatoria, y el algoritmo de recombinación/cruce utilizado es el de recombinación en un punto; tomamos dos poblaciones como \textit{padres}, se elige aleatoriamente un punto de corte en la longitud de ambos padres; los \textit{hijos} resultan de combinar la sección izquierda del corte de un padre con la sección derecha del corte del otro, y viceversa.
 
 El esquema más tradicional que define el uso de estos operadores son los \textit{Algoritmos Genéticos}. A continuación se definen dos algoritmos: GGA y SGA
 
@@ -336,8 +331,10 @@ En cada iteración se eligen dos individuos padres mediante el operador de selec
 \section{Evaluación experimental}
 En esta sección se hablará de la configuración usada sobre los experimentos para probar y comparar las metaheurísticas búsqueda local, búsqueda local iterada, GRASP, GGA y SGA y de los resultados arrojados por las mismas.
 
+\subsection{Ambiente de prueba}
+Es importante definir un ambiente de pruebas igual para todos los experimentos que se vayan a realizar para que sea posible la comparación entre ellos, sobre todo en términos de tiempo. En este trabajo se realizaron pruebas en una máquina que corre sobre Debian \textit{Wheezy} con procesador Intel Core i7 de 3.4 Ghz y 8 GB de memoria RAM. 
 \subsection{Conjunto de datos}
-
+	
 Un factor importante para la evaluación de las diferentes metaheurísticas es el conjunto de datos a utilizar, la distribución de los datos, el número de instancias, el número de atributos de cada una de ellas y la cantidad de datos ruidosos ya que los mismos influyen en el espacio de búsqueda y por ende en la efectivdad del algoritmo. 
 
 Los conjuntos de datos usados para estos experimentos pertenecen originalmente a \textit{UCI Machine Learning Repository}~\cite{Lichman:2013} pero se obtuvo una modificación de los mismos basada en la estrategia de validación cruzada en 10 grupos (10-\textit{fold} \textit{cross-validation}) del \textit{KEEL Data-Mining Software Tool}~\cite{alcala2010keel}. Se usaron 6 conjuntos para realizar dichas evaluaciones, separando los datos en tres grupos según el número de instancias. En el cuadro~\ref{table:small-dataset} se puede ver con más detalle los conjunto de datos pequeños, en el cuadro~\ref{table:medium-dataset} los medianos y en el cuadro~\ref{table:large-dataset} los grandes.
@@ -361,7 +358,6 @@ Los conjuntos de datos usados para estos experimentos pertenecen originalmente a
 	\hline
 	Conjunto & Instancias & Atributos & Clases \\
 	\hline
-	Australian & 690 & 14 & 2 \\
 	WDBC & 596 & 30 & 2 \\
 	Pima & 768 & 8 & 2 \\
 	\end{tabular}
@@ -376,7 +372,7 @@ Los conjuntos de datos usados para estos experimentos pertenecen originalmente a
 	\hline
 	Conjunto & Instancias & Atributos & Clases \\
 	\hline
-	Abalone & 4174 & 8 & 28 \\
+	Segment & 2310 & 19 & 7 \\
 	\end{tabular}
 	\caption{Conjunto de datos grande}
 	\label{table:large-dataset}
@@ -393,22 +389,126 @@ En las diferentes metaheurísticas hay parámetros que regulan el proceso de bú
 	\hline
 	Parámetro & LS & ILS & GRASP & GGA & SGA \\
 	\hline
-	Iteraciones & 1000 & 1000 & 1000 & 1000 & 1000 \\
+	Iteraciones & 1000 & 1000 & 1000 & 100 & 100 \\
 	Iteraciones LS & - & 100 & 100 & - & - \\
-	\textit{Classification rate} & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 \\
-	\textit{Greediness rate} & - & - & 0.5 & - & - \\
+	\textit{Classification} & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 \\
+	\textit{Greediness} & - & - & 0.5 & - & - \\
 	Población & - & - & - & 50 & 50 \\
 	Prob. de cruce & - & - & - & 1.0 & 1.0 \\
-	Prob. de mutación & - & - & - & XXX & XXX \\
-	N perturbaciones & - & - & - & XXX & XXX \\
+	Prob. de mutación & - & - & - & 0.5 & 0.5 \\
+	\% perturbaciones & - & - & - & 0.1 & 0.1 \\
 	\end{tabular}
-	\caption{Conjunto de datos pequeños}
+	\caption{Parámetros entonados para las metaheurísticas}
 	\label{table:parameters}
 \end{table}
 
+\textit{Classification} se refiere al peso de la clasificación sobre la reducción, es decir, $\alpha$ en la ecuación~\ref{eq:exp}, \textit{Greediness} es qué tan \textit{Greedy} es el algoritmo \textit{Greedy} aleatorio usado en GRASP (mientras se acerca a 1, se hace más \textit{Greedy}), y el \% de perturbaciones es el porcentaje sobre el número total de puntos del conjunto que define cuantas perturbaciones se harán para modificar los descendientes generados con el operador de Mutación.
+
 
 \subsection{Resultados}
-%\section*{Conclusiones}
+En esta sección se muestran los resulados obtenidos luego de hacer la evaluación experimental. Se harán comparaciones de las metaheurísticas en cada uno de los conjunto de datos utilizados por separado.
+
+Se tomaron 10 ejecuciones de los 10 grupos de validación cruzada y se promediaron en las tablas~\ref{table:ls-result} ,~\ref{table:ils-result} ,~\ref{table:grasp-result} ,~\ref{table:gga-result} y~\ref{table:sga-result} tomando en cuenta porcentaje de clasificación, porcentaje de reducción y tiempo de ejecución.
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c c c c}
+	\hline
+	Conjunto & Clasificación & Reducción & Tiempo (seg) \\
+	\hline
+	Glass & 0.64 & 0.58 & 1.4 \\
+	Iris & 0.94 & 0.89 & 0.2 \\
+	WDBC & 0.92 & 0.87 & 69.4 \\
+	Pima & 0.64 & 0.56 & 151.3 \\
+	Segment & 0.96 & 0.77 & 214.8 \\
+	\end{tabular}
+	\caption{Resultados Búsqueda Local}
+	\label{table:ls-result}
+\end{table}
+
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c c c c}
+	\hline
+	Conjunto & Clasificación & Red	ucción & Tiempo (seg) \\
+	\hline
+	Glass & 0.68 & 0.65 & 56 \\
+	Iris & 0.97 & 0.96 & 11 \\
+	WDBC & 0.92 & 0.97 & 196 \\
+	Pima & 0.65 & 0.59 & 661 \\
+	Segment & 0.95 & 0.9 & 786.2 \\
+	\end{tabular}
+	\caption{Resultados Búsqueda Local Iterada}
+	\label{table:ils-result}
+\end{table}
+
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c c c c}
+	\hline
+	Conjunto & Clasificación & Reducción & Tiempo (seg) \\
+	\hline
+	Glass & 0.68 & 0.93 & 56 \\
+	Iris & 0.95 & 0.96 & 24 \\
+	WDBC & 0.93 & 0.99 & 72 \\
+	Pima & 0.73 & 0.99 & 46.03 \\
+	Segment & 0.85 & 0.88 & 335.6 \\
+	\end{tabular}
+	\caption{Resultados GRASP}
+	\label{table:grasp-result}
+\end{table}
+
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c c c c}
+	\hline
+	Conjunto & Clasificación & Reducción & Tiempo (seg) \\
+	\hline
+	Glass & & & \\
+	Iris & & & \\
+	WDBC & & & \\
+	Pima & & & \\
+	Segment & & & \\
+	\end{tabular}
+	\caption{Resultados GGA}
+	\label{table:gga-result}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c c c c}
+	\hline
+	Conjunto & Clasificación & Reducción & Tiempo (seg) \\
+	\hline
+	Glass & & & \\
+	Iris & & & \\
+	WDBC & & & \\
+	Pima & & & \\
+	Segment & & & \\
+	\end{tabular}
+	\caption{Resultados SGA}
+	\label{table:sga-result}
+\end{table}
+
+
+Se puede ver una tendencia a mantener el porcentaje de clasificación para LS, ILS y GRASP lo que se puede deber al 0.9 que se le da de peso a la clasificación en la función objetivo. Pero por otro lado, en general, GRASP muestra una reducción muy superior con respecto a LS e ILS, lo que sugiere que la función \textit{Greedy} aleatoria está haciendo una buena selección de los candidatos a utilizar, por lo que se puede concluir que la función de costo incremental basada en la distancia del centroide es una buena opción para esta metaheurística.
+
+En cuanto a los tiempos de ejecución, ILS es más lento que LS y GRASP a medida que el conjunto de datos aumenta el tamaño, y estas dos últimos tienen tiempos de ejecución aceptables.
+
+Por otro lado, en las figuras 1,2,3,4 y 5 XXINSERTAR BOXPLOTSXXX, podemos observar una comparación de las metaheurísticas por conjunto de datos. En la clasificación, se ve que siempre se solapan las cajas en el diagrama, lo que indica cierta similitud en los resultados, pero si se detalla la figura 5 XXXDiagrama de segmentXXX, GRASP no parece ser muy estable pues la clasificación es muy dispersa en comparación de LS e ILS. 
+
+Con respecto a la reducción, se puede notar una superioridad de GRASP sobre LS e ILS, pero de nuevo siendo poco estable en el conjunto segment. Las cajas en los diagramas de GRASP abarcan pocos valores y casi no hay \textit{outliers}.
+
+
+
+\section*{Conclusiones}
+
+Podemos concluir que Búsqueda Local es inferior como metaheurística a la hora de resolver el problema de selección de instancias con respecto a las metaheurísticas de trayectoria ILS y GRASP. GRASP arrojó mejores resultados que ILS, pero menor estabilidad, a diferencia de ILS que arrojó resultados más estables pero que se hacían muy lentos a medida que el conjunto de datos aumentaba su tamaño.
+
+Por otra parte, darle un peso mayor a la clasificación que a la reducción mostró resultados favorables dado que las metaheurísticas mantienen el porcentaje de clasificación luego de haber reducido el número de puntos. Y finalmente, la función de costo incremental basada en la distancia del centroide, resultó ser positiva para la \textit{perturbación inteligente} de la búsqueda local y el algoritmo \textit{Greedy} aleatorio de GRASP.
 %---------------------------- Bibliography -------------------------------
 
 % Please add the contents of the .bbl file that you generate,  or add bibitem entries manually if you like.

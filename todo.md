@@ -7,20 +7,22 @@
     - [x] on 2015-06-19 18:21:04 | En perturbación aleatoria: habla de perturbar atributos, y es perturbar soluciones
     - [x] on 2015-06-19 18:21:05 | En GRASP: habla de manera aleatoria recorre la mayor cantidad de vecindades. Aclarar
     - [x] on 2015-06-19 18:21:07 | Algoritmo Greedy Aleatorio es diferente a GRASP
-- [ ] Explicar la selección random de la población
-- [ ] Agregar sección de conclusiones
 - [ ] Agregar sección de Experimentos
-    - [ ] Agregar resultados
-    - [ ] Agregar análisis de resultados
+    - [ ] Agregar resultados GGA
+    - [ ] Agregar resultados SGA
+    - [x] on 2015-06-22 01:29:03 | Agregar resultados
+    - [x] on 2015-06-22 01:29:04 | Agregar análisis de resultados
     - [x] on 2015-06-20 18:39:16 | Explicar parámetros usados
-- [ ] Cambiar gráficas de funciones por las nuevas (con peso)
-- [ ] Agregar información de selección inicial al informe
-    - [ ] Todas las instancias
-    - [ ] Aleatorio
-    - [ ] CNN
-    - [ ] MCNN 
-    - [ ] RNN
-    - [ ] Explicar deterioro de la solución inicial
+- [x] on 2015-06-22 01:28:55 | Explicar la selección random de la población
+- [x] on 2015-06-22 01:28:59 | Agregar sección de conclusiones
+- [x] on 2015-06-22 01:29:07 | Cambiar gráficas de funciones por las nuevas (con peso)
+- [x] on 2015-06-22 01:42:31 | Agregar información de selección inicial al informe
+    - [x] on 2015-06-22 01:29:50 | Todas las instancias
+    - [x] on 2015-06-22 01:29:51 | Aleatorio
+    - [x] on 2015-06-22 01:42:25 | CNN
+    - [x] on 2015-06-22 01:42:26 | MCNN 
+    - [x] on 2015-06-22 01:42:26 | RNN
+    - [x] on 2015-06-22 01:42:29 | Explicar deterioro de la solución inicial
 - [x] on 2015-06-20 12:43:45 | Agregar explicación de GGA 
 - [x] on 2015-06-20 12:43:46 | Agregar explicación de SGA
 - [x] on 2015-06-20 12:43:49 | Explicar Crossover
