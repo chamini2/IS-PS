@@ -121,14 +121,14 @@ template<typename Point, typename Class>
         PopulationMap<Point, Class> curr_map =
             PopulationMap<Point, Class>::GreedyRandomAlgorithm(data, alpha, map.classifier(), map.evaluator(), map.mht());
 
-        if (curr_map.SelectedPoints().empty()) continue; 
+        if (curr_map.SelectedPoints().empty()) continue;
 
         //assert(curr_map.data().size() == data.size());
 
         // Perform local search to improve result
         PopulationMap<Point,Class> candidate = LocalSearchFirstFound<Point, Class>(curr_map, local_search_its);
 
-        if (candidate.SelectedPoints().empty()) continue; 
+        if (candidate.SelectedPoints().empty()) continue;
 
 
         // Evaluate and keep if better
@@ -148,9 +148,9 @@ template<typename Point, typename Class>
                                        int iterations) {
 
     // XXX: Need to decide the size
-    const int population_size = 100;
-    // Need to decide the mutation params (for now is 50% of probability
-    // and 10% of the data size perturbations
+    const int population_size = 50;
+    // We need to decide the mutation params (for now is 50% of probability
+    // and 10% of the data size perturbations)
     const float mutation_percentage = 0.5;
     const int mutation_perturbations = map.data().size() * 0.1;
 

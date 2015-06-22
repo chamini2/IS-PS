@@ -215,11 +215,10 @@ public:
 
         int elements = unselected_points_.size() * set_percentage;
 
-        srand(time(NULL));
         repeat(elements) {
             auto random_point_iterator =
                 std::next(std::begin(unselected_points_),
-                          std::rand() % unselected_points_.size());
+                          rand() % unselected_points_.size());
 
             toggle(*random_point_iterator, TOGGLE_IN);
         }
@@ -242,10 +241,9 @@ public:
         unselected_points_ = selected_points_;
         selected_points_.clear();
 
-        srand(time(NULL));
         auto random_point_iterator =
             std::next(std::begin(unselected_points_),
-                      std::rand() % unselected_points_.size());
+                      rand() % unselected_points_.size());
 
         Point point = *random_point_iterator;
 
@@ -272,7 +270,6 @@ public:
     void MCNN() {
 
         // MeasureTime mt("MCNN");
-        srand(time(NULL));
 
         // Start with the empty set C `selected_points_`
         unselected_points_ = selected_points_;
@@ -361,13 +358,13 @@ public:
         selected_points_.clear();
         unselected_points_.clear();
         // First we randomize the selected_points
-        for (auto itr = data.begin(); itr != data.end(); ++itr) {
+        for (auto& instance : data) {
             int use_in_solution = rand() % 2;
 
             if (use_in_solution == 1) {
-                selected_points_.insert(*itr);
+                selected_points_.insert(instance);
             } else {
-                unselected_points_.insert(*itr);
+                unselected_points_.insert(instance);
             }
         }
     }
@@ -426,7 +423,7 @@ public:
                                                                       : unselected_points_);
         auto random_point_iterator =
             std::next(std::begin(set_to_use),
-                      std::rand() % set_to_use.size());
+                      rand() % set_to_use.size());
 
         return *random_point_iterator;
     }
@@ -577,7 +574,7 @@ public:
 
             // Pick a random point from RCL
             auto random_point_iterator = std::next(std::begin(RCL),
-                                                   std::rand() % RCL.size());
+                                                   rand() % RCL.size());
 
             // Insert random point into solution and remove from RCL
             selected.insert(Point(*random_point_iterator));
@@ -600,9 +597,6 @@ public:
                        data.end(),
                        selected.begin(), selected.end(),
                        std::inserter(unselected, unselected.begin()));
-
-        //cout << selected.size() << " + " << unselected.size() << " = " << data.size() << endl << flush;
-
 
         return PopulationMap<Point,Class>(selected, unselected, 1, cls, eval, mht);
     }
@@ -713,14 +707,12 @@ public:
     // Genetic algorithm functions
 
     // Generates a random populatio of PopulatioMaps
-    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int population_size,
+    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int size,
                                                                      const set<Point>& data) {
 
         set<PopulationMap<Point,Class> > population;
 
-        srand(time(NULL));
-        repeat(population_size) {
-
+        while (population.size() < size) {
 
             // Generate random solution
             PopulationMap<Point,Class> solution(data);
@@ -755,7 +747,7 @@ public:
     void mutate(int perturbations, float mutation_percentage) {
 
         repeat(perturbations) {
-            double prob = double(rand()) / RAND_MAX;
+            float prob = float(rand()) / RAND_MAX;
             // mutation_percentage = 0.6, then if 0 <= prob <= mutation_percentage is
             // 60% of chances since prob is between 0 and 1
             if (prob <= mutation_percentage) {
@@ -767,13 +759,12 @@ public:
     // Selects two population maps from a population
     static vector<PopulationMap<Point,Class> > select(const set<PopulationMap<Point,Class> >& population) {
 
-        srand(time(NULL));
         // Parent's random selection
         auto parent1_itr = std::next(std::begin(population),
-                                      std::rand() % population.size());
+                                      rand() % population.size());
 
         auto parent2_itr = std::next(std::begin(population),
-                                      std::rand() % population.size());
+                                      rand() % population.size());
 
         vector<PopulationMap<Point,Class> > parents;
         parents.reserve(2);
@@ -1086,8 +1077,6 @@ private:
     static pair<set<Point>, set<Point> > PickRandomSet(const set<Point>& data) {
         set<Point> random_set;
         set<Point> rest;
-
-        srand(time(NULL));
 
         // XXX: Maybe here we should make the % of selected points a variable
         for (auto itr = data.begin(); itr != data.end(); ++itr) {

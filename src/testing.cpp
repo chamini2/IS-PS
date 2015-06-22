@@ -40,7 +40,6 @@ Result Test::run() {
     pair<int, int> n_points;
     pair<float, float> correct, reducti, quality;
 
-
     // attributes_[0] = Training dataset
     // attributes_[1] = Testing dataset
     // attributes_[2] = Metaheuristic to use
