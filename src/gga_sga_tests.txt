@@ -1,0 +1,89 @@
+# path/to/training,path/to/testing,algorithm,fitnessfunction
+# glass gga
+../data/small/glass/glass-10-1tra.dat,../data/small/glass/glass-10-1tst.dat,gga,eul
+../data/small/glass/glass-10-2tra.dat,../data/small/glass/glass-10-2tst.dat,gga,eul
+../data/small/glass/glass-10-3tra.dat,../data/small/glass/glass-10-3tst.dat,gga,eul
+../data/small/glass/glass-10-4tra.dat,../data/small/glass/glass-10-4tst.dat,gga,eul
+../data/small/glass/glass-10-5tra.dat,../data/small/glass/glass-10-5tst.dat,gga,eul
+../data/small/glass/glass-10-6tra.dat,../data/small/glass/glass-10-6tst.dat,gga,eul
+../data/small/glass/glass-10-7tra.dat,../data/small/glass/glass-10-7tst.dat,gga,eul
+../data/small/glass/glass-10-8tra.dat,../data/small/glass/glass-10-8tst.dat,gga,eul
+../data/small/glass/glass-10-9tra.dat,../data/small/glass/glass-10-9tst.dat,gga,eul
+../data/small/glass/glass-10-10tra.dat,../data/small/glass/glass-10-10tst.dat,gga,eul
+# glass sga
+../data/small/glass/glass-10-1tra.dat,../data/small/glass/glass-10-1tst.dat,sga,eul
+../data/small/glass/glass-10-2tra.dat,../data/small/glass/glass-10-2tst.dat,sga,eul
+../data/small/glass/glass-10-3tra.dat,../data/small/glass/glass-10-3tst.dat,sga,eul
+../data/small/glass/glass-10-4tra.dat,../data/small/glass/glass-10-4tst.dat,sga,eul
+../data/small/glass/glass-10-5tra.dat,../data/small/glass/glass-10-5tst.dat,sga,eul
+../data/small/glass/glass-10-6tra.dat,../data/small/glass/glass-10-6tst.dat,sga,eul
+../data/small/glass/glass-10-7tra.dat,../data/small/glass/glass-10-7tst.dat,sga,eul
+../data/small/glass/glass-10-8tra.dat,../data/small/glass/glass-10-8tst.dat,sga,eul
+../data/small/glass/glass-10-9tra.dat,../data/small/glass/glass-10-9tst.dat,sga,eul
+../data/small/glass/glass-10-10tra.dat,../data/small/glass/glass-10-10tst.dat,sga,eul
+# iris gga
+../data/small/iris/iris-10-1tra.dat,../data/small/iris/iris-10-1tst.dat,gga,eul
+../data/small/iris/iris-10-2tra.dat,../data/small/iris/iris-10-2tst.dat,gga,eul
+../data/small/iris/iris-10-3tra.dat,../data/small/iris/iris-10-3tst.dat,gga,eul
+../data/small/iris/iris-10-4tra.dat,../data/small/iris/iris-10-4tst.dat,gga,eul
+../data/small/iris/iris-10-5tra.dat,../data/small/iris/iris-10-5tst.dat,gga,eul
+../data/small/iris/iris-10-6tra.dat,../data/small/iris/iris-10-6tst.dat,gga,eul
+../data/small/iris/iris-10-7tra.dat,../data/small/iris/iris-10-7tst.dat,gga,eul
+../data/small/iris/iris-10-8tra.dat,../data/small/iris/iris-10-8tst.dat,gga,eul
+../data/small/iris/iris-10-9tra.dat,../data/small/iris/iris-10-9tst.dat,gga,eul
+../data/small/iris/iris-10-10tra.dat,../data/small/iris/iris-10-10tst.dat,gga,eul
+# iris sga
+../data/small/iris/iris-10-1tra.dat,../data/small/iris/iris-10-1tst.dat,sga,eul
+../data/small/iris/iris-10-2tra.dat,../data/small/iris/iris-10-2tst.dat,sga,eul
+../data/small/iris/iris-10-3tra.dat,../data/small/iris/iris-10-3tst.dat,sga,eul
+../data/small/iris/iris-10-4tra.dat,../data/small/iris/iris-10-4tst.dat,sga,eul
+../data/small/iris/iris-10-5tra.dat,../data/small/iris/iris-10-5tst.dat,sga,eul
+../data/small/iris/iris-10-6tra.dat,../data/small/iris/iris-10-6tst.dat,sga,eul
+../data/small/iris/iris-10-7tra.dat,../data/small/iris/iris-10-7tst.dat,sga,eul
+../data/small/iris/iris-10-8tra.dat,../data/small/iris/iris-10-8tst.dat,sga,eul
+../data/small/iris/iris-10-9tra.dat,../data/small/iris/iris-10-9tst.dat,sga,eul
+../data/small/iris/iris-10-10tra.dat,../data/small/iris/iris-10-10tst.dat,sga,eul
+# wdbc gga
+../data/medium/wdbc/wdbc-10-1tra.dat,../data/medium/wdbc/wdbc-10-1tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-2tra.dat,../data/medium/wdbc/wdbc-10-2tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-3tra.dat,../data/medium/wdbc/wdbc-10-3tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-4tra.dat,../data/medium/wdbc/wdbc-10-4tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-5tra.dat,../data/medium/wdbc/wdbc-10-5tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-6tra.dat,../data/medium/wdbc/wdbc-10-6tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-7tra.dat,../data/medium/wdbc/wdbc-10-7tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-8tra.dat,../data/medium/wdbc/wdbc-10-8tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-9tra.dat,../data/medium/wdbc/wdbc-10-9tst.dat,gga,eul
+../data/medium/wdbc/wdbc-10-10tra.dat,../data/medium/wdbc/wdbc-10-10tst.dat,gga,eul
+# wdbc sga
+../data/medium/wdbc/wdbc-10-1tra.dat,../data/medium/wdbc/wdbc-10-1tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-2tra.dat,../data/medium/wdbc/wdbc-10-2tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-3tra.dat,../data/medium/wdbc/wdbc-10-3tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-4tra.dat,../data/medium/wdbc/wdbc-10-4tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-5tra.dat,../data/medium/wdbc/wdbc-10-5tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-6tra.dat,../data/medium/wdbc/wdbc-10-6tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-7tra.dat,../data/medium/wdbc/wdbc-10-7tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-8tra.dat,../data/medium/wdbc/wdbc-10-8tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-9tra.dat,../data/medium/wdbc/wdbc-10-9tst.dat,sga,eul
+../data/medium/wdbc/wdbc-10-10tra.dat,../data/medium/wdbc/wdbc-10-10tst.dat,sga,eul
+# pima gga
+../data/medium/pima/pima-10-1tra.dat,../data/medium/pima/pima-10-1tst.dat,gga,eul
+../data/medium/pima/pima-10-2tra.dat,../data/medium/pima/pima-10-2tst.dat,gga,eul
+../data/medium/pima/pima-10-3tra.dat,../data/medium/pima/pima-10-3tst.dat,gga,eul
+../data/medium/pima/pima-10-4tra.dat,../data/medium/pima/pima-10-4tst.dat,gga,eul
+../data/medium/pima/pima-10-5tra.dat,../data/medium/pima/pima-10-5tst.dat,gga,eul
+../data/medium/pima/pima-10-6tra.dat,../data/medium/pima/pima-10-6tst.dat,gga,eul
+../data/medium/pima/pima-10-7tra.dat,../data/medium/pima/pima-10-7tst.dat,gga,eul
+../data/medium/pima/pima-10-8tra.dat,../data/medium/pima/pima-10-8tst.dat,gga,eul
+../data/medium/pima/pima-10-9tra.dat,../data/medium/pima/pima-10-9tst.dat,gga,eul
+../data/medium/pima/pima-10-10tra.dat,../data/medium/pima/pima-10-10tst.dat,gga,eul
+# pima sga
+../data/medium/pima/pima-10-1tra.dat,../data/medium/pima/pima-10-1tst.dat,sga,eul
+../data/medium/pima/pima-10-2tra.dat,../data/medium/pima/pima-10-2tst.dat,sga,eul
+../data/medium/pima/pima-10-3tra.dat,../data/medium/pima/pima-10-3tst.dat,sga,eul
+../data/medium/pima/pima-10-4tra.dat,../data/medium/pima/pima-10-4tst.dat,sga,eul
+../data/medium/pima/pima-10-5tra.dat,../data/medium/pima/pima-10-5tst.dat,sga,eul
+../data/medium/pima/pima-10-6tra.dat,../data/medium/pima/pima-10-6tst.dat,sga,eul
+../data/medium/pima/pima-10-7tra.dat,../data/medium/pima/pima-10-7tst.dat,sga,eul
+../data/medium/pima/pima-10-8tra.dat,../data/medium/pima/pima-10-8tst.dat,sga,eul
+../data/medium/pima/pima-10-9tra.dat,../data/medium/pima/pima-10-9tst.dat,sga,eul
+../data/medium/pima/pima-10-10tra.dat,../data/medium/pima/pima-10-10tst.dat,sga,eul
