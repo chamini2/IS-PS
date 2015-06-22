@@ -209,7 +209,6 @@ template<typename Point, typename Class>
         PopulationMap<Point,Class>::replace(children, population);
 
         PopulationMap<Point,Class> new_best(PopulationMap<Point,Class>::GetBestSolution(population));
-        cout << endl << new_best.EvaluateQuality() << " and " << best_solution.EvaluateQuality();
         if (new_best.EvaluateQuality() > best_solution.EvaluateQuality()) {
             best_solution = new_best;
         }
