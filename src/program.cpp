@@ -13,6 +13,7 @@ using std::unordered_map;
 #include <iostream>
 using std::cout;
 using std::endl;
+using std::flush;
 
 using std::pair;
 using std::make_pair;
@@ -72,7 +73,6 @@ vector<Test> load(const char* filename) {
 }
 
 
-
 int main(int argc, char *argv[]) {
 
     if (argc < 2) {
@@ -82,8 +82,14 @@ int main(int argc, char *argv[]) {
 
     vector<Test> tests = load(argv[1]);
 
+    // Randomness for the whole program
+    srand(time(NULL));
+
+    // Consider the iterations to use
+    const int iterations = 100;
+
     for (Test t : tests) {
-        cout << t << t.run() << endl;
+        cout << t << flush << t.run(iterations) << endl;
     }
 
     return 0;

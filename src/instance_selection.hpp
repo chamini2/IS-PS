@@ -71,59 +71,7 @@ using std::iterator;
 
 #include "point_instances.hpp"
 
-// Forward declaration
-#include "testing.hpp"
-
-// Class to measure time. The objects will serve as "function decorators"
-class MeasureTime {
-public:
-    MeasureTime(string fn) {
-        function_name_ = fn;
-        begin_         = clock();
-        result_        = NULL;
-        print_         = true;
-        ++deepness;
-    }
-
-    MeasureTime(string fn, Result *result) {
-        function_name_ = fn;
-        begin_         = clock();
-        result_        = result;
-        print_         = true;
-        ++deepness;
-    }
-
-    MeasureTime(string fn, Result *result, bool print) {
-        function_name_ = fn;
-        begin_         = clock();
-        result_        = result;
-        print_         = print;
-        ++deepness;
-    }
-
-
-    ~MeasureTime() {
-        double elapsed_time = double(clock() - begin_) / CLOCKS_PER_SEC;
-        if (print_) {
-            repeat(deepness) { cout << "-"; }
-            cout << function_name_ << " : "
-                 << elapsed_time << " seconds\n" << flush;
-        }
-
-        if (result_ != NULL) {
-            result_->addTime(elapsed_time);
-        }
-
-        --deepness;
-    }
-
-private:
-    clock_t begin_;
-    string function_name_;
-    static int deepness;
-    Result *result_;
-    bool print_;
-};
+#include "measure_time.hpp"
 
 template <typename Point>
 bool AscendingCentroidComparetor(const pair<Point, float>& lhs, const pair<Point, float>& rhs) {
@@ -267,11 +215,10 @@ public:
 
         int elements = unselected_points_.size() * set_percentage;
 
-        srand(time(NULL));
         repeat(elements) {
             auto random_point_iterator =
                 std::next(std::begin(unselected_points_),
-                          std::rand() % unselected_points_.size());
+                          rand() % unselected_points_.size());
 
             toggle(*random_point_iterator, TOGGLE_IN);
         }
@@ -283,7 +230,7 @@ public:
     }
 
     // Resolve method that calls the metaheuristic function
-    PopulationMap<Point, Class> resolve() { return resolve_(*this, 1000); }
+    PopulationMap<Point, Class> resolve(int its) { return resolve_(*this, its); }
 
     void CNN() {
 
@@ -294,10 +241,9 @@ public:
         unselected_points_ = selected_points_;
         selected_points_.clear();
 
-        srand(time(NULL));
         auto random_point_iterator =
             std::next(std::begin(unselected_points_),
-                      std::rand() % unselected_points_.size());
+                      rand() % unselected_points_.size());
 
         Point point = *random_point_iterator;
 
@@ -324,7 +270,6 @@ public:
     void MCNN() {
 
         // MeasureTime mt("MCNN");
-        srand(time(NULL));
 
         // Start with the empty set C `selected_points_`
         unselected_points_ = selected_points_;
@@ -413,13 +358,13 @@ public:
         selected_points_.clear();
         unselected_points_.clear();
         // First we randomize the selected_points
-        for (auto itr = data.begin(); itr != data.end(); ++itr) {
+        for (auto& instance : data) {
             int use_in_solution = rand() % 2;
 
             if (use_in_solution == 1) {
-                selected_points_.insert(*itr);
+                selected_points_.insert(instance);
             } else {
-                unselected_points_.insert(*itr);
+                unselected_points_.insert(instance);
             }
         }
     }
@@ -478,7 +423,7 @@ public:
                                                                       : unselected_points_);
         auto random_point_iterator =
             std::next(std::begin(set_to_use),
-                      std::rand() % set_to_use.size());
+                      rand() % set_to_use.size());
 
         return *random_point_iterator;
     }
@@ -629,7 +574,7 @@ public:
 
             // Pick a random point from RCL
             auto random_point_iterator = std::next(std::begin(RCL),
-                                                   std::rand() % RCL.size());
+                                                   rand() % RCL.size());
 
             // Insert random point into solution and remove from RCL
             selected.insert(Point(*random_point_iterator));
@@ -652,9 +597,6 @@ public:
                        data.end(),
                        selected.begin(), selected.end(),
                        std::inserter(unselected, unselected.begin()));
-
-        //cout << selected.size() << " + " << unselected.size() << " = " << data.size() << endl << flush;
-
 
         return PopulationMap<Point,Class>(selected, unselected, 1, cls, eval, mht);
     }
@@ -744,7 +686,7 @@ public:
 
     float EvaluateQuality(const set<Point>& testing_set) const {
 
-        if (selected_points_.empty()) return 0.0; 
+        if (selected_points_.empty()) return 0.0;
 
         float classification_correctness = RunClassifier(selected_points_, testing_set);
         float reduction_percentage       = GetReductionPercentage();
@@ -765,14 +707,12 @@ public:
     // Genetic algorithm functions
 
     // Generates a random populatio of PopulatioMaps
-    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int population_size,
+    static set<PopulationMap<Point,Class> > GenerateRandomPopulation(int size,
                                                                      const set<Point>& data) {
 
         set<PopulationMap<Point,Class> > population;
 
-        srand(time(NULL));
-        repeat(population_size) {
-
+        while (population.size() < size) {
 
             // Generate random solution
             PopulationMap<Point,Class> solution(data);
@@ -807,7 +747,7 @@ public:
     void mutate(int perturbations, float mutation_percentage) {
 
         repeat(perturbations) {
-            double prob = double(rand()) / RAND_MAX;
+            float prob = float(rand()) / RAND_MAX;
             // mutation_percentage = 0.6, then if 0 <= prob <= mutation_percentage is
             // 60% of chances since prob is between 0 and 1
             if (prob <= mutation_percentage) {
@@ -819,13 +759,12 @@ public:
     // Selects two population maps from a population
     static vector<PopulationMap<Point,Class> > select(const set<PopulationMap<Point,Class> >& population) {
 
-        srand(time(NULL));
         // Parent's random selection
         auto parent1_itr = std::next(std::begin(population),
-                                      std::rand() % population.size());
+                                      rand() % population.size());
 
         auto parent2_itr = std::next(std::begin(population),
-                                      std::rand() % population.size());
+                                      rand() % population.size());
 
         vector<PopulationMap<Point,Class> > parents;
         parents.reserve(2);
@@ -835,52 +774,139 @@ public:
         return parents;
     }
 
-    // Replaces two points of the population for the two childrens (according
+    // Replaces two points of the population for the two children (according
     // to some criteria)
-    static void replace(pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> > childrens,
-                        set<PopulationMap<Point,Class> >& population) {
-    }
-    // Combines two population maps to create two childrens
-    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> >
-                                crossover(const PopulationMap<Point,Class>& fstp,
-                                          const PopulationMap<Point,Class>& sndp) {
-        int fstp_break_point, sndp_break_point;
-        PopulationMap<Point,Class> fstc(fstp), sndc(sndp);
-        auto fstp_it = fstc.selected_points_.begin();
-        auto sndp_it = sndc.selected_points_.begin();
+    static void replace(pair< PopulationMap<Point,Class>, PopulationMap<Point,Class> > children,
+                        set< PopulationMap<Point,Class> >& population) {
 
-        // Randomply determine how many instances from each we're going to change
-        srand(time(NULL));
-        fstp_break_point = rand() % fstc.selected_points_.size();
-        sndp_break_point = rand() % sndc.selected_points_.size();
+        auto fst_remove_it = population.end();
+        auto snd_remove_it = population.end();
+        float fst_remove_eq, snd_remove_eq;
 
-        // Take some instances from fst and put them in snd
-        repeat(fstp_break_point) {
-            auto random_point_iterator =
-                std::next(std::begin(fstp.selected_points_),
-                          std::rand() % fstp.selected_points_.size());
+        bool fst_out = population.find(children.first)  == population.end();
+        bool snd_out = population.find(children.second) == population.end();
 
-            // Out of fstc
-            fstc.toggle(*random_point_iterator, TOGGLE_OUT);
-            if (sndc.unselected_points_.find(*random_point_iterator) ==
-                                            sndc.unselected_points_.end()) {
-                // In sndc, if it wasn't already there
-                sndc.toggle(*random_point_iterator, TOGGLE_IN);
+        // Trying to insert elements already in the population
+        if (!fst_out && !snd_out) return;
+
+        // Find the two worst instances in the current population
+        for (auto it = population.begin(); it != population.end(); it++) {
+
+            float it_eq = it->EvaluateQuality();
+
+            // First instance to take
+            if (fst_remove_it == population.end()) {
+                fst_remove_it = it;
+                fst_remove_eq = it_eq;
+                continue;
+            }
+
+            // First instance to take
+            if (snd_remove_it == population.end()) {
+                snd_remove_it = it;
+                snd_remove_eq = it_eq;
+                continue;
+            }
+
+            if (it_eq < fst_remove_eq) {
+                // Found a new worst by comparing to fst
+                if (fst_remove_eq < snd_remove_eq) {
+                    // Keeping the worst two
+                    snd_remove_it = it;
+                    snd_remove_eq = it_eq;
+                } else {
+                    fst_remove_it = it;
+                    fst_remove_eq = it_eq;
+                }
+            } else if (it_eq < fst_remove_eq) {
+                snd_remove_it = it;
+                snd_remove_eq = it_eq;
             }
         }
 
+        // Insert both found, if they're not in the population yet
+        PopulationMap<Point,Class> fst, snd;
+        float fst_eq = fst.EvaluateQuality();
+        float snd_eq = snd.EvaluateQuality();
+
+        // fst has the smallest one
+        if (snd_eq < fst_eq) {
+            float temp_eq = fst_eq;
+            fst_eq = snd_eq;
+            snd_eq = temp_eq;
+
+            bool temp_b = fst_out;
+            fst_out = snd_out;
+            snd_out = temp_b;
+
+            fst = children.second;
+            snd = children.first;
+        }
+
+        // fst has the smallest one
+        if (snd_remove_eq < fst_remove_eq) {
+            auto temp_eq = fst_remove_eq;
+            fst_remove_eq = snd_remove_eq;
+            snd_remove_eq = temp_eq;
+
+            auto temp_it = fst_remove_it;
+            fst_remove_it = snd_remove_it;
+            snd_remove_it = temp_it;
+        }
+
+        if ((fst_remove_eq < fst_eq) && fst_out) {
+            population.erase(fst_remove_it);
+            population.insert(fst);
+
+            if ((snd_remove_eq < snd_eq) && snd_out) {
+                population.erase(snd_remove_it);
+                population.insert(snd);
+            }
+        } else if ((fst_remove_eq < snd_eq) && snd_out) {
+            population.erase(fst_remove_it);
+            population.insert(snd);
+        }
+
+    }
+
+    // Combines two population maps to create two children
+    static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> >
+                                crossover(const PopulationMap<Point,Class>& fstp,
+                                          const PopulationMap<Point,Class>& sndp) {
+        int break_point;
+        PopulationMap<Point,Class> fstc(fstp), sndc(sndp);
+
+        // Randomly determine how many instances to take out
+        break_point = (fstc.selected_points_.size() == 0 ? 0 : rand() % fstc.selected_points_.size());
+        // Take some instances from fst and put them in snd
+        repeat(break_point) {
+            assert(fstc.selected_points_.size() > 0);
+            Point random_point = *std::next(std::begin(fstc.selected_points_),
+                                            rand() % fstc.selected_points_.size());
+
+            // Out of fstc
+            fstc.toggle(random_point, TOGGLE_OUT);
+            if (sndc.selected_points_.find(random_point) ==
+                                            sndc.selected_points_.end()) {
+                // In sndc, if it wasn't already there
+                sndc.toggle(random_point, TOGGLE_IN);
+            }
+        }
+
+        // Randomly determine how many instances to take out
+        break_point = (sndc.selected_points_.size() == 0 ? 0 : rand() % sndc.selected_points_.size());
         // Take some instances from snd and put them in fst
-        repeat(sndp_break_point) {
-            auto random_point_iterator =
-                std::next(std::begin(sndp.selected_points_),
-                          std::rand() % sndp.selected_points_.size());
+        repeat(break_point) {
+            assert(sndc.selected_points_.size() > 0);
+            Point random_point = *std::next(std::begin(sndc.selected_points_),
+                                            rand() % sndc.selected_points_.size());
 
             // Out of sndc
-            sndc.toggle(*random_point_iterator, TOGGLE_OUT);
-            if (fstc.unselected_points_.find(*random_point_iterator) ==
-                                            fstc.unselected_points_.end()) {
+            sndc.toggle(random_point, TOGGLE_OUT);
+            if (fstc.selected_points_.find(random_point) ==
+                                            fstc.selected_points_.end()) {
                 // In fstc, if it wasn't already there
-                fstc.toggle(*random_point_iterator, TOGGLE_IN);
+                fstc.toggle(random_point, TOGGLE_IN);
             }
         }
 
@@ -920,7 +946,6 @@ private:
                                                                          : selected_points_);
         int n_point_attributes = non_empty_set.begin()->attributes().size();
         vector<double>& tmp_totals = class_totals_[p.ClassLabel()];
-
 
         if (tmp_totals.empty()) {
             tmp_totals = vector<double>(n_point_attributes, 0.0);
@@ -1048,8 +1073,6 @@ private:
     static pair<set<Point>, set<Point> > PickRandomSet(const set<Point>& data) {
         set<Point> random_set;
         set<Point> rest;
-
-        srand(time(NULL));
 
         // XXX: Maybe here we should make the % of selected points a variable
         for (auto itr = data.begin(); itr != data.end(); ++itr) {

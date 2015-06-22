@@ -16,10 +16,10 @@ using std::string;
 using std::pair;
 
 class Result {
-    public:
-        Result() {}
-        Result(pair<int, int> n_points, pair<float, float> correct,
-               pair<float, float> reducti,   pair<float, float> quality) : src_points(n_points.first),
+public:
+    Result() {}
+    Result(pair<int, int> n_points, pair<float, float> correct,
+           pair<float, float> reducti,   pair<float, float> quality) : src_points(n_points.first),
                                                                  dst_points(n_points.second),
                                                                  src_correct(correct.first),
                                                                  dst_correct(correct.second),
@@ -46,7 +46,7 @@ class Test {
 public:
     Test(vector<string> attributes) : attributes_ (attributes) {}
 
-    Result run();
+    Result run(int iterations);
     vector<string> attributes_;
 };
 

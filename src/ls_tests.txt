@@ -21,17 +21,6 @@
 ../data/small/iris/iris-10-8tra.dat,../data/small/iris/iris-10-8tst.dat,ls,eul
 ../data/small/iris/iris-10-9tra.dat,../data/small/iris/iris-10-9tst.dat,ls,eul
 ../data/small/iris/iris-10-10tra.dat,../data/small/iris/iris-10-10tst.dat,ls,eul
-# australian
-../data/medium/australian/australian-10-1tra.dat,../data/medium/australian/australian-10-1tst.dat,ls,eul
-../data/medium/australian/australian-10-2tra.dat,../data/medium/australian/australian-10-2tst.dat,ls,eul
-../data/medium/australian/australian-10-3tra.dat,../data/medium/australian/australian-10-3tst.dat,ls,eul
-../data/medium/australian/australian-10-4tra.dat,../data/medium/australian/australian-10-4tst.dat,ls,eul
-../data/medium/australian/australian-10-5tra.dat,../data/medium/australian/australian-10-5tst.dat,ls,eul
-../data/medium/australian/australian-10-6tra.dat,../data/medium/australian/australian-10-6tst.dat,ls,eul
-../data/medium/australian/australian-10-7tra.dat,../data/medium/australian/australian-10-7tst.dat,ls,eul
-../data/medium/australian/australian-10-8tra.dat,../data/medium/australian/australian-10-8tst.dat,ls,eul
-../data/medium/australian/australian-10-9tra.dat,../data/medium/australian/australian-10-9tst.dat,ls,eul
-../data/medium/australian/australian-10-10tra.dat,../data/medium/australian/australian-10-10tst.dat,ls,eul
 # wdbc
 ../data/medium/wdbc/wdbc-10-1tra.dat,../data/medium/wdbc/wdbc-10-1tst.dat,ls,eul
 ../data/medium/wdbc/wdbc-10-2tra.dat,../data/medium/wdbc/wdbc-10-2tst.dat,ls,eul
