@@ -230,7 +230,7 @@ public:
     }
 
     // Resolve method that calls the metaheuristic function
-    PopulationMap<Point, Class> resolve() { return resolve_(*this, 1000); }
+    PopulationMap<Point, Class> resolve(int its) { return resolve_(*this, its); }
 
     void CNN() {
 

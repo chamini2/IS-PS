@@ -46,7 +46,7 @@ class Test {
 public:
     Test(vector<string> attributes) : attributes_ (attributes) {}
 
-    Result run();
+    Result run(int iterations);
     vector<string> attributes_;
 };
 

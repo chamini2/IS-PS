@@ -26,12 +26,14 @@ EvaluatorMap em = {
 MetaHeuristicTypeMap mthm = {
                                 { "ls", LOCAL_SEARCH },
                                 { "ils", ITERATED_LOCAL_SEARCH },
-                                { "grasp", GRASP }
+                                { "grasp", GRASP },
+                                { "gga", GGA },
+                                { "sga", SGA }
                             };
 
 int g_max_label = 0;
 
-Result Test::run() {
+Result Test::run(int iterations) {
 
     Result r;
     MeasureTime mt("Test", &r, false);
@@ -56,7 +58,7 @@ Result Test::run() {
     set<GenericPoint> testing_set(GenericPoint::load(attributes_[1].c_str()));
     stats = pop_map.SolutionStatistics(testing_set);
 
-    PopulationMap<GenericPoint, int> best_map = pop_map.resolve();
+    PopulationMap<GenericPoint, int> best_map = pop_map.resolve(iterations);
 
     rstats = best_map.SolutionStatistics(testing_set);
 

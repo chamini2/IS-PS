@@ -82,8 +82,14 @@ int main(int argc, char *argv[]) {
 
     vector<Test> tests = load(argv[1]);
 
+    // Randomness for the whole program
+    srand(time(NULL));
+
+    // Consider the iterations to use
+    const int iterations = 100;
+
     for (Test t : tests) {
-        cout << t << t.run() << endl;
+        cout << t << flush << t.run(iterations) << endl;
     }
 
     return 0;
