@@ -873,44 +873,40 @@ public:
     static pair<PopulationMap<Point,Class>, PopulationMap<Point,Class> >
                                 crossover(const PopulationMap<Point,Class>& fstp,
                                           const PopulationMap<Point,Class>& sndp) {
-        int fst_break_point, snd_break_point;
+        int break_point;
         PopulationMap<Point,Class> fstc(fstp), sndc(sndp);
-        auto fst_it = fstc.selected_points_.begin();
-        auto snd_it = sndc.selected_points_.begin();
-
-        srand(time(NULL));
 
         // Randomly determine how many instances to take out
-        fst_break_point = rand() % fstc.selected_points_.size();
+        break_point = (fstc.selected_points_.size() == 0 ? 0 : rand() % fstc.selected_points_.size());
         // Take some instances from fst and put them in snd
-        repeat(fst_break_point) {
-            auto random_point_iterator =
-                std::next(std::begin(fstc.selected_points_),
-                          std::rand() % fstc.selected_points_.size());
+        repeat(break_point) {
+            assert(fstc.selected_points_.size() > 0);
+            Point random_point = *std::next(std::begin(fstc.selected_points_),
+                                            rand() % fstc.selected_points_.size());
 
             // Out of fstc
-            fstc.toggle(*random_point_iterator, TOGGLE_OUT);
-            if (sndc.selected_points_.find(*random_point_iterator) ==
+            fstc.toggle(random_point, TOGGLE_OUT);
+            if (sndc.selected_points_.find(random_point) ==
                                             sndc.selected_points_.end()) {
                 // In sndc, if it wasn't already there
-                sndc.toggle(*random_point_iterator, TOGGLE_IN);
+                sndc.toggle(random_point, TOGGLE_IN);
             }
         }
 
         // Randomly determine how many instances to take out
-        snd_break_point = rand() % sndc.selected_points_.size();
+        break_point = (sndc.selected_points_.size() == 0 ? 0 : rand() % sndc.selected_points_.size());
         // Take some instances from snd and put them in fst
-        repeat(snd_break_point) {
-            auto random_point_iterator =
-                std::next(std::begin(sndc.selected_points_),
-                          std::rand() % sndc.selected_points_.size());
+        repeat(break_point) {
+            assert(sndc.selected_points_.size() > 0);
+            Point random_point = *std::next(std::begin(sndc.selected_points_),
+                                            rand() % sndc.selected_points_.size());
 
             // Out of sndc
-            sndc.toggle(*random_point_iterator, TOGGLE_OUT);
-            if (fstc.selected_points_.find(*random_point_iterator) ==
+            sndc.toggle(random_point, TOGGLE_OUT);
+            if (fstc.selected_points_.find(random_point) ==
                                             fstc.selected_points_.end()) {
                 // In fstc, if it wasn't already there
-                fstc.toggle(*random_point_iterator, TOGGLE_IN);
+                fstc.toggle(random_point, TOGGLE_IN);
             }
         }
 
