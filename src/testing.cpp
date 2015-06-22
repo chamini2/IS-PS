@@ -1,10 +1,10 @@
 #include "testing.hpp"
 
+#include "measure_time.hpp"
 #include "point_instances.hpp"
 #include "instance_selection.hpp"
 #include "fitness.hpp"
 #include "classifiers.hpp"
-
 
 using std::make_pair;
 

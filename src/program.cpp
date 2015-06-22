@@ -13,6 +13,7 @@ using std::unordered_map;
 #include <iostream>
 using std::cout;
 using std::endl;
+using std::flush;
 
 using std::pair;
 using std::make_pair;

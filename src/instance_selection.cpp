@@ -1,4 +1,5 @@
 #include "instance_selection.hpp"
+#include "measure_time.hpp"
 
 // Performs a local search on the current map
 template <typename Point, typename Class>
