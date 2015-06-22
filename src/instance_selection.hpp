@@ -744,7 +744,7 @@ public:
 
     float EvaluateQuality(const set<Point>& testing_set) const {
 
-        if (selected_points_.empty()) return 0.0; 
+        if (selected_points_.empty()) return 0.0;
 
         float classification_correctness = RunClassifier(selected_points_, testing_set);
         float reduction_percentage       = GetReductionPercentage();
@@ -844,13 +844,11 @@ public:
         auto snd_remove_it = population.end();
         float fst_remove_eq, snd_remove_eq;
 
-        bool fst_out = population.find(fst) == population.end();
-        bool snd_out = population.find(snd) == population.end();
+        bool fst_out = population.find(children.first)  == population.end();
+        bool snd_out = population.find(children.second) == population.end();
 
         // Trying to insert elements already in the population
-        if (!fst_out && !snd_out) {
-            return;
-        }
+        if (!fst_out && !snd_out) return;
 
         // Find the two worst instances in the current population
         for (auto it = population.begin(); it != population.end(); it++) {
@@ -897,6 +895,10 @@ public:
             float temp_eq = fst_eq;
             fst_eq = snd_eq;
             snd_eq = temp_eq;
+
+            bool temp_b = fst_out;
+            fst_out = snd_out;
+            snd_out = temp_b;
 
             fst = children.second;
             snd = children.first;
