@@ -36,11 +36,9 @@
 \begin{abstract}
 El uso de clasificadores para determinar la clase de algún \textit{documento} está intimamente relacionado con el conjuntos de datos \textit{TR} con el que son entrenados. Un TR que represente adecuadamente a la muestra contiene potencialmente una gran cantidad de instancias, lo que genera un entrenamiento y una clasificación lenta. El objetivo de este estudio es encontrar, haciendo uso de metaheurísticas, un subconjunto de TR considerablemente más pequeño que mantenga el mismo desempeño de clasificación.
 
-Entre las metaheurísticas probadas, tenemos Búsqueda Local, Búsqueda Local Iterada, GRASP y algoritmos evolutivos como GGA (Algoritmo Genético Generacional) y SGA (Algoritmo Genético Estacionario), y  dentro de ellas, se hizo uso de una función objetivo exponencial que prioriza la clasificación sobre la reducción para comparar soluciones y de una perturbación inteligente, la cual prioriza aquellos puntos que potencialmente mejoren más la solución.
+Entre las metaheurísticas probadas, tenemos Búsqueda Local, Búsqueda Local Iterada, GRASP y algoritmos evolutivos como GGA (Algoritmo Genético Generacional) y SGA (Algoritmo Genético Estacionario), y  dentro de ellas, se hizo uso de una función objetivo exponencial que prioriza la clasificación sobre la reducción para comparar soluciones, y de una perturbación inteligente, la cual prioriza aquellos puntos que potencialmente mejoren más la solución.
 
-Búsqueda local mostró ser inferior a las metaheurísticas de trayectoria para la resolución del problema de selección de instancia, a pesar de que GRASP mostró un poco de inestabilidad con conjuntos de datos grandes e ILS una ejecución lenta.
-
-XXX Insertar resultados de algoritmos evolutivos XXX
+Se hicieron una serie de experimentos sobre las metaheurísticas antes mencionadas donde se concluyó que para las metaheurísicas de trayectoria, GRASP fue superior mostrando una buena reducción para conjuntos de datos pequeños pero cierta inestabilidad con conjunto de datos grandes, y para las metaheurísticas poblacionales, GGA mostró superioridad reduciendo al mismo nivel que GRASP pero con estabilidad y menores tiempos de ejecución.
 
 \end{abstract}
 
@@ -258,7 +256,7 @@ Los algoritmos genéticos son metaheurísticas que hacen alusión a la metáfora
 \item \textbf{Selección}: Este operador permite definir qué individuos van a participar en la recombinación o cruce y a su vez, los genes que pasarán a las siguientes generaciones. Simula el proceso de selección natural.
 \end{itemize}
 
-En nuestor caso particular, la mutación consiste en perturbar la solución que representa el individuo $n$ veces, la selección es completamente aleatoria, y el algoritmo de recombinación/cruce utilizado es el de recombinación en un punto; tomamos dos poblaciones como \textit{padres}, se elige aleatoriamente un punto de corte en la longitud de ambos padres; los \textit{hijos} resultan de combinar la sección izquierda del corte de un padre con la sección derecha del corte del otro, y viceversa.
+En nuestor caso particular, la mutación consiste en seleccionar de forma aleatoria (con misma probabilidad) si se va a insertar o quitar de la solución un punto cualquiera, repitiendo este proceso para un 5\% del conjunto total de inviduos, la selección es completamente aleatoria, y el algoritmo de recombinación/cruce utilizado es el de recombinación en un punto; tomamos dos individuos como \textit{padres}, se elige aleatoriamente un punto de corte en la longitud de ambos padres; los \textit{hijos} resultan de combinar la sección izquierda del corte de un padre con la sección derecha del corte del otro, y viceversa.
 
 El esquema más tradicional que define el uso de estos operadores son los \textit{Algoritmos Genéticos}. A continuación se definen dos algoritmos: GGA y SGA
 
@@ -348,7 +346,7 @@ Los conjuntos de datos usados para estos experimentos pertenecen originalmente a
 	Glass & 214 & 9 & 7 \\
 	Iris & 150 & 4 & 3 \\
 	\end{tabular}
-	\caption{Conjunto de datos pequeños}
+	\caption{Conjuntos de datos pequeños}
 	\label{table:small-dataset}
 \end{table}
 
@@ -361,7 +359,7 @@ Los conjuntos de datos usados para estos experimentos pertenecen originalmente a
 	WDBC & 596 & 30 & 2 \\
 	Pima & 768 & 8 & 2 \\
 	\end{tabular}
-	\caption{Conjunto de datos mediano}
+	\caption{Conjuntos de datos medianos}
 	\label{table:medium-dataset}
 \end{table}
 
@@ -467,11 +465,11 @@ Se tomaron 10 ejecuciones de los 10 grupos de validación cruzada y se promediar
 	\hline
 	Conjunto & Clasificación & Reducción & Tiempo (seg) \\
 	\hline
-	Glass & & & \\
-	Iris & & & \\
-	WDBC & & & \\
-	Pima & & & \\
-	Segment & & & \\
+	Glass & 0.65 & 0.9 & 2.17 \\
+	Iris & 0.93 & 0.97 & 1.23 \\
+	WDBC & 0.92 & 0.98 & 16.3 \\
+	Pima & 0.74 & 0.99 & 13.2 \\
+	Segment & 0.87 & 0.9 & 122.486 \\
 	\end{tabular}
 	\caption{Resultados GGA}
 	\label{table:gga-result}
@@ -483,20 +481,22 @@ Se tomaron 10 ejecuciones de los 10 grupos de validación cruzada y se promediar
 	\hline
 	Conjunto & Clasificación & Reducción & Tiempo (seg) \\
 	\hline
-	Glass & & & \\
-	Iris & & & \\
-	WDBC & & & \\
-	Pima & & & \\
-	Segment & & & \\
+	Glass & 0.6 & 0.78 & 6.66 \\
+	Iris & 0.89 & 0.89 & 2.71 \\
+	WDBC & 0.91 & 0.92 & 76.83 \\
+	Pima & 0.67 & 0.88 & 74.13 \\
+	Segment & 0.91 & 0.85 & 592.08 \\
 	\end{tabular}
 	\caption{Resultados SGA}
 	\label{table:sga-result}
 \end{table}
 
 
-Se puede ver una tendencia a mantener el porcentaje de clasificación para LS, ILS y GRASP lo que se puede deber al 0.9 que se le da de peso a la clasificación en la función objetivo. Pero por otro lado, en general, GRASP muestra una reducción muy superior con respecto a LS e ILS, lo que sugiere que la función \textit{Greedy} aleatoria está haciendo una buena selección de los candidatos a utilizar, por lo que se puede concluir que la función de costo incremental basada en la distancia del centroide es una buena opción para esta metaheurística.
+Se puede ver una tendencia a mantener el porcentaje de clasificación para LS, ILS y GRASP lo que se puede deber al 0.9 que se le da de peso a la clasificación en la función objetivo. Pero por otro lado, en general, GRASP muestra una reducción muy superior con respecto a LS e ILS en los conjuntos de datos pequeños (Glass, Iris, Pima y WDBC), lo que sugiere que la función \textit{Greedy} aleatoria está haciendo una buena selección de los candidatos a utilizar, por lo que se puede concluir que la función de costo incremental basada en la distancia del centroide es una buena opción para esta metaheurística con conjuntos pequeños.
 
 En cuanto a los tiempos de ejecución, ILS es más lento que LS y GRASP a medida que el conjunto de datos aumenta el tamaño, y estas dos últimos tienen tiempos de ejecución aceptables.
+
+Con respecto a las metaheurísticas poblacionales, GGA arrojó resultados favorables. Tiene una reducción mucho mayor que LS e ILS y más estabilidad que GRASP cuando se usan conjuntos de datos grandes. Por otra parte, siendo GRASP la única metaheurística de trayectoria comparable en términos de resultados, la misma se ejecuta en un tiempo mucho mayor que GGA, lo que indica que GGA es una mejor opción para resolver el problema de selección de instancia.
 
 Por otro lado, en las figuras 1,2,3,4 y 5 XXINSERTAR BOXPLOTSXXX, podemos observar una comparación de las metaheurísticas por conjunto de datos. En la clasificación, se ve que siempre se solapan las cajas en el diagrama, lo que indica cierta similitud en los resultados, pero si se detalla la figura 5 XXXDiagrama de segmentXXX, GRASP no parece ser muy estable pues la clasificación es muy dispersa en comparación de LS e ILS. 
 
@@ -506,9 +506,9 @@ Con respecto a la reducción, se puede notar una superioridad de GRASP sobre LS 
 
 \section*{Conclusiones}
 
-Podemos concluir que Búsqueda Local es inferior como metaheurística a la hora de resolver el problema de selección de instancias con respecto a las metaheurísticas de trayectoria ILS y GRASP. GRASP arrojó mejores resultados que ILS, pero menor estabilidad, a diferencia de ILS que arrojó resultados más estables pero que se hacían muy lentos a medida que el conjunto de datos aumentaba su tamaño.
+Podemos concluir que Búsqueda Local es inferior como metaheurística a la hora de resolver el problema de selección de instancias con respecto a las metaheurísticas de trayectoria ILS y GRASP, y las poblacionales GGA y SGA. GRASP arrojó mejores resultados que ILS, pero menor estabilidad, a diferencia de ILS que arrojó resultados más estables pero que se hacían muy lentos a medida que el conjunto de datos aumentaba su tamaño. GGA por su parte, arrojó resultados favorables manteniendo estabilidad y tiempos de ejecución muy superiores a GRASP.
 
-Por otra parte, darle un peso mayor a la clasificación que a la reducción mostró resultados favorables dado que las metaheurísticas mantienen el porcentaje de clasificación luego de haber reducido el número de puntos. Y finalmente, la función de costo incremental basada en la distancia del centroide, resultó ser positiva para la \textit{perturbación inteligente} de la búsqueda local y el algoritmo \textit{Greedy} aleatorio de GRASP.
+Por otra parte, darle un peso mayor a la clasificación que a la reducción mostró resultados favorables dado que las metaheurísticas mantienen el porcentaje de clasificación luego de haber reducido el número de puntos. Finalmente, la función de costo incremental basada en la distancia del centroide, resultó ser positiva para la \textit{perturbación inteligente} de la búsqueda local y el algoritmo \textit{Greedy} aleatorio de GRASP para conjuntos de datos pequeños.
 %---------------------------- Bibliography -------------------------------
 
 % Please add the contents of the .bbl file that you generate,  or add bibitem entries manually if you like.
